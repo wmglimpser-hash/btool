@@ -832,6 +832,7 @@
                   <button id="copyCardText">复制文案</button>
                   <button id="copyCitation">复制引用格式</button>
                 </div>
+                <div id="shareError" class="share-error" style="display:none;color:var(--cinnabar);font-size:13px;margin-top:10px;text-align:center">⚠️ 分享卡下载依赖未加载，可先复制文案或截图保存。</div>
               </div>
             </div>
           </div>
@@ -1041,6 +1042,47 @@
       }
     };
 
+    // 通用生成逻辑：为手动输入或未知书目生成基于文本结构的演示输出
+    function generateOutput(book){
+      const text=book.text||'';
+      const sentences=text.split(/[。！？；\n]/).map(s=>s.trim()).filter(s=>s.length>0);
+      const preview=sentences.slice(0,2).join('。')+(sentences.length>0?'。':'');
+      const anchorSentences=sentences.slice(0,3);
+      const anchors=anchorSentences.length?anchorSentences.map((s,i)=>({
+        modern:`第 ${i+1} 句通俗理解（演示模板）：${s}。`,
+        source:s+'。',
+        confidence:'medium'
+      })):[{modern:'输入文本较短，暂不提供逐句锚点。',source:text.slice(0,30)+(text.length>30?'...':''),confidence:'low'}];
+      const medium=Math.min(anchorSentences.length*20+20,70);
+      const low=Math.max(0,100-medium-10);
+      const high=Math.max(0,100-medium-low);
+      return {
+        vernacular:`【手动输入 · 演示模板】这是一段用户提供的古籍文本。前两句可理解为：${preview||text.slice(0,40)}…… 由于手动输入未关联权威注本，以上解读仅作格式演示，实际传播前请补充典籍版本与参考注本后复核。`,
+        anchors:anchors,
+        confidence:{high:high,medium:medium,low:low},
+        disclaimer:'⚠️ 手动输入模式为演示模板：白话解读、分镜与传播要点基于输入文本的通用结构生成，未经过权威注本校勘，不可直接作为科普依据。',
+        highlights:[
+          `输入文本共 ${text.length} 字，约 ${sentences.length} 句`,
+          '手动输入适合快速预览活化结构',
+          '正式发布前建议补充典籍版本与参考注本',
+          '核心原则：先建立出处与边界意识，再谈传播'
+        ],
+        boundary:{
+          allow:['保留原文核心字句与意象','标注出处与版本信息','用于个人学习与非商业创作','结合权威注本进行二次解读'],
+          forbid:['脱离原文进行无依据发挥','将演示解读当作学术结论','删除或改写关键原文','用于伪造古籍出处']
+        },
+        storyboard:[
+          {time:'0-10s',title:'原文呈现',desc:'以竖排或卷轴形式呈现输入文本，建立出处感',basis:sentences[0]||text.slice(0,20)},
+          {time:'11-25s',title:'关键词句',desc:'选取文本中关键意象或论点进行画面化',basis:sentences[1]||text.slice(20,40)},
+          {time:'26-40s',title:'通俗阐释',desc:'用现代语言解释文本大意，配合古籍书影',basis:'整体文意（演示模板）'},
+          {time:'41-55s',title:'二创边界',desc:'以绿区/红线可视化展示改编边界',basis:'反伪科普设计'},
+          {time:'56-60s',title:'落版号召',desc:'出现典籍名称与出处，引导观众溯源复核',basis:book.title}
+        ],
+        prompt:'Chinese ancient text visualization, ink wash scroll unrolling, vertical classical Chinese calligraphy, soft paper texture, traditional book pages, serene scholarly atmosphere, warm candlelight, bamboo and plum blossom elements, cinematic 4K, elegant and restrained',
+        quote:text.slice(0,14)+(text.length>14?'……':'')
+      };
+    }
+
     let selectedBook=books[0];
 
     function renderBooks(){
@@ -1125,7 +1167,7 @@
       document.getElementById('confLow').style.width=conf.low+'%';
       document.getElementById('confLow').textContent=conf.low?conf.low+'%':'';
 
-      document.getElementById('disclaimerText').textContent=output.disclaimer||'本内容为基于古籍原文的生成结果，具体创作时请结合权威注本复核。';
+      document.getElementById('disclaimerText').textContent=output.disclaimer||'本内容为基于古籍原文的结构化演示，具体创作时请结合权威注本复核。';
     }
 
     function renderAnchors(anchors){
@@ -1204,7 +1246,7 @@
         };
       }
 
-      const output=outputs[book.id]||outputs.guanju;
+      const output=outputs[book.id]||generateOutput(book);
 
       btn.textContent='活化中...';
       btn.disabled=true;
@@ -1255,13 +1297,32 @@
     });
 
     document.getElementById('downloadCard').addEventListener('click',()=>{
+      if(typeof html2canvas==='undefined'){
+        document.getElementById('shareError').style.display='block';
+        alert('分享卡下载依赖（html2canvas）未加载，请检查网络后重试，或先使用「复制文案」功能。');
+        return;
+      }
+      document.getElementById('shareError').style.display='none';
       const card=document.getElementById('shareCard');
       html2canvas(card,{scale:2,backgroundColor:null,useCORS:true}).then(canvas=>{
         const link=document.createElement('a');
         link.download=`古籍活化_${selectedBook.shortTitle}.png`;
         link.href=canvas.toDataURL('image/png');
         link.click();
+      }).catch(err=>{
+        console.error(err);
+        document.getElementById('shareError').style.display='block';
+        alert('分享卡生成失败，请尝试复制文案或截图保存。');
       });
+    });
+
+    // 页面加载后检测 html2canvas 是否可用
+    window.addEventListener('load',()=>{
+      if(typeof html2canvas==='undefined'){
+        document.getElementById('shareError').style.display='block';
+        document.getElementById('downloadCard').disabled=true;
+        document.getElementById('downloadCard').textContent='下载依赖未加载';
+      }
     });
 
     document.getElementById('copyCardText').addEventListener('click',()=>{
