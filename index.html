@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>古籍活化工坊 · 让古文长出翅膀</title>
+  <meta name="description" content="选择一页古籍，AI 帮你生成白话解读、传播要点、二创边界、短视频分镜与文创分享卡。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root{
+      --paper:#f7f3e9;
+      --paper-dark:#efe8d8;
+      --ink:#2b2118;
+      --ink-light:#5c4d3c;
+      --cinnabar:#b83e2f;
+      --cinnabar-dark:#8f2e22;
+      --gold:#c9a227;
+      --green:#4a7c59;
+      --red-line:#c0392b;
+      --shadow:0 12px 40px rgba(43,33,24,.12);
+      --shadow-sm:0 4px 12px rgba(43,33,24,.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:"Noto Serif SC",serif;
+      background:var(--paper);
+      color:var(--ink);
+      line-height:1.8;
+      min-height:100vh;
+      position:relative;
+      overflow-x:hidden;
+    }
+    /* 纸张纹理 */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      opacity:.45;
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.35'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 20% 30%, rgba(139,69,19,.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(139,69,19,.05) 0%, transparent 45%);
+    }
+    /* 水墨晕染装饰 */
+    .ink-wash{
+      position:fixed;
+      border-radius:50%;
+      filter:blur(60px);
+      opacity:.12;
+      pointer-events:none;
+      z-index:0;
+      animation:inkFlow 20s ease-in-out infinite alternate;
+    }
+    .ink-wash:nth-child(1){width:500px;height:500px;background:#5c4d3c;top:-120px;left:-120px;animation-delay:0s}
+    .ink-wash:nth-child(2){width:400px;height:400px;background:#8b4513;bottom:-100px;right:-80px;animation-delay:-7s}
+    .ink-wash:nth-child(3){width:300px;height:300px;background:#2b2118;top:40%;left:60%;animation-delay:-14s}
+    @keyframes inkFlow{
+      0%{transform:translate(0,0) scale(1)}
+      100%{transform:translate(30px,40px) scale(1.1)}
+    }
+    .wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 24px}
+    /* 顶部导航 */
+    header{
+      padding:28px 0 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid rgba(43,33,24,.1);
+      margin-bottom:40px;
+    }
+    .brand{display:flex;align-items:center;gap:16px}
+    .seal{
+      width:54px;height:54px;
+      background:var(--cinnabar);
+      color:#fff;
+      display:grid;place-items:center;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:28px;
+      font-weight:900;
+      border-radius:6px;
+      box-shadow:inset 0 0 0 3px rgba(255,255,255,.25), var(--shadow-sm);
+      transform:rotate(-3deg);
+      letter-spacing:2px;
+    }
+    .brand-text h1{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:28px;
+      letter-spacing:4px;
+      margin-bottom:-4px;
+    }
+    .brand-text p{font-size:13px;color:var(--ink-light);letter-spacing:1px}
+    .nav-links a{
+      color:var(--ink-light);
+      text-decoration:none;
+      margin-left:28px;
+      font-size:14px;
+      transition:color .2s;
+      position:relative;
+    }
+    .nav-links a:hover{color:var(--cinnabar)}
+    .nav-links a::after{
+      content:"";
+      position:absolute;
+      bottom:-4px;left:0;width:0;height:2px;
+      background:var(--cinnabar);
+      transition:width .3s;
+    }
+    .nav-links a:hover::after{width:100%}
+    /* Hero */
+    .hero{
+      text-align:center;
+      padding:50px 0 60px;
+      position:relative;
+    }
+    .hero-subtitle{
+      display:inline-block;
+      border:1px solid var(--cinnabar);
+      color:var(--cinnabar);
+      padding:6px 18px;
+      border-radius:20px;
+      font-size:13px;
+      letter-spacing:2px;
+      margin-bottom:24px;
+    }
+    .hero h2{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:52px;
+      line-height:1.25;
+      margin-bottom:20px;
+      letter-spacing:6px;
+    }
+    .hero p{
+      font-size:18px;
+      color:var(--ink-light);
+      max-width:640px;
+      margin:0 auto 36px;
+    }
+    .hero-ink{
+      position:absolute;
+      top:50%;left:50%;
+      transform:translate(-50%,-50%);
+      width:700px;height:280px;
+      background:radial-gradient(ellipse at center, rgba(184,62,47,.08) 0%, transparent 70%);
+      pointer-events:none;
+      z-index:-1;
+    }
+    /* 选书区域 */
+    .section-title{
+      display:flex;align-items:center;gap:14px;
+      margin:50px 0 28px;
+    }
+    .section-title h3{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:24px;
+      letter-spacing:3px;
+    }
+    .section-title .line{
+      flex:1;height:1px;background:linear-gradient(90deg, rgba(43,33,24,.3), transparent);
+    }
+    .book-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-bottom:36px}
+    .book-card{
+      background:var(--paper);
+      border:1px solid rgba(43,33,24,.15);
+      border-radius:4px;
+      padding:0;
+      cursor:pointer;
+      transition:all .35s cubic-bezier(.25,.8,.25,1);
+      position:relative;
+      overflow:hidden;
+      box-shadow:var(--shadow-sm);
+    }
+    .book-card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+    .book-card.active{border-color:var(--cinnabar);box-shadow:0 0 0 2px rgba(184,62,47,.15), var(--shadow)}
+    .book-cover{
+      height:160px;
+      position:relative;
+      display:flex;align-items:center;justify-content:center;
+      background:
+        linear-gradient(135deg, rgba(139,69,19,.12) 0%, rgba(139,69,19,.05) 50%, rgba(139,69,19,.12) 100%),
+        url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23d4c4a8' fill-opacity='0.2'/%3E%3Cpath d='M0 0h40v2H0zM0 38h40v2H0z' fill='%238b4513' fill-opacity='0.08'/%3E%3C/svg%3E");
+    }
+    .book-cover::before{
+      content:"";
+      position:absolute;
+      left:8px;top:8px;bottom:8px;width:4px;
+      background:linear-gradient(180deg, var(--cinnabar) 0%, var(--cinnabar-dark) 100%);
+      border-radius:2px;
+    }
+    .book-spine{
+      writing-mode:vertical-rl;
+      text-orientation:upright;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:28px;
+      color:var(--ink);
+      letter-spacing:6px;
+      text-shadow:1px 1px 0 rgba(255,255,255,.5);
+    }
+    .book-dynasty{
+      position:absolute;
+      top:10px;right:10px;
+      background:var(--gold);
+      color:#fff;
+      font-size:11px;
+      padding:3px 10px;
+      border-radius:3px;
+      letter-spacing:1px;
+    }
+    .book-info{padding:16px}
+    .book-info h4{font-size:16px;margin-bottom:6px;letter-spacing:1px}
+    .book-info p{font-size:12px;color:var(--ink-light);line-height:1.6}
+    /* 输入区 */
+    .input-tabs{
+      display:flex;gap:8px;
+      margin-bottom:18px;
+    }
+    .tab{
+      padding:10px 22px;
+      border:1px solid rgba(43,33,24,.15);
+      background:transparent;
+      cursor:pointer;
+      font-family:inherit;
+      font-size:14px;
+      color:var(--ink-light);
+      border-radius:4px;
+      transition:all .2s;
+    }
+    .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .input-panel{
+      background:rgba(255,255,255,.5);
+      border:1px solid rgba(43,33,24,.12);
+      border-radius:8px;
+      padding:24px;
+      margin-bottom:28px;
+      backdrop-filter:blur(4px);
+    }
+    .field{margin-bottom:18px}
+    .field label{display:block;font-size:14px;margin-bottom:8px;color:var(--ink-light)}
+    .field input,.field textarea{
+      width:100%;
+      padding:14px 16px;
+      border:1px solid rgba(43,33,24,.18);
+      background:rgba(255,255,255,.7);
+      border-radius:6px;
+      font-family:inherit;
+      font-size:15px;
+      color:var(--ink);
+      outline:none;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .field input:focus,.field textarea:focus{
+      border-color:var(--cinnabar);
+      box-shadow:0 0 0 3px rgba(184,62,47,.1);
+    }
+    .field textarea{min-height:140px;resize:vertical;line-height:1.9}
+    .manual-fields{display:none}
+    .manual-fields.active{display:block}
+    /* 生成按钮 */
+    .generate-btn{
+      display:block;
+      width:100%;
+      max-width:360px;
+      margin:0 auto 60px;
+      padding:18px 36px;
+      background:var(--cinnabar);
+      color:#fff;
+      border:none;
+      border-radius:50px;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:20px;
+      letter-spacing:4px;
+      cursor:pointer;
+      box-shadow:0 8px 24px rgba(184,62,47,.35);
+      transition:all .3s;
+      position:relative;
+      overflow:hidden;
+    }
+    .generate-btn:hover{
+      background:var(--cinnabar-dark);
+      transform:translateY(-2px);
+      box-shadow:0 12px 32px rgba(184,62,47,.45);
+    }
+    .generate-btn:active{transform:translateY(0)}
+    .generate-btn::after{
+      content:"";
+      position:absolute;
+      top:50%;left:50%;
+      width:0;height:0;
+      background:rgba(255,255,255,.2);
+      border-radius:50%;
+      transform:translate(-50%,-50%);
+      transition:width .6s,height .6s;
+    }
+    .generate-btn:hover::after{width:400px;height:400px}
+    /* 结果区 */
+    .results{display:none}
+    .results.active{display:block;animation:fadeUp .6s ease}
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(30px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    .result-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:24px;
+      margin-bottom:40px;
+    }
+    .result-card{
+      background:rgba(255,255,255,.65);
+      border:1px solid rgba(43,33,24,.1);
+      border-radius:8px;
+      padding:24px;
+      box-shadow:var(--shadow-sm);
+      position:relative;
+    }
+    .result-card.full{grid-column:1/-1}
+    .result-card h4{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:18px;
+      margin-bottom:16px;
+      display:flex;align-items:center;gap:10px;
+      letter-spacing:2px;
+    }
+    .result-card h4 .num{
+      width:28px;height:28px;
+      border-radius:50%;
+      background:var(--cinnabar);
+      color:#fff;
+      display:grid;place-items:center;
+      font-size:13px;
+      font-family:"Noto Serif SC",serif;
+    }
+    .result-body{font-size:15px;color:var(--ink-light);line-height:1.9}
+    .result-body ul{list-style:none;padding-left:0}
+    .result-body li{padding-left:22px;position:relative;margin-bottom:10px}
+    .result-body li::before{
+      content:"·";
+      position:absolute;left:4px;
+      color:var(--cinnabar);font-weight:bold;
+    }
+    /* 白话解读打字机 */
+    .typewriter-text{min-height:80px}
+    .typewriter-cursor{
+      display:inline-block;width:2px;height:1.1em;background:var(--cinnabar);
+      animation:blink 1s infinite;margin-left:2px;vertical-align:middle;
+    }
+    @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+    /* 二创边界可视化 */
+    .boundary-visual{
+      display:grid;grid-template-columns:1fr 1fr;gap:18px;
+    }
+    .boundary-zone{
+      border-radius:8px;
+      padding:20px;
+      position:relative;
+      overflow:hidden;
+    }
+    .boundary-zone.allow{
+      background:linear-gradient(135deg, rgba(74,124,89,.1) 0%, rgba(74,124,89,.05) 100%);
+      border:2px solid var(--green);
+    }
+    .boundary-zone.forbid{
+      background:linear-gradient(135deg, rgba(192,57,43,.08) 0%, rgba(192,57,43,.03) 100%);
+      border:2px solid var(--red-line);
+    }
+    .boundary-zone h5{
+      font-size:15px;margin-bottom:12px;
+      display:flex;align-items:center;gap:8px;
+    }
+    .boundary-zone.allow h5{color:var(--green)}
+    .boundary-zone.forbid h5{color:var(--red-line)}
+    .boundary-zone ul{list-style:none}
+    .boundary-zone li{
+      font-size:13px;
+      padding:8px 0 8px 22px;
+      border-bottom:1px dashed rgba(43,33,24,.1);
+      position:relative;
+    }
+    .boundary-zone li:last-child{border-bottom:none}
+    .boundary-zone.allow li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:bold}
+    .boundary-zone.forbid li::before{content:"✕";position:absolute;left:0;color:var(--red-line);font-weight:bold}
+    .forbid-stamp{
+      position:absolute;
+      top:50%;right:20px;
+      transform:translateY(-50%) rotate(-12deg);
+      width:80px;height:80px;
+      border:3px solid var(--red-line);
+      border-radius:8px;
+      display:grid;place-items:center;
+      color:var(--red-line);
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:36px;
+      opacity:.15;
+      pointer-events:none;
+    }
+    /* 分镜时间轴 */
+    .story-timeline{
+      position:relative;
+      padding:20px 0 10px;
+      overflow-x:auto;
+    }
+    .timeline-track{
+      display:flex;
+      gap:16px;
+      padding-bottom:12px;
+      min-width:max-content;
+    }
+    .timeline-track::before{
+      content:"";
+      position:absolute;
+      top:46px;left:0;right:0;
+      height:3px;
+      background:linear-gradient(90deg, var(--cinnabar), var(--gold));
+      border-radius:2px;
+      z-index:0;
+    }
+    .shot-card{
+      flex:0 0 220px;
+      background:rgba(255,255,255,.8);
+      border:1px solid rgba(43,33,24,.12);
+      border-radius:8px;
+      padding:16px;
+      position:relative;
+      z-index:1;
+      transition:transform .3s;
+    }
+    .shot-card:hover{transform:translateY(-4px)}
+    .shot-time{
+      display:inline-block;
+      background:var(--cinnabar);
+      color:#fff;
+      font-size:12px;
+      padding:3px 10px;
+      border-radius:20px;
+      margin-bottom:12px;
+    }
+    .shot-title{font-weight:700;font-size:14px;margin-bottom:8px;color:var(--ink)}
+    .shot-desc{font-size:13px;color:var(--ink-light);line-height:1.7}
+    /* 视频提示词 */
+    .prompt-box{
+      background:rgba(43,33,24,.05);
+      border-left:4px solid var(--gold);
+      padding:16px;
+      border-radius:0 8px 8px 0;
+      font-family:"Noto Serif SC",serif;
+      font-size:14px;
+      line-height:1.8;
+      color:var(--ink-light);
+    }
+    /* 文创分享卡 */
+    .share-area{grid-column:1/-1}
+    .share-card-wrap{
+      display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;
+    }
+    .share-card{
+      width:360px;
+      aspect-ratio:9/16;
+      background:
+        linear-gradient(135deg, #f7f3e9 0%, #efe8d8 100%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h60v60H0z' fill='%23d4c4a8' fill-opacity='0.15'/%3E%3Cpath d='M0 0h60v1H0zM0 30h60v1H0z' fill='%238b4513' fill-opacity='0.05'/%3E%3C/svg%3E");
+      border:8px solid var(--cinnabar);
+      border-radius:4px;
+      padding:36px 28px;
+      display:flex;flex-direction:column;
+      justify-content:space-between;
+      position:relative;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .share-card::before{
+      content:"";
+      position:absolute;
+      inset:12px;
+      border:1px solid rgba(139,69,19,.25);
+      pointer-events:none;
+    }
+    .share-card-top{display:flex;justify-content:space-between;align-items:flex-start}
+    .share-card-dynasty{
+      writing-mode:vertical-rl;
+      text-orientation:upright;
+      font-size:14px;
+      letter-spacing:4px;
+      color:var(--ink-light);
+    }
+    .share-card-title{
+      writing-mode:vertical-rl;
+      text-orientation:upright;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:42px;
+      letter-spacing:12px;
+      color:var(--ink);
+      max-height:360px;
+    }
+    .share-card-quote{
+      font-size:15px;
+      color:var(--ink-light);
+      line-height:1.8;
+      margin:24px 0;
+      padding:16px;
+      border-top:1px solid rgba(43,33,24,.12);
+      border-bottom:1px solid rgba(43,33,24,.12);
+    }
+    .share-card-bottom{display:flex;justify-content:space-between;align-items:flex-end}
+    .share-card-tags{font-size:12px;color:var(--cinnabar)}
+    .share-card-seal{
+      width:56px;height:56px;
+      background:var(--cinnabar);
+      color:#fff;
+      display:grid;place-items:center;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:22px;
+      border-radius:4px;
+      transform:rotate(8deg);
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.3);
+    }
+    .share-actions{display:flex;flex-direction:column;gap:12px;flex:1;min-width:200px}
+    .share-actions button{
+      padding:14px 24px;
+      border:1px solid var(--cinnabar);
+      background:transparent;
+      color:var(--cinnabar);
+      border-radius:6px;
+      font-family:inherit;
+      font-size:15px;
+      cursor:pointer;
+      transition:all .2s;
+    }
+    .share-actions button:hover{background:var(--cinnabar);color:#fff}
+    .share-card-source{
+      position:absolute;bottom:18px;left:0;right:0;
+      text-align:center;
+      font-size:11px;color:var(--ink-light);
+      letter-spacing:1px;
+    }
+    /* 活化溯源 */
+    .source-panel{}
+    .source-meta{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+      margin-bottom:18px;
+    }
+    @media(max-width:900px){
+      .source-meta{grid-template-columns:repeat(2,1fr)}
+    }
+    .source-item{
+      background:rgba(255,255,255,.5);
+      border:1px solid rgba(43,33,24,.1);
+      border-radius:6px;
+      padding:12px 14px;
+    }
+    .source-label{
+      display:block;
+      font-size:12px;color:var(--ink-light);
+      margin-bottom:4px;
+    }
+    .source-value{
+      display:block;
+      font-size:15px;font-weight:600;
+      color:var(--ink);
+    }
+    .source-annotations{
+      font-size:13px;color:var(--ink-light);
+      padding:12px 14px;
+      background:rgba(201,162,39,.08);
+      border-left:3px solid var(--gold);
+      border-radius:0 6px 6px 0;
+      margin-bottom:18px;
+    }
+    .confidence-bar{margin-bottom:18px}
+    .confidence-label{
+      font-size:13px;color:var(--ink-light);
+      margin-bottom:8px;
+    }
+    .confidence-track{
+      display:flex;height:32px;
+      border-radius:6px;overflow:hidden;
+      background:rgba(43,33,24,.05);
+    }
+    .confidence-segment{
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;color:#fff;
+      transition:width .6s ease;
+    }
+    .confidence-segment.high{background:var(--green)}
+    .confidence-segment.medium{background:var(--gold)}
+    .confidence-segment.low{background:var(--red-line)}
+    .disclaimer-box{
+      background:rgba(184,62,47,.08);
+      border:1px solid rgba(184,62,47,.2);
+      border-radius:6px;
+      padding:14px 16px;
+      font-size:14px;
+      color:var(--ink-light);
+      line-height:1.8;
+    }
+    .disclaimer-box strong{color:var(--cinnabar)}
+    /* 原文锚点 */
+    .anchor-toggle{margin-top:16px}
+    .anchor-toggle button{
+      padding:8px 16px;
+      border:1px solid var(--cinnabar);
+      background:transparent;
+      color:var(--cinnabar);
+      border-radius:4px;
+      font-family:inherit;
+      font-size:13px;
+      cursor:pointer;
+      transition:all .2s;
+    }
+    .anchor-toggle button:hover{background:var(--cinnabar);color:#fff}
+    .anchor-list{
+      margin-top:16px;
+      padding:16px;
+      background:rgba(255,255,255,.6);
+      border:1px solid rgba(43,33,24,.1);
+      border-radius:6px;
+    }
+    .anchor-item{
+      padding:12px 0;
+      border-bottom:1px dashed rgba(43,33,24,.1);
+    }
+    .anchor-item:last-child{border-bottom:none}
+    .anchor-modern{font-size:14px;color:var(--ink);margin-bottom:6px}
+    .anchor-source{
+      font-size:13px;color:var(--ink-light);
+      padding-left:14px;
+      border-left:3px solid var(--green);
+    }
+    .anchor-source.medium{border-left-color:var(--gold)}
+    .anchor-source.low{border-left-color:var(--red-line)}
+    .anchor-badge{
+      display:inline-block;
+      font-size:11px;padding:2px 8px;
+      border-radius:10px;margin-left:8px;
+      color:#fff;
+    }
+    .anchor-badge.high{background:var(--green)}
+    .anchor-badge.medium{background:var(--gold)}
+    .anchor-badge.low{background:var(--red-line)}
+    /* 分镜原文依据 */
+    .shot-basis{
+      font-size:11px;color:var(--cinnabar);
+      margin-top:10px;padding-top:8px;
+      border-top:1px dashed rgba(43,33,24,.1);
+    }
+    /* 页脚 */
+    footer{
+      text-align:center;
+      padding:50px 0 40px;
+      color:var(--ink-light);
+      font-size:13px;
+      border-top:1px solid rgba(43,33,24,.1);
+      margin-top:60px;
+    }
+    /* 响应式 */
+    @media(max-width:900px){
+      .book-grid{grid-template-columns:repeat(2,1fr)}
+      .result-grid{grid-template-columns:1fr}
+      .hero h2{font-size:36px}
+      .boundary-visual{grid-template-columns:1fr}
+      .share-card-wrap{justify-content:center}
+    }
+    @media(max-width:600px){
+      .book-grid{grid-template-columns:1fr}
+      header{flex-direction:column;gap:16px;align-items:flex-start}
+      .hero h2{font-size:28px}
+      .share-card{width:100%;max-width:340px}
+    }
+    /* 加载动画 */
+    .ink-drop{
+      position:absolute;
+      width:80px;height:80px;
+      background:radial-gradient(circle, rgba(43,33,24,.2) 0%, transparent 70%);
+      border-radius:50%;
+      pointer-events:none;
+      animation:dropExpand .8s ease-out forwards;
+    }
+    @keyframes dropExpand{
+      0%{transform:scale(0);opacity:.6}
+      100%{transform:scale(4);opacity:0}
+    }
+  </style>
+</head>
+<body>
+  <div class="ink-wash"></div>
+  <div class="ink-wash"></div>
+  <div class="ink-wash"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="seal">古</div>
+        <div class="brand-text">
+          <h1>古籍活化工坊</h1>
+          <p>让一页古文，长出千万种翅膀</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="showcase.html">作品展示</a>
+        <a href="#tool">开始活化</a>
+        <a href="https://github.com/wmglimpser-hash/btool" target="_blank">GitHub</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-ink"></div>
+      <div class="hero-subtitle">TRAE AI 创造力大赛 · 古籍活化工具</div>
+      <h2>古文今说，一纸成戏</h2>
+      <p>选择一页典籍，我们帮你生成白话解读、传播要点、二创边界、短视频分镜、视频提示词与文创分享卡。让古籍从书架走进屏幕，从文字变成故事。</p>
+    </section>
+
+    <section id="tool">
+      <div class="section-title">
+        <h3>选一页古籍</h3>
+        <div class="line"></div>
+      </div>
+      <div class="book-grid" id="bookGrid"></div>
+
+      <div class="input-tabs">
+        <button class="tab active" data-tab="builtin">内置古籍</button>
+        <button class="tab" data-tab="manual">手动输入</button>
+      </div>
+
+      <div class="input-panel">
+        <div id="builtinPanel">
+          <p style="color:var(--ink-light);font-size:14px">已选择：<strong id="selectedBookName" style="color:var(--cinnabar)">诗经 · 关雎</strong>，点击下方按钮即可活化。</p>
+        </div>
+        <div id="manualPanel" class="manual-fields">
+          <div class="field">
+            <label>典籍名称</label>
+            <input type="text" id="manualTitle" placeholder="如：诗经 · 关雎">
+          </div>
+          <div class="field">
+            <label>原文</label>
+            <textarea id="manualText" placeholder="在此粘贴古籍原文..."></textarea>
+          </div>
+          <div class="field">
+            <label>朝代/出处（可选）</label>
+            <input type="text" id="manualDynasty" placeholder="如：周">
+          </div>
+        </div>
+      </div>
+
+      <button class="generate-btn" id="generateBtn">开始活化</button>
+
+      <div class="results" id="results">
+        <div class="section-title">
+          <h3>活化成果</h3>
+          <div class="line"></div>
+        </div>
+        <div class="result-grid">
+          <div class="result-card full">
+            <h4><span class="num">源</span>活化溯源</h4>
+            <div class="result-body">
+              <div class="source-panel" id="sourcePanel">
+                <div class="source-meta">
+                  <div class="source-item"><span class="source-label">典籍</span><span class="source-value" id="sourceCanon">《诗经》</span></div>
+                  <div class="source-item"><span class="source-label">篇目</span><span class="source-value" id="sourceChapter">周南 · 关雎</span></div>
+                  <div class="source-item"><span class="source-label">版本</span><span class="source-value" id="sourceVersion">毛诗正义（通行本）</span></div>
+                  <div class="source-item"><span class="source-label">时代</span><span class="source-value" id="sourceEra">先秦</span></div>
+                </div>
+                <div class="source-annotations" id="sourceAnnotations">参考注本：朱熹《诗集传》、方玉润《诗经原始》、程俊英《诗经译注》</div>
+                <div class="confidence-bar">
+                  <div class="confidence-label">内容置信度</div>
+                  <div class="confidence-track">
+                    <div class="confidence-segment high" style="width:60%" id="confHigh">高 60%</div>
+                    <div class="confidence-segment medium" style="width:30%" id="confMedium">中 30%</div>
+                    <div class="confidence-segment low" style="width:10%" id="confLow">低 10%</div>
+                  </div>
+                </div>
+                <div class="disclaimer-box" id="disclaimerBox">
+                  <strong>改编声明：</strong><span id="disclaimerText">...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="result-card">
+            <h4><span class="num">一</span>白话解读</h4>
+            <div class="result-body">
+              <p class="typewriter-text" id="vernacularText"></p>
+              <div class="anchor-toggle">
+                <button id="toggleAnchors">显示原文锚点</button>
+              </div>
+              <div class="anchor-list" id="anchorList" style="display:none"></div>
+            </div>
+          </div>
+          <div class="result-card">
+            <h4><span class="num">二</span>传播要点</h4>
+            <div class="result-body" id="highlightsText"></div>
+          </div>
+          <div class="result-card full">
+            <h4><span class="num">三</span>二创边界</h4>
+            <div class="result-body">
+              <div class="boundary-visual" id="boundaryText"></div>
+            </div>
+          </div>
+          <div class="result-card full">
+            <h4><span class="num">四</span>短视频分镜</h4>
+            <div class="result-body">
+              <div class="story-timeline">
+                <div class="timeline-track" id="storyboardText"></div>
+              </div>
+            </div>
+          </div>
+          <div class="result-card">
+            <h4><span class="num">五</span>视频提示词</h4>
+            <div class="result-body">
+              <div class="prompt-box" id="promptText"></div>
+            </div>
+          </div>
+          <div class="result-card share-area">
+            <h4><span class="num">六</span>文创分享卡</h4>
+            <div class="result-body">
+              <div class="share-card-wrap">
+                <div class="share-card" id="shareCard">
+                  <div class="share-card-top">
+                    <div class="share-card-dynasty" id="cardDynasty">周</div>
+                    <div class="share-card-title" id="cardTitle">关雎</div>
+                  </div>
+                  <div class="share-card-quote" id="cardQuote">窈窕淑女，君子好逑</div>
+                  <div class="share-card-bottom">
+                    <div class="share-card-tags" id="cardTags">#诗经 #古籍活化</div>
+                    <div class="share-card-seal">活化</div>
+                  </div>
+                  <div class="share-card-source" id="cardSource">《诗经》· 周南 · 关雎</div>
+                </div>
+                <div class="share-actions">
+                  <button id="downloadCard">下载分享卡</button>
+                  <button id="copyCardText">复制文案</button>
+                  <button id="copyCitation">复制引用格式</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>古籍活化工坊 · 2025 TRAE AI 创造力大赛参赛作品</p>
+      <p style="margin-top:6px;opacity:.7">附加赛题 / 社会公益 / 古籍活化工具</p>
+    </footer>
+  </div>
+
+  <script>
+    const books=[
+      {
+        id:'guanju',
+        title:'诗经 · 关雎',
+        shortTitle:'关雎',
+        dynasty:'周',
+        source:'诗经 · 周南',
+        text:'关关雎鸠，在河之洲。窈窕淑女，君子好逑。参差荇菜，左右流之。窈窕淑女，寤寐求之。求之不得，寤寐思服。悠哉悠哉，辗转反侧。参差荇菜，左右采之。窈窕淑女，琴瑟友之。参差荇菜，左右芼之。窈窕淑女，钟鼓乐之。',
+        coverChars:'诗经',
+        quote:'窈窕淑女，君子好逑',
+        sourceInfo:{
+          canon:'《诗经》',
+          chapter:'周南 · 关雎',
+          version:'毛诗正义（通行本）',
+          annotations:['朱熹《诗集传》','方玉润《诗经原始》','程俊英《诗经译注》'],
+          era:'先秦',
+          note:'《关雎》为《诗经》首篇，传统解读以"后妃之德"为主，今多视为爱情诗。'
+        }
+      },
+      {
+        id:'xueer',
+        title:'论语 · 学而',
+        shortTitle:'学而',
+        dynasty:'春秋',
+        source:'论语 · 学而篇',
+        text:'子曰：学而时习之，不亦说乎？有朋自远方来，不亦乐乎？人不知而不愠，不亦君子乎？',
+        coverChars:'论语',
+        quote:'学而时习之，不亦说乎',
+        sourceInfo:{
+          canon:'《论语》',
+          chapter:'学而篇第一',
+          version:'何晏《论语集解》/ 朱熹《论语集注》（通行本）',
+          annotations:['朱熹《论语集注》','刘宝楠《论语正义》','杨伯峻《论语译注》'],
+          era:'春秋末期',
+          note:'此章为《论语》开篇，记录孔子论学习、交友、修养三端。'
+        }
+      },
+      {
+        id:'xiaoyao',
+        title:'庄子 · 逍遥游',
+        shortTitle:'逍遥游',
+        dynasty:'战国',
+        source:'庄子 · 内篇',
+        text:'北冥有鱼，其名为鲲。鲲之大，不知其几千里也；化而为鸟，其名为鹏。鹏之背，不知其几千里也；怒而飞，其翼若垂天之云。',
+        coverChars:'庄子',
+        quote:'北冥有鱼，其名为鲲',
+        sourceInfo:{
+          canon:'《庄子》',
+          chapter:'内篇 · 逍遥游第一',
+          version:'郭象注本（通行本）',
+          annotations:['郭象注','成玄英疏','王先谦《庄子集解》','陈鼓应《庄子今注今译》'],
+          era:'战国中期',
+          note:'《逍遥游》为《庄子》内篇之首，以鲲鹏寓言阐发超越世俗的精神自由。'
+        }
+      },
+      {
+        id:'huozhi',
+        title:'史记 · 货殖列传',
+        shortTitle:'货殖列传',
+        dynasty:'西汉',
+        source:'史记 · 货殖列传',
+        text:'天下熙熙，皆为利来；天下攘攘，皆为利往。夫千乘之王，万家之侯，百室之君，尚犹患贫，而况匹夫编户之民乎！',
+        coverChars:'史记',
+        quote:'天下熙熙，皆为利来',
+        sourceInfo:{
+          canon:'《史记》',
+          chapter:'货殖列传第六十九',
+          version:'中华书局点校本（通行本）',
+          annotations:['裴骃《史记集解》','司马贞《史记索隐》','张大可《史记研究》'],
+          era:'西汉武帝时期',
+          note:'《货殖列传》为司马迁所作，是中国最早的商业史专篇，肯定商业活动的历史作用。'
+        }
+      }
+    ];
+
+    const outputs={
+      guanju:{
+        vernacular:'水鸟关关和鸣，栖息在河中的小洲。那位文静美好的姑娘，正是君子心中理想的伴侣。长短不齐的荇菜，在左右流动的水中摇曳；君子日夜思念，辗转难眠。最终他以琴瑟表达亲近，以钟鼓迎接喜悦。这是一首关于追求、思念与成婚的古老恋歌。',
+        anchors:[
+          {modern:'水鸟关关和鸣，栖息在河中的小洲。',source:'关关雎鸠，在河之洲。',confidence:'high'},
+          {modern:'那位文静美好的姑娘，正是君子心中理想的伴侣。',source:'窈窕淑女，君子好逑。',confidence:'high'},
+          {modern:'长短不齐的荇菜，在左右流动的水中摇曳；君子日夜思念，辗转难眠。',source:'参差荇菜，左右流之。窈窕淑女，寤寐求之。',confidence:'high'},
+          {modern:'最终他以琴瑟表达亲近，以钟鼓迎接喜悦。',source:'窈窕淑女，琴瑟友之。窈窕淑女，钟鼓乐之。',confidence:'medium'},
+          {modern:'这是一首关于追求、思念与成婚的古老恋歌。',source:'全篇综合',confidence:'medium'}
+        ],
+        confidence:{high:60,medium:30,low:10},
+        disclaimer:'"琴瑟友之""钟鼓乐之"在原文中象征亲近与喜庆，具体婚礼仪式为后世常见演绎，非原文细节。',
+        highlights:[
+          '中国最早的恋歌之一，比西方情诗早一千多年',
+          '"窈窕淑女，君子好逑"是中国人最熟悉的爱情金句',
+          '从求之不得的焦灼到琴瑟友之的圆满，情绪曲线完整',
+          '荇菜、水鸟、琴瑟等意象极具画面感，适合视觉化'
+        ],
+        boundary:{
+          allow:['用现代场景演绎"追求"主题','保留原文核心意象（水鸟、荇菜、琴瑟）','改编为纯音乐、舞蹈、动画','解读为健康的情感表达'],
+          forbid:['歪曲为低俗恋爱内容','删除"君子"的人格内涵','改写成与现代婚恋观冲突的价值观','将古典婚礼场景娱乐化为恶搞梗']
+        },
+        storyboard:[
+          {time:'0-8s',title:'河洲晨雾',desc:'水墨晕染出河中小洲，雎鸠双飞入画，古琴泛音',basis:'关关雎鸠，在河之洲。'},
+          {time:'9-18s',title:'淑女采荇',desc:'女子在浅水边采摘荇菜，衣袂飘飘，荇菜随波',basis:'参差荇菜，左右流之。'},
+          {time:'19-28s',title:'君子思服',desc:'男子临窗抚琴，光影流转表现日夜思念',basis:'窈窕淑女，寤寐求之。'},
+          {time:'29-40s',title:'辗转反侧',desc:'夜晚烛火摇曳，以剪影表现求而不得的焦灼',basis:'求之不得，寤寐思服。悠哉悠哉，辗转反侧。'},
+          {time:'41-50s',title:'琴瑟友之',desc:'两人隔窗对望，琴瑟和鸣，红绸渐起',basis:'窈窕淑女，琴瑟友之。'},
+          {time:'51-60s',title:'钟鼓乐之',desc:'婚礼场景，钟鼓齐鸣，画面定格在"好逑"二字',basis:'窈窕淑女，钟鼓乐之。'}
+        ],
+        prompt:'Chinese ink wash animation, ancient river islet at dawn, two mandarin ducks flying over misty water, a gentle maiden picking water caltrops in flowing Hanfu, soft silk robes, bamboo grove, traditional guqin music atmosphere, vertical Chinese calligraphy titles, serene and poetic, 4K, cinematic lighting'
+      },
+      xueer:{
+        vernacular:'孔子说：学习了知识并按时温习实践，不也是很喜悦的事吗？有志同道合的朋友从远方来相聚，不也是很快乐吗？别人不了解自己，自己却不生气，不也是君子的修养吗？',
+        anchors:[
+          {modern:'孔子说：学习了知识并按时温习实践，不也是很喜悦的事吗？',source:'子曰：学而时习之，不亦说乎？',confidence:'high'},
+          {modern:'有志同道合的朋友从远方来相聚，不也是很快乐吗？',source:'有朋自远方来，不亦乐乎？',confidence:'high'},
+          {modern:'别人不了解自己，自己却不生气，不也是君子的修养吗？',source:'人不知而不愠，不亦君子乎？',confidence:'high'}
+        ],
+        confidence:{high:90,medium:10,low:0},
+        disclaimer:'本段为《论语》开篇直译，语义较为明确；"时习"之"习"有"温习""实践"二义，此处取兼义。',
+        highlights:[
+          '三句排比，道尽学习的三重境界',
+          '"学而时习之"强调实践，不只是读书',
+          '"人不知而不愠"是情绪管理的古老智慧',
+          '适合开学季、教师节、终身学习主题传播'
+        ],
+        boundary:{
+          allow:['用现代课堂、读书会场景演绎','强调学习与实践结合','表现朋友相聚的喜悦','诠释"不愠"的修养'],
+          forbid:['将孔子塑造成说教形象','曲解为功利性学习','忽略"时习"的实践含义','用于反智或读书无用论']
+        },
+        storyboard:[
+          {time:'0-8s',title:'书卷展开',desc:'竹简缓缓展开，毛笔书写"学而时习之"',basis:'子曰：学而时习之，不亦说乎？'},
+          {time:'9-18s',title:'灯下温习',desc:'少年在灯下诵读，窗外月光流转',basis:'学而时习之'},
+          {time:'19-28s',title:'远方来客',desc:'门扉轻启，友人携琴而来，相视而笑',basis:'有朋自远方来，不亦乐乎？'},
+          {time:'29-40s',title:'人不知',desc:'一人独行于雨巷，神态安然，不怒不躁',basis:'人不知而不愠'},
+          {time:'41-50s',title:'君子之姿',desc:'竹林中静坐，风吹过竹叶，人物逐渐透明化入山水',basis:'不亦君子乎'},
+          {time:'51-60s',title:'三境合一',desc:'学习、友情、修养三个画面叠化，落版"学而"',basis:'全章综合'}
+        ],
+        prompt:'Traditional Chinese scholar studio, bamboo slips unrolling, warm candlelight, young student reading classics, friend arriving with qin instrument, bamboo forest meditation, rain alley scene, serene ink wash style, soft golden lighting, vertical calligraphy, educational and philosophical atmosphere, 4K'
+      },
+      xiaoyao:{
+        vernacular:'北海有一条鱼，名叫鲲。鲲的庞大，不知道有几千里；它变化成鸟，名叫鹏。鹏的脊背，也不知道有几千里；当它奋起而飞时，翅膀就像垂挂在天边的云。',
+        anchors:[
+          {modern:'北海有一条鱼，名叫鲲。',source:'北冥有鱼，其名为鲲。',confidence:'high'},
+          {modern:'鲲的庞大，不知道有几千里；它变化成鸟，名叫鹏。',source:'鲲之大，不知其几千里也；化而为鸟，其名为鹏。',confidence:'high'},
+          {modern:'鹏的脊背，也不知道有几千里；当它奋起而飞时，翅膀就像垂挂在天边的云。',source:'鹏之背，不知其几千里也；怒而飞，其翼若垂天之云。',confidence:'high'}
+        ],
+        confidence:{high:85,medium:15,low:0},
+        disclaimer:'鲲鹏为庄子寓言形象，具体大小、形态属文学夸张，非实录；"北冥"地理所指历代有不同说法。',
+        highlights:[
+          '"鲲鹏"已成为中国人表达志向的超级符号',
+          '从鱼到鸟的变形，自带奇幻视觉张力',
+          '庄子的自由精神契合当代年轻人的解压需求',
+          '适合毕业季、职场转型、追寻梦想等主题'
+        ],
+        boundary:{
+          allow:['用动画表现鲲鹏变形','将"逍遥"解读为心灵自由','结合现代追梦主题','创作国风插画、游戏皮肤'],
+          forbid:['将庄子思想简化为躺平','删除鲲鹏的宏大意境','用于宣扬消极避世','篡改为玄幻修仙套路']
+        },
+        storyboard:[
+          {time:'0-8s',title:'北冥深渊',desc:'深海墨蓝，巨鲲缓缓游动，眼睛如明月',basis:'北冥有鱼，其名为鲲。'},
+          {time:'9-18s',title:'鲲化为鹏',desc:'海浪翻涌，鱼身羽化，巨翼展开遮蔽天空',basis:'化而为鸟，其名为鹏。'},
+          {time:'19-28s',title:'怒而飞',desc:'大鹏冲破海面，翅膀如垂天之云，水雾漫天',basis:'怒而飞，其翼若垂天之云。'},
+          {time:'29-40s',title:'背负青天',desc:'鹏鸟翱翔于云海之上，下方山河如画卷',basis:'庄子后文"背负青天"意象'},
+          {time:'41-50s',title:'蜩与学鸠',desc:'切到枝头小鸟，形成大小对比，暗示境界差异',basis:'庄子后文蜩与学鸠寓言'},
+          {time:'51-60s',title:'逍遥之境',desc:'大鹏与云融为一体，字幕"逍遥游"淡入',basis:'篇名与主题'}
+        ],
+        prompt:'Epic Chinese mythology animation, deep dark Northern Ocean, colossal Kun fish transforming into Roc bird, giant wings covering the sky like hanging clouds, ink wash ocean waves, clouds and mist, soaring above mountains, dramatic transformation scene, traditional Chinese fantasy art, cinematic 4K'
+      },
+      huozhi:{
+        vernacular:'天下人熙熙攘攘，都是为了利益而来，为了利益而往。即便是拥有千辆兵车的君王、万户封侯的贵族、百室之邑的长官，尚且担心贫穷，何况普通的百姓人家呢？',
+        anchors:[
+          {modern:'天下人熙熙攘攘，都是为了利益而来，为了利益而往。',source:'天下熙熙，皆为利来；天下攘攘，皆为利往。',confidence:'high'},
+          {modern:'即便是拥有千辆兵车的君王、万户封侯的贵族、百室之邑的长官，尚且担心贫穷，何况普通的百姓人家呢？',source:'夫千乘之王，万家之侯，百室之君，尚犹患贫，而况匹夫编户之民乎！',confidence:'high'}
+        ],
+        confidence:{high:80,medium:20,low:0},
+        disclaimer:'"千乘之王""万家之侯""百室之君"为汉代爵禄等级表述，具体数值为当时制度概括，非精确统计。',
+        highlights:[
+          '"熙熙攘攘，皆为利来"是描述商业社会的千古名句',
+          '司马迁为商人正名，打破"重农抑商"偏见',
+          '对当代创业、商业伦理、财富观有现实意义',
+          '适合财经、商业史、经济学科普内容'
+        ],
+        boundary:{
+          allow:['用古代市集场景再现商业繁荣','客观解读"利"的正当性','结合现代创业故事','讨论商业伦理'],
+          forbid:['将"利"等同于拜金主义','丑化商人形象','用于宣扬不择手段逐利','歪曲司马迁的经济思想']
+        },
+        storyboard:[
+          {time:'0-8s',title:'市集喧嚣',desc:'古代市集俯瞰，人来人往，摊位林立',basis:'天下熙熙，皆为利来。'},
+          {time:'9-18s',title:'利来利往',desc:'商人牵着骆驼、推着货车，钱币流动动画',basis:'天下攘攘，皆为利往。'},
+          {time:'19-28s',title:'王侯之忧',desc:'宫殿内诸侯看账册，眉头微蹙',basis:'千乘之王，万家之侯，百室之君，尚犹患贫。'},
+          {time:'29-40s',title:'编户之民',desc:'田间农舍，百姓交易，表现普通人求生计',basis:'而况匹夫编户之民乎！'},
+          {time:'41-50s',title:'货殖之道',desc:'地图上的商路点亮，从长安到西域',basis:'《货殖列传》全篇商业史背景'},
+          {time:'51-60s',title:'古今对话',desc:'古代商路与现代城市夜景叠化，落版"货殖列传"',basis:'篇名与主题'}
+        ],
+        prompt:'Ancient Chinese marketplace animation, bustling trade scene, merchants with camels and carts, copper coins flowing, royal court accounting, rural farmhouses, Silk Road map lighting up, transition to modern city night view, historical documentary style, warm golden tones, 4K cinematic'
+      }
+    };
+
+    let selectedBook=books[0];
+
+    function renderBooks(){
+      const grid=document.getElementById('bookGrid');
+      grid.innerHTML=books.map((b,i)=>`
+        <div class="book-card ${i===0?'active':''}" data-id="${b.id}">
+          <div class="book-cover">
+            <div class="book-dynasty">${b.dynasty}</div>
+            <div class="book-spine">${b.coverChars}</div>
+          </div>
+          <div class="book-info">
+            <h4>${b.title}</h4>
+            <p>${b.text.slice(0,24)}...</p>
+          </div>
+        </div>
+      `).join('');
+      grid.querySelectorAll('.book-card').forEach(card=>{
+        card.addEventListener('click',()=>{
+          grid.querySelectorAll('.book-card').forEach(c=>c.classList.remove('active'));
+          card.classList.add('active');
+          selectedBook=books.find(b=>b.id===card.dataset.id);
+          document.getElementById('selectedBookName').textContent=selectedBook.title;
+        });
+      });
+    }
+
+    // Tab 切换
+    document.querySelectorAll('.tab').forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        if(tab.dataset.tab==='manual'){
+          document.getElementById('builtinPanel').style.display='none';
+          document.getElementById('manualPanel').classList.add('active');
+        }else{
+          document.getElementById('builtinPanel').style.display='block';
+          document.getElementById('manualPanel').classList.remove('active');
+        }
+      });
+    });
+
+    function typeWriter(el,text,speed=35){
+      el.innerHTML='';
+      let i=0;
+      const cursor=document.createElement('span');
+      cursor.className='typewriter-cursor';
+      el.appendChild(cursor);
+      return new Promise(resolve=>{
+        const timer=setInterval(()=>{
+          if(i<text.length){
+            cursor.before(text.charAt(i));
+            i++;
+          }else{
+            clearInterval(timer);
+            cursor.remove();
+            resolve();
+          }
+        },speed);
+      });
+    }
+
+    function renderSourcePanel(book,output){
+      const info=book.sourceInfo||{
+        canon:book.title,
+        chapter:'手动输入',
+        version:'用户自定义',
+        annotations:[],
+        era:book.dynasty||'未知',
+        note:''
+      };
+      document.getElementById('sourceCanon').textContent=info.canon;
+      document.getElementById('sourceChapter').textContent=info.chapter;
+      document.getElementById('sourceVersion').textContent=info.version;
+      document.getElementById('sourceEra').textContent=info.era;
+      document.getElementById('sourceAnnotations').textContent='参考注本：'+(info.annotations.length?info.annotations.join('、'):'无');
+
+      const conf=output.confidence||{high:60,medium:30,low:10};
+      document.getElementById('confHigh').style.width=conf.high+'%';
+      document.getElementById('confHigh').textContent=conf.high+'%';
+      document.getElementById('confMedium').style.width=conf.medium+'%';
+      document.getElementById('confMedium').textContent=conf.medium?conf.medium+'%':'';
+      document.getElementById('confLow').style.width=conf.low+'%';
+      document.getElementById('confLow').textContent=conf.low?conf.low+'%':'';
+
+      document.getElementById('disclaimerText').textContent=output.disclaimer||'本内容为基于古籍原文的生成结果，具体创作时请结合权威注本复核。';
+    }
+
+    function renderAnchors(anchors){
+      const list=document.getElementById('anchorList');
+      if(!anchors||anchors.length===0){
+        list.innerHTML='<p style="color:var(--ink-light);font-size:13px">手动输入模式暂不提供原文锚点。</p>';
+        return;
+      }
+      list.innerHTML=anchors.map(a=>`
+        <div class="anchor-item">
+          <div class="anchor-modern">${a.modern}<span class="anchor-badge ${a.confidence}">${a.confidence==='high'?'高':a.confidence==='medium'?'中':'低'}置信</span></div>
+          <div class="anchor-source ${a.confidence}">原文：${a.source}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderHighlights(items){
+      return '<ul>'+items.map(item=>`<li>${item}</li>`).join('')+'</ul>';
+    }
+
+    function renderBoundary(data){
+      return `
+        <div class="boundary-zone allow">
+          <h5>✓ 可自由改编</h5>
+          <ul>${data.allow.map(x=>`<li>${x}</li>`).join('')}</ul>
+        </div>
+        <div class="boundary-zone forbid">
+          <div class="forbid-stamp">禁</div>
+          <h5>✕ 改编红线</h5>
+          <ul>${data.forbid.map(x=>`<li>${x}</li>`).join('')}</ul>
+        </div>
+      `;
+    }
+
+    function renderStoryboard(shots){
+      return shots.map(s=>`
+        <div class="shot-card">
+          <span class="shot-time">${s.time}</span>
+          <div class="shot-title">${s.title}</div>
+          <div class="shot-desc">${s.desc}</div>
+          ${s.basis?`<div class="shot-basis">原文依据：${s.basis}</div>`:''}
+        </div>
+      `).join('');
+    }
+
+    function updateShareCard(book,output){
+      document.getElementById('cardDynasty').textContent=book.dynasty;
+      document.getElementById('cardTitle').textContent=book.shortTitle;
+      document.getElementById('cardQuote').textContent=output.quote;
+      document.getElementById('cardTags').textContent=`#${book.shortTitle} #古籍活化 #${book.dynasty}`;
+      const info=book.sourceInfo||{canon:book.title,chapter:book.source||''};
+      document.getElementById('cardSource').textContent=`${info.canon} · ${info.chapter}`;
+    }
+
+    document.getElementById('generateBtn').addEventListener('click',async ()=>{
+      const btn=document.getElementById('generateBtn');
+      const results=document.getElementById('results');
+      const tab=document.querySelector('.tab.active').dataset.tab;
+      let book=selectedBook;
+      if(tab==='manual'){
+        const title=document.getElementById('manualTitle').value.trim();
+        const text=document.getElementById('manualText').value.trim();
+        if(!title||!text){
+          alert('请填写典籍名称和原文');
+          return;
+        }
+        book={
+          id:'manual',
+          title:title,
+          shortTitle:title.split('·').pop()||title,
+          dynasty:document.getElementById('manualDynasty').value.trim()||'古籍',
+          source:'手动输入',
+          text:text,
+          coverChars:title.slice(0,2),
+          quote:text.slice(0,12)
+        };
+      }
+
+      const output=outputs[book.id]||outputs.guanju;
+
+      btn.textContent='活化中...';
+      btn.disabled=true;
+      results.classList.remove('active');
+
+      // 滚动到结果区上方
+      setTimeout(()=>{
+        document.getElementById('tool').scrollIntoView({behavior:'smooth',block:'start'});
+      },100);
+
+      await new Promise(r=>setTimeout(r,400));
+      results.classList.add('active');
+
+      // 活化溯源
+      renderSourcePanel(book,output);
+
+      // 打字机效果
+      await typeWriter(document.getElementById('vernacularText'),output.vernacular);
+      renderAnchors(output.anchors);
+      document.getElementById('anchorList').style.display='none';
+      document.getElementById('toggleAnchors').textContent='显示原文锚点';
+      document.getElementById('highlightsText').innerHTML=renderHighlights(output.highlights);
+      document.getElementById('boundaryText').innerHTML=renderBoundary(output.boundary);
+      document.getElementById('storyboardText').innerHTML=renderStoryboard(output.storyboard);
+      document.getElementById('promptText').textContent=output.prompt;
+      updateShareCard(book,output);
+
+      btn.textContent='重新活化';
+      btn.disabled=false;
+    });
+
+    document.getElementById('toggleAnchors').addEventListener('click',function(){
+      const list=document.getElementById('anchorList');
+      if(list.style.display==='none'){
+        list.style.display='block';
+        this.textContent='隐藏原文锚点';
+      }else{
+        list.style.display='none';
+        this.textContent='显示原文锚点';
+      }
+    });
+
+    document.getElementById('copyCitation').addEventListener('click',()=>{
+      const book=selectedBook;
+      const info=book.sourceInfo||{canon:book.title,chapter:book.source||'',version:'用户自定义'};
+      const citation=`${info.canon} · ${info.chapter}[M]. ${info.version}. 活化内容生成自：古籍活化工坊（TRAE AI 创造力大赛参赛作品），仅供创作参考。`;
+      navigator.clipboard.writeText(citation).then(()=>alert('引用格式已复制'));
+    });
+
+    document.getElementById('downloadCard').addEventListener('click',()=>{
+      const card=document.getElementById('shareCard');
+      html2canvas(card,{scale:2,backgroundColor:null,useCORS:true}).then(canvas=>{
+        const link=document.createElement('a');
+        link.download=`古籍活化_${selectedBook.shortTitle}.png`;
+        link.href=canvas.toDataURL('image/png');
+        link.click();
+      });
+    });
+
+    document.getElementById('copyCardText').addEventListener('click',()=>{
+      const book=selectedBook;
+      const text=`【${book.title}】\n${outputs[book.id]?.quote||book.quote}\n\n用古籍活化工坊，把一页古文变成短视频脚本。\n#${book.shortTitle} #古籍活化 #传统文化`;
+      navigator.clipboard.writeText(text).then(()=>alert('文案已复制到剪贴板'));
+    });
+
+    renderBooks();
+  </script>
+</body>
+</html>
