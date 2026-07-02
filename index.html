@@ -731,15 +731,34 @@
         <div id="manualPanel" class="manual-fields">
           <div class="field">
             <label>典籍名称</label>
-            <input type="text" id="manualTitle" placeholder="如：诗经 · 关雎">
+            <input type="text" id="manualTitle" placeholder="如：楚辞 · 橘颂">
           </div>
           <div class="field">
-            <label>原文</label>
-            <textarea id="manualText" placeholder="在此粘贴古籍原文..."></textarea>
+            <label>原文 <span style="color:var(--cinnabar);font-size:12px">*</span></label>
+            <textarea id="manualText" placeholder="在此粘贴可追溯的古籍原文..."></textarea>
           </div>
           <div class="field">
-            <label>朝代/出处（可选）</label>
-            <input type="text" id="manualDynasty" placeholder="如：周">
+            <label>朝代/出处</label>
+            <input type="text" id="manualDynasty" placeholder="如：战国 · 楚">
+          </div>
+          <div class="field">
+            <label>原文来源名称</label>
+            <input type="text" id="manualSourceName" placeholder="如：中国哲学书电子化计划 / 维基文库 / 自藏刻本">
+          </div>
+          <div class="field">
+            <label>原文来源链接</label>
+            <input type="url" id="manualSourceUrl" placeholder="可核验的原文 URL（选填，但建议填写）">
+          </div>
+          <div class="field">
+            <label>版本/整理说明</label>
+            <input type="text" id="manualEditionNote" placeholder="如：以《四部丛刊》本为基础，项目方标点">
+          </div>
+          <div class="field">
+            <label>参考注本</label>
+            <input type="text" id="manualReferenceWorks" placeholder="如：王逸《楚辞章句》、朱熹《楚辞集注》（用顿号分隔）">
+          </div>
+          <div class="source-tip" style="padding:12px 14px;background:rgba(184,62,47,.06);border-radius:6px;border-left:3px solid var(--cinnabar);font-size:13px;color:var(--ink-light);line-height:1.7">
+            <strong>来源说明：</strong>手动输入内容将明确标注为「用户输入 · 版本待确认」。系统只基于原文结构生成通用演示，不会调用内置书目的解读模板；传播前请补充权威注本并复核。
           </div>
         </div>
       </div>
@@ -763,6 +782,14 @@
                   <div class="source-item"><span class="source-label">时代</span><span class="source-value" id="sourceEra">先秦</span></div>
                 </div>
                 <div class="source-annotations" id="sourceAnnotations">参考注本：朱熹《诗集传》、方玉润《诗经原始》、程俊英《诗经译注》</div>
+                <div class="source-link" id="sourceLink" style="margin-top:12px;padding:12px;background:rgba(184,62,47,.05);border-radius:6px;border-left:3px solid var(--cinnabar)">
+                  <div style="font-size:13px;color:var(--ink-light);margin-bottom:6px"><strong>原文来源</strong></div>
+                  <a id="sourceUrl" href="#" target="_blank" rel="noopener" style="color:var(--cinnabar);font-size:13px;word-break:break-all">https://ctext.org/...</a>
+                  <div id="sourceEditionNote" style="font-size:12px;color:var(--ink-light);margin-top:6px">版本说明</div>
+                </div>
+                <div class="content-note" id="contentNote" style="margin-top:12px;font-size:12px;color:var(--ink-light);line-height:1.8">
+                  内容说明
+                </div>
                 <div class="confidence-bar">
                   <div class="confidence-label">内容置信度</div>
                   <div class="confidence-track">
@@ -863,7 +890,12 @@
           version:'毛诗正义（通行本）',
           annotations:['朱熹《诗集传》','方玉润《诗经原始》','程俊英《诗经译注》'],
           era:'先秦',
-          note:'《关雎》为《诗经》首篇，传统解读以"后妃之德"为主，今多视为爱情诗。'
+          note:'《关雎》为《诗经》首篇，传统解读以"后妃之德"为主，今多视为爱情诗。',
+          textSourceName:'中国哲学书电子化计划（ctext.org）',
+          textSourceUrl:'https://ctext.org/book-of-poetry/guan-ju/zh',
+          editionNote:'以公开古籍数字文本为基础，项目方整理标点与分段',
+          referenceWorks:['朱熹《诗集传》','方玉润《诗经原始》','程俊英《诗经译注》'],
+          contentNote:'原文为公版古籍；白话解读、分镜、传播建议、分享卡文案为项目基于传统注本整理的生成内容，仅供创作参考。'
         }
       },
       {
@@ -881,7 +913,12 @@
           version:'何晏《论语集解》/ 朱熹《论语集注》（通行本）',
           annotations:['朱熹《论语集注》','刘宝楠《论语正义》','杨伯峻《论语译注》'],
           era:'春秋末期',
-          note:'此章为《论语》开篇，记录孔子论学习、交友、修养三端。'
+          note:'此章为《论语》开篇，记录孔子论学习、交友、修养三端。',
+          textSourceName:'中国哲学书电子化计划（ctext.org）',
+          textSourceUrl:'https://ctext.org/analects/xue-er/zh',
+          editionNote:'以公开古籍数字文本为基础，项目方整理标点与分段',
+          referenceWorks:['朱熹《论语集注》','刘宝楠《论语正义》','杨伯峻《论语译注》'],
+          contentNote:'原文为公版古籍；白话解读、分镜、传播建议、分享卡文案为项目基于传统注本整理的生成内容，仅供创作参考。'
         }
       },
       {
@@ -894,7 +931,12 @@
         coverChars:'庄子',
         quote:'北冥有鱼，其名为鲲',
         sourceInfo:{
-          canon:'《庄子》',
+          canon:'《庄子》',,
+          textSourceName:'中国哲学书电子化计划（ctext.org）',
+          textSourceUrl:'https://ctext.org/zhuangzi/enjoyment-in-untroubled-ease/zh',
+          editionNote:'以公开古籍数字文本为基础，项目方整理标点与分段',
+          referenceWorks:['郭象注','成玄英疏','王先谦《庄子集解》','陈鼓应《庄子今注今译》'],
+          contentNote:'原文为公版古籍；白话解读、分镜、传播建议、分享卡文案为项目基于传统注本整理的生成内容，仅供创作参考。'
           chapter:'内篇 · 逍遥游第一',
           version:'郭象注本（通行本）',
           annotations:['郭象注','成玄英疏','王先谦《庄子集解》','陈鼓应《庄子今注今译》'],
@@ -917,7 +959,12 @@
           version:'中华书局点校本（通行本）',
           annotations:['裴骃《史记集解》','司马贞《史记索隐》','张大可《史记研究》'],
           era:'西汉武帝时期',
-          note:'《货殖列传》为司马迁所作，是中国最早的商业史专篇，肯定商业活动的历史作用。'
+          note:'《货殖列传》为司马迁所作，是中国最早的商业史专篇，肯定商业活动的历史作用。',
+          textSourceName:'中国哲学书电子化计划（ctext.org）',
+          textSourceUrl:'https://ctext.org/shiji/huo-zhi-lie-zhuan/zh',
+          editionNote:'以公开古籍数字文本为基础，项目方整理标点与分段',
+          referenceWorks:['裴骃《史记集解》','司马贞《史记索隐》','张大可《史记研究》'],
+          contentNote:'原文为公版古籍；白话解读、分镜、传播建议、分享卡文案为项目基于传统注本整理的生成内容，仅供创作参考。'
         }
       }
     ];
@@ -1053,9 +1100,10 @@
         source:s+'。',
         confidence:'medium'
       })):[{modern:'输入文本较短，暂不提供逐句锚点。',source:text.slice(0,30)+(text.length>30?'...':''),confidence:'low'}];
-      const medium=Math.min(anchorSentences.length*20+20,70);
-      const low=Math.max(0,100-medium-10);
-      const high=Math.max(0,100-medium-low);
+      // 手动输入未关联权威注本，整体置信度标为待核验：高置信 0，中置信保留少量原文复述，其余标低
+      const high=0;
+      const medium=Math.min(anchorSentences.length*15,40);
+      const low=Math.max(0,100-medium);
       return {
         vernacular:`【手动输入 · 演示模板】这是一段用户提供的古籍文本。前两句可理解为：${preview||text.slice(0,40)}…… 由于手动输入未关联权威注本，以上解读仅作格式演示，实际传播前请补充典籍版本与参考注本后复核。`,
         anchors:anchors,
@@ -1150,14 +1198,30 @@
         chapter:'手动输入',
         version:'用户自定义',
         annotations:[],
+        referenceWorks:[],
         era:book.dynasty||'未知',
-        note:''
+        note:'',
+        textSourceName:'用户输入',
+        textSourceUrl:'',
+        editionNote:'来源待确认',
+        contentNote:'本内容为基于用户输入文本的结构化演示，未关联权威注本，仅供格式参考。'
       };
       document.getElementById('sourceCanon').textContent=info.canon;
       document.getElementById('sourceChapter').textContent=info.chapter;
       document.getElementById('sourceVersion').textContent=info.version;
       document.getElementById('sourceEra').textContent=info.era;
-      document.getElementById('sourceAnnotations').textContent='参考注本：'+(info.annotations.length?info.annotations.join('、'):'无');
+      document.getElementById('sourceAnnotations').textContent='参考注本：'+(info.referenceWorks&&info.referenceWorks.length?info.referenceWorks.join('、'):info.annotations&&info.annotations.length?info.annotations.join('、'):'无');
+
+      const sourceUrlEl=document.getElementById('sourceUrl');
+      if(info.textSourceUrl){
+        sourceUrlEl.href=info.textSourceUrl;
+        sourceUrlEl.textContent=(info.textSourceName||'原文来源')+'：'+info.textSourceUrl;
+        sourceUrlEl.parentElement.style.display='block';
+      }else{
+        sourceUrlEl.parentElement.style.display='none';
+      }
+      document.getElementById('sourceEditionNote').textContent='版本说明：'+(info.editionNote||'未提供');
+      document.getElementById('contentNote').textContent=info.contentNote||'本内容为基于古籍原文的结构化演示，具体创作时请结合权威注本复核。';
 
       const conf=output.confidence||{high:60,medium:30,low:10};
       document.getElementById('confHigh').style.width=conf.high+'%';
@@ -1234,15 +1298,34 @@
           alert('请填写典籍名称和原文');
           return;
         }
+        const dynasty=document.getElementById('manualDynasty').value.trim()||'待考';
+        const sourceName=document.getElementById('manualSourceName').value.trim();
+        const sourceUrl=document.getElementById('manualSourceUrl').value.trim();
+        const editionNote=document.getElementById('manualEditionNote').value.trim();
+        const referenceWorksStr=document.getElementById('manualReferenceWorks').value.trim();
+        const referenceWorks=referenceWorksStr?referenceWorksStr.split(/[、,，]/).map(s=>s.trim()).filter(Boolean):[];
         book={
           id:'manual',
           title:title,
           shortTitle:title.split('·').pop()||title,
-          dynasty:document.getElementById('manualDynasty').value.trim()||'古籍',
-          source:'手动输入',
+          dynasty:dynasty,
+          source:'手动输入 · 版本待确认',
           text:text,
           coverChars:title.slice(0,2),
-          quote:text.slice(0,12)
+          quote:text.slice(0,12),
+          sourceInfo:{
+            canon:title,
+            chapter:'用户输入',
+            version:'用户自定义',
+            annotations:referenceWorks,
+            referenceWorks:referenceWorks,
+            era:dynasty,
+            note:'',
+            textSourceName:sourceName||'用户输入',
+            textSourceUrl:sourceUrl,
+            editionNote:editionNote||'来源待确认，请补充权威版本与参考注本',
+            contentNote:'本内容为基于用户输入文本的结构化演示。白话解读、分镜、传播建议、分享卡文案由系统按原文结构生成，未关联权威注本，仅供格式参考，不可直接作为科普依据。'
+          }
         };
       }
 
