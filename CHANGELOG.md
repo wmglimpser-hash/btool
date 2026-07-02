@@ -4,6 +4,19 @@
 
 ---
 
+## [1.2.1] 2025-07-02 · 推送 GitHub 并验证部署
+
+### 新增
+- 初始化本地 Git 仓库并关联远程 `origin`
+- 首次完整推送 `main` 分支至 GitHub
+
+### 验证
+- GitHub Pages 已生效：https://wmglimpser-hash.github.io/btool/
+- `index.html` 工具站主页面可正常访问
+- `showcase.html` 作品展示页面可正常访问
+
+---
+
 ## [1.2.0] 2025-07-02 · 活化溯源与反伪科普机制
 
 ### 新增
