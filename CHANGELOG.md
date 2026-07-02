@@ -16,6 +16,11 @@
 - **html2canvas 失败降级**：页面加载时检测依赖是否可用，未加载时禁用下载按钮并显示提示，提供「复制文案」作为替代方案
 - **输出数据统一绑定**：所有渲染函数统一从 `output` 对象读取数据，避免内置书目与手动输入状态串台
 
+### 验证
+- 已推送 GitHub：`513e9be..7c269c3`
+- GitHub Pages 已更新：https://wmglimpser-hash.github.io/btool/
+- `index.html` 与 `showcase.html` 在线版本可正常访问
+
 ---
 
 ## [1.2.1] 2026-07-02 · 推送 GitHub 并验证部署
