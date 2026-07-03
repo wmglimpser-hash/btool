@@ -231,6 +231,90 @@
     .reader-source a{color:var(--cinnabar);text-decoration:none}
     .reader-source a:hover{text-decoration:underline}
 
+    /* 可信来源卡 */
+    .source-card{
+      margin-bottom:20px;
+      padding:16px 20px;
+      background:rgba(255,255,255,.4);
+      border:1px solid rgba(43,33,24,.12);
+      border-radius:6px;
+      display:none;
+    }
+    .source-card.show{display:block;animation:cardFade .2s ease}
+    @keyframes cardFade{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    .source-card-header{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .source-status{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 12px;
+      border-radius:14px;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:1px;
+    }
+    .source-status.traceable{
+      background:rgba(74,124,89,.12);
+      color:var(--green);
+      border:1px solid var(--green);
+    }
+    .source-status.pending{
+      background:rgba(201,162,27,.12);
+      color:var(--gold);
+      border:1px solid var(--gold);
+    }
+    .source-status-icon{
+      width:8px;height:8px;
+      border-radius:50%;
+      background:currentColor;
+    }
+    .source-card-title{
+      font-size:15px;
+      font-weight:600;
+      color:var(--ink);
+      letter-spacing:1px;
+    }
+    .source-card-body{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:10px 20px;
+      font-size:13px;
+      color:var(--ink-light);
+      line-height:1.7;
+    }
+    .source-card-item{
+      display:flex;
+      gap:8px;
+    }
+    .source-card-item-label{
+      color:var(--ink);
+      font-weight:500;
+      white-space:nowrap;
+    }
+    .source-card-item-value a{
+      color:var(--cinnabar);
+      text-decoration:none;
+      transition:color .2s;
+    }
+    .source-card-item-value a:hover{color:var(--cinnabar-dark);text-decoration:underline}
+    .source-card-reference{
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px dashed rgba(43,33,24,.1);
+      font-size:12px;
+      color:var(--ink-light);
+      opacity:.8;
+    }
+    .source-card-reference-label{
+      color:var(--ink);
+      font-weight:500;
+    }
+
     /* 显性工具条 */
     .toolbar-wrap{
       margin-bottom:20px;
@@ -417,6 +501,51 @@
       font-size:15px;
       line-height:1.9;
       color:var(--ink-light);
+    }
+
+    /* 三段布局样式 */
+    .product-selected-section,
+    .product-content-section,
+    .product-source-section{
+      padding:14px 20px;
+    }
+    .product-section-label{
+      font-size:12px;
+      color:var(--ink-light);
+      opacity:.7;
+      margin-bottom:8px;
+      letter-spacing:1px;
+    }
+    .product-selected-section{
+      min-height:60px;
+      background:rgba(43,33,24,.04);
+      border-bottom:1px solid rgba(43,33,24,.1);
+    }
+    .product-selected-text{
+      font-size:14px;
+      color:var(--ink);
+      line-height:1.7;
+      font-style:italic;
+      opacity:.9;
+    }
+    .product-content-section{
+      min-height:120px;
+      background:rgba(255,255,255,.5);
+      border-bottom:1px solid rgba(43,33,24,.1);
+    }
+    .product-content-body{
+      font-size:15px;
+      line-height:1.9;
+      color:var(--ink-light);
+    }
+    .product-source-section{
+      min-height:50px;
+      background:rgba(43,33,24,.06);
+    }
+    .product-source-body{
+      font-size:13px;
+      color:var(--ink-light);
+      line-height:1.6;
     }
     
     /* 白话解读 */
@@ -960,7 +1089,10 @@
               来源：<a href="https://ctext.org/book-of-poetry/guan-ju/zh" target="_blank">中国哲学书电子化计划</a>
             </div>
           </div>
-        </div>
+    </div>
+
+        <!-- 可信来源卡 -->
+        <div class="source-card" id="sourceCard"></div>
 
         <!-- 显性工具条 -->
         <div class="toolbar-wrap">
@@ -1035,7 +1167,19 @@
             <h4 class="product-panel-title" id="productPanelTitle">白话解读</h4>
             <button class="product-panel-close" id="productPanelClose">×</button>
           </div>
-          <div class="product-panel-body" id="productPanelBody"></div>
+          <!-- 三段布局：选中原文 / 生成内容 / 来源说明 -->
+          <div class="product-selected-section" id="productSelectedSection">
+            <div class="product-section-label">当前选中原文</div>
+            <div class="product-selected-text" id="productSelectedText"></div>
+          </div>
+          <div class="product-content-section" id="productContentSection">
+            <div class="product-section-label">生成内容</div>
+            <div class="product-content-body" id="productPanelBody"></div>
+          </div>
+          <div class="product-source-section" id="productSourceSection">
+            <div class="product-section-label">来源 / 可信度</div>
+            <div class="product-source-body" id="productSourceBody"></div>
+          </div>
         </div>
       </main>
     </div>
@@ -1295,12 +1439,75 @@
         sourceEl.innerHTML='';
       }
       
+      // 渲染可信来源卡
+      renderSourceCard(book);
+      
       const contentEl=document.getElementById('readerContent');
       contentEl.innerHTML=book.text.split('\n').map(p=>`<p>${p}</p>`).join('');
       
       // 关闭产物面板
       document.getElementById('productPanel').classList.remove('show');
       document.getElementById('productMenu').classList.remove('show');
+    }
+    
+    // 渲染可信来源卡
+    function renderSourceCard(book){
+      const cardEl=document.getElementById('sourceCard');
+      const sourceInfo=book.sourceInfo||{};
+      
+      // 判断是否为内置书目（有完整的 sourceInfo 且 textSourceUrl 包含 ctext.org）
+      const isBuiltin=sourceInfo.textSourceUrl&&sourceInfo.textSourceUrl.includes('ctext.org');
+      const isTraceable=isBuiltin;
+      
+      // 状态标签
+      const statusClass=isTraceable?'traceable':'pending';
+      const statusText=isTraceable?'可追溯':'待核验';
+      
+      // 来源链接
+      const sourceLink=sourceInfo.textSourceUrl
+        ?`<a href="${sourceInfo.textSourceUrl}" target="_blank">${sourceInfo.textSourceName||'原文链接'}</a>`
+        :sourceInfo.textSourceName||'用户输入';
+      
+      // 版本信息
+      const version=sourceInfo.version||(isTraceable?'版本待确认':'版本待确认');
+      
+      // 参考注本
+      const referenceHtml=sourceInfo.referenceWorks&&sourceInfo.referenceWorks.length>0
+        ?`<div class="source-card-reference"><span class="source-card-reference-label">参考注本：</span>${sourceInfo.referenceWorks.join('、')}</div>`
+        :'';
+      
+      // 构建来源卡内容
+      const cardContent=`
+        <div class="source-card-header">
+          <div class="source-status ${statusClass}">
+            <span class="source-status-icon"></span>
+            ${statusText}
+          </div>
+          <div class="source-card-title">${sourceInfo.canon||book.title}</div>
+        </div>
+        <div class="source-card-body">
+          <div class="source-card-item">
+            <span class="source-card-item-label">原文来源：</span>
+            <span class="source-card-item-value">${sourceLink}</span>
+          </div>
+          <div class="source-card-item">
+            <span class="source-card-item-label">版本：</span>
+            <span class="source-card-item-value">${version}</span>
+          </div>
+          <div class="source-card-item">
+            <span class="source-card-item-label">篇章：</span>
+            <span class="source-card-item-value">${sourceInfo.chapter||book.source||''}</span>
+          </div>
+          <div class="source-card-item">
+            <span class="source-card-item-label">时代：</span>
+            <span class="source-card-item-value">${sourceInfo.era||book.dynasty||''}</span>
+          </div>
+        </div>
+        ${referenceHtml}
+      `;
+      
+      cardEl.innerHTML=cardContent;
+      cardEl.classList.add('show');
     }
     
     // 更新工具条按钮状态
@@ -1351,7 +1558,9 @@
       
       const panel=document.getElementById('productPanel');
       const titleEl=document.getElementById('productPanelTitle');
+      const selectedTextEl=document.getElementById('productSelectedText');
       const bodyEl=document.getElementById('productPanelBody');
+      const sourceBodyEl=document.getElementById('productSourceBody');
       
       // 从当前书籍的 outputs 中提取，或动态生成
       const outputs=currentBook.outputs||{};
@@ -1371,13 +1580,13 @@
       const sourceInfo=currentBook.sourceInfo||{};
       let sourceHtml='';
       if(sourceInfo.textSourceUrl){
-        sourceHtml=`来源：${sourceInfo.canon||currentBook.title} · ${sourceInfo.chapter||currentBook.source||''} | <a href="${sourceInfo.textSourceUrl}" target="_blank">${sourceInfo.textSourceName||'原文链接'}</a>`;
+        sourceHtml=`${sourceInfo.canon||currentBook.title} · ${sourceInfo.chapter||currentBook.source||''} | <a href="${sourceInfo.textSourceUrl}" target="_blank">${sourceInfo.textSourceName||'原文链接'}</a>`;
       }else if(sourceInfo.textSourceName){
-        sourceHtml=`来源：${sourceInfo.canon||currentBook.title} · ${sourceInfo.chapter||currentBook.source||''} | ${sourceInfo.textSourceName}`;
+        sourceHtml=`${sourceInfo.canon||currentBook.title} · ${sourceInfo.chapter||currentBook.source||''} | ${sourceInfo.textSourceName}`;
       }else{
-        sourceHtml=`来源：${currentBook.title} · ${currentBook.source||''}（用户输入，版本待确认）`;
+        sourceHtml=`${currentBook.title} · ${currentBook.source||''}（用户输入，版本待确认）`;
       }
-      const sourceFooter=`<div class="source-footer">${sourceHtml}</div>`;
+      const sourceFooter=reliabilityTag+`<div class="source-footer">${sourceHtml}</div>`;
       
       switch(type){
         case 'vernacular':
@@ -1484,8 +1693,14 @@
       }
       
       titleEl.textContent=title;
-      // 考据/演绎标签 + 内容 + 来源标注
-      bodyEl.innerHTML=reliabilityTag+content+sourceFooter;
+      // 三段布局渲染
+      // 1. 顶部：选中原文（截取前100字）
+      const displaySelectedText=selectedText.length>100?selectedText.slice(0,100)+'……':selectedText;
+      selectedTextEl.textContent=displaySelectedText;
+      // 2. 中间：生成内容
+      bodyEl.innerHTML=content;
+      // 3. 底部：来源/可信度说明
+      sourceBodyEl.innerHTML=sourceFooter;
       panel.classList.add('show');
       
       // 隐藏菜单
