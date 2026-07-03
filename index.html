@@ -1258,6 +1258,520 @@
       
       .workspace{gap:14px}
     }
+
+    /* ============ 案例展示区 ============ */
+    .case-showcase{
+      background:rgba(255,255,255,.65);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:24px 26px 22px;
+      margin-bottom:20px;
+      position:relative;
+      overflow:hidden;
+      backdrop-filter:blur(2px);
+    }
+    .case-showcase::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.4;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise2)' opacity='0.25'/%3E%3C/svg%3E");
+    }
+    .case-showcase>*{position:relative;z-index:1}
+
+    /* 主题横幅 */
+    .case-theme-banner{
+      margin-bottom:16px;
+      padding-bottom:14px;
+      border-bottom:1px solid var(--border);
+    }
+    .case-theme-label{
+      display:inline-block;
+      font-size:11px;
+      letter-spacing:2px;
+      color:var(--cinnabar);
+      background:var(--cinnabar-light);
+      padding:3px 10px;
+      border-radius:10px;
+      margin-bottom:8px;
+    }
+    .case-theme-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:26px;
+      letter-spacing:3px;
+      color:var(--ink);
+      margin-bottom:6px;
+      line-height:1.4;
+    }
+    .case-theme-meta{
+      font-size:12px;
+      color:var(--ink-muted);
+      letter-spacing:1px;
+    }
+
+    /* 来源条 */
+    .case-source-bar{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:8px 12px;
+      padding:10px 12px;
+      background:rgba(26,20,16,.04);
+      border:1px solid var(--border);
+      border-radius:6px;
+      font-size:12px;
+      color:var(--ink-light);
+      margin-bottom:18px;
+    }
+    .case-source-bar .source-status{
+      font-size:11px;
+      padding:3px 9px;
+    }
+    .case-source-item{color:var(--ink-light)}
+    .case-source-bar a{
+      color:var(--cinnabar);
+      text-decoration:none;
+    }
+    .case-source-bar a:hover{text-decoration:underline}
+    .case-source-ref{
+      width:100%;
+      font-size:11px;
+      color:var(--ink-muted);
+      padding-top:6px;
+      border-top:1px dashed var(--border);
+    }
+
+    /* 三类产物网格 */
+    .case-categories{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+      margin-bottom:18px;
+    }
+    .case-category{
+      background:rgba(255,255,255,.45);
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:14px;
+      min-width:0;
+    }
+    .case-category-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:15px;
+      letter-spacing:3px;
+      margin-bottom:12px;
+      padding-bottom:8px;
+      border-bottom:2px solid var(--border);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    /* 文字类 = 墨色 */
+    .case-category:nth-child(1) .case-category-title{border-bottom-color:var(--ink);color:var(--ink)}
+    .case-category:nth-child(1) .case-category-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink)}
+    /* 图片类 = 金色 */
+    .case-category:nth-child(2) .case-category-title{border-bottom-color:var(--gold);color:var(--gold)}
+    .case-category:nth-child(2) .case-category-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+    /* 视频类 = 朱砂 */
+    .case-category:nth-child(3) .case-category-title{border-bottom-color:var(--cinnabar);color:var(--cinnabar)}
+    .case-category:nth-child(3) .case-category-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cinnabar)}
+
+    .case-cards{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    /* 文字类卡片 */
+    .case-card{
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--border);
+      border-left:3px solid var(--ink);
+      border-radius:4px;
+      padding:10px 12px;
+      font-size:12px;
+      line-height:1.7;
+      color:var(--ink-light);
+    }
+    .case-card-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:6px;
+    }
+    .case-card-title{
+      font-size:13px;
+      font-weight:600;
+      color:var(--ink);
+      letter-spacing:1px;
+    }
+    .case-card-body{
+      color:var(--ink-light);
+      font-size:12px;
+      line-height:1.8;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .case-card-footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:6px;
+      padding-top:6px;
+      border-top:1px dashed var(--border);
+      font-size:11px;
+      color:var(--ink-muted);
+    }
+    .case-source-tag{color:var(--ink-muted)}
+
+    /* 考据/演绎 badge */
+    .case-badge{
+      display:inline-block;
+      padding:2px 8px;
+      font-size:10px;
+      border-radius:10px;
+      letter-spacing:1px;
+      font-weight:600;
+    }
+    .case-badge.kaoju{
+      background:var(--green-light);
+      color:var(--green);
+      border:1px solid var(--green);
+    }
+    .case-badge.yanyi{
+      background:var(--cinnabar-light);
+      color:var(--cinnabar);
+      border:1px solid var(--cinnabar);
+    }
+
+    /* 状态标签 */
+    .case-status-tag{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:3px 8px;
+      font-size:11px;
+      border-radius:10px;
+      background:rgba(26,20,16,.05);
+      color:var(--ink-muted);
+      border:1px solid var(--border);
+    }
+    .case-status-tag.demo{
+      background:rgba(184,148,31,.1);
+      color:var(--gold);
+      border-color:var(--gold);
+    }
+    .case-status-tag.done{
+      background:var(--green-light);
+      color:var(--green);
+      border-color:var(--green);
+    }
+    .case-status-tag.loading{
+      background:rgba(163,50,31,.08);
+      color:var(--cinnabar);
+      border-color:var(--cinnabar);
+    }
+    .case-status-tag.failed{
+      background:rgba(163,50,31,.15);
+      color:var(--cinnabar-dark);
+      border-color:var(--cinnabar-dark);
+    }
+    .case-status-tag.idle{
+      background:rgba(26,20,16,.04);
+      color:var(--ink-muted);
+      border-color:var(--border);
+    }
+
+    /* 图片类预览卡 */
+    .case-preview-card{
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--border);
+      border-left:3px solid var(--gold);
+      border-radius:4px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .preview-visual{
+      height:90px;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:6px;
+      color:#fff;
+      font-size:11px;
+      letter-spacing:1px;
+      overflow:hidden;
+    }
+    .preview-icon{font-size:22px;line-height:1;position:relative;z-index:2}
+    .preview-label{font-size:11px;letter-spacing:2px;text-shadow:0 1px 3px rgba(0,0,0,.4);position:relative;z-index:2}
+    /* 金句卡：竖排书法风 */
+    .preview-quoteCard{
+      background:
+        linear-gradient(135deg, rgba(247,243,233,.95) 0%, rgba(232,223,202,.95) 100%),
+        repeating-linear-gradient(0deg, rgba(139,69,19,.04) 0 2px, transparent 2px 6px);
+      color:var(--ink);
+      position:relative;
+    }
+    .preview-quoteCard::before{
+      content:"窈窕淑女";
+      position:absolute;
+      writing-mode:vertical-rl;
+      text-orientation:upright;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:18px;
+      letter-spacing:4px;
+      color:var(--cinnabar);
+      right:18px;
+      top:50%;
+      transform:translateY(-50%);
+      text-shadow:0 0 1px rgba(163,50,31,.3);
+    }
+    .preview-quoteCard .preview-label{color:var(--ink-light);text-shadow:none}
+    /* 海报：水墨晕染 */
+    .preview-poster{
+      background:
+        radial-gradient(ellipse at 30% 30%, rgba(58,107,74,.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 70%, rgba(139,69,19,.3) 0%, transparent 60%),
+        linear-gradient(180deg, #e8dfca 0%, #c9b896 100%);
+      position:relative;
+    }
+    .preview-poster::before{
+      content:"关雎";
+      position:absolute;
+      writing-mode:vertical-rl;
+      text-orientation:upright;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:28px;
+      letter-spacing:6px;
+      color:rgba(255,255,255,.85);
+      right:14px;
+      top:8px;
+      text-shadow:0 1px 4px rgba(0,0,0,.5);
+    }
+    /* 图片 prompt：抽象渐变 */
+    .preview-imagePrompt{
+      background:
+        conic-gradient(from 45deg at 50% 50%, rgba(184,148,31,.5), rgba(163,50,31,.4), rgba(58,107,74,.4), rgba(184,148,31,.5));
+      position:relative;
+    }
+    .preview-imagePrompt::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:repeating-linear-gradient(45deg, transparent 0 8px, rgba(255,255,255,.06) 8px 16px);
+    }
+    .preview-prompt{
+      padding:8px 12px;
+      font-family:monospace;
+      font-size:11px;
+      color:var(--ink-light);
+      line-height:1.6;
+      background:rgba(26,20,16,.03);
+      border-top:1px solid var(--border);
+      min-height:32px;
+      word-break:break-word;
+    }
+    .preview-footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:6px 12px;
+      border-top:1px solid var(--border);
+      background:rgba(255,255,255,.5);
+    }
+    .loading-dots{
+      color:var(--cinnabar);
+      font-size:14px;
+      letter-spacing:2px;
+      animation:loadingPulse 1s ease-in-out infinite;
+    }
+    @keyframes loadingPulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+    /* 视频类分镜时间轴 */
+    .case-storyboard-timeline{
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      padding-bottom:8px;
+      margin-bottom:4px;
+      scrollbar-width:thin;
+    }
+    .case-storyboard-timeline::-webkit-scrollbar{height:5px}
+    .case-storyboard-timeline::-webkit-scrollbar-thumb{background:rgba(163,50,31,.25);border-radius:3px}
+    .timeline-shot{
+      flex:0 0 150px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--border);
+      border-left:3px solid var(--cinnabar);
+      border-radius:4px;
+      padding:8px 10px;
+      font-size:11px;
+    }
+    .timeline-shot-time{
+      display:inline-block;
+      background:var(--cinnabar);
+      color:#fff;
+      font-size:10px;
+      padding:2px 6px;
+      border-radius:8px;
+      margin-bottom:5px;
+      letter-spacing:1px;
+    }
+    .timeline-shot-title{
+      font-weight:600;
+      font-size:12px;
+      color:var(--ink);
+      margin-bottom:3px;
+    }
+    .timeline-shot-desc{
+      font-size:10px;
+      color:var(--ink-light);
+      line-height:1.6;
+      margin-bottom:4px;
+    }
+    .timeline-shot-basis{
+      font-size:10px;
+      color:var(--gold);
+      padding-top:4px;
+      border-top:1px dashed var(--border);
+    }
+
+    /* 主题输入区 */
+    .theme-input-section{
+      margin-top:18px;
+      padding-top:16px;
+      border-top:1px solid var(--border);
+    }
+    .theme-input-row{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+    }
+    .theme-input-row input{
+      flex:1;
+      min-width:0;
+      padding:10px 14px;
+      border:1px solid var(--border-strong);
+      background:rgba(255,255,255,.85);
+      border-radius:5px;
+      font-family:inherit;
+      font-size:13px;
+      color:var(--ink);
+      transition:border-color .2s,box-shadow .2s;
+    }
+    .theme-input-row input:focus{
+      outline:none;
+      border-color:var(--cinnabar);
+      box-shadow:0 0 0 3px rgba(163,50,31,.12);
+    }
+    .theme-submit-btn{
+      flex:0 0 auto;
+      padding:10px 18px;
+      border:none;
+      background:var(--cinnabar);
+      color:#fff;
+      border-radius:5px;
+      font-family:inherit;
+      font-size:13px;
+      cursor:pointer;
+      transition:background .2s;
+      letter-spacing:1px;
+    }
+    .theme-submit-btn:hover{background:var(--cinnabar-dark)}
+    .theme-submit-btn:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
+    }
+    .theme-presets{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-bottom:10px;
+    }
+    .theme-preset{
+      padding:5px 12px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.5);
+      color:var(--ink-light);
+      border-radius:14px;
+      font-family:inherit;
+      font-size:12px;
+      cursor:pointer;
+      transition:all .2s;
+    }
+    .theme-preset:hover{
+      border-color:var(--cinnabar);
+      color:var(--cinnabar);
+      background:var(--cinnabar-light);
+    }
+    .api-status-indicator{
+      font-size:11px;
+      color:var(--ink-muted);
+      letter-spacing:1px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .api-status-indicator::before{
+      content:"";
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:var(--gold);
+    }
+
+    /* 工作台区域标题 */
+    .workspace-section-header{
+      margin:8px 0 14px;
+      padding:10px 0;
+      text-align:center;
+      position:relative;
+    }
+    .workspace-section-header::before,
+    .workspace-section-header::after{
+      content:"";
+      position:absolute;
+      top:50%;
+      width:80px;
+      height:1px;
+      background:var(--border);
+    }
+    .workspace-section-header::before{left:50%;transform:translateX(-180px)}
+    .workspace-section-header::after{right:50%;transform:translateX(180px)}
+    .workspace-section-header h2{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:20px;
+      letter-spacing:4px;
+      color:var(--ink);
+      margin-bottom:4px;
+    }
+    .workspace-section-header p{
+      font-size:12px;
+      color:var(--ink-muted);
+      letter-spacing:1px;
+    }
+
+    /* 案例区响应式 */
+    @media(max-width:900px){
+      .case-showcase{padding:18px 14px}
+      .case-theme-title{font-size:20px;letter-spacing:2px}
+      .case-categories{grid-template-columns:1fr;gap:12px}
+      .case-source-bar{font-size:11px;gap:6px 8px;padding:8px 10px}
+      .workspace-section-header::before,
+      .workspace-section-header::after{display:none}
+      .theme-input-row input{font-size:14px}
+    }
+    @media(max-width:390px){
+      .case-showcase{padding:14px 10px}
+      .case-theme-title{font-size:18px}
+      .case-source-bar{flex-direction:column;align-items:flex-start;gap:4px}
+      .timeline-shot{flex:0 0 130px}
+      .preview-visual{height:72px}
+    }
   </style>
 </head>
 <body>
@@ -1279,13 +1793,61 @@
         <a href="https://github.com/wmglimpser-hash/btool" target="_blank">GitHub</a>
       </nav>
     </header>
-    
+
+    <!-- 案例驱动首屏 -->
+    <section class="case-showcase" id="caseShowcase">
+      <div class="case-theme-banner">
+        <div class="case-theme-label">当前案例主题</div>
+        <h2 class="case-theme-title" id="caseThemeTitle">《关雎》如何表达理想关系？</h2>
+        <div class="case-theme-meta" id="caseThemeMeta">基于《诗经·周南》· 来源可追溯</div>
+      </div>
+
+      <div class="case-source-bar" id="caseSourceBar"></div>
+
+      <div class="case-categories" id="caseCategories">
+        <!-- 文字类 -->
+        <div class="case-category">
+          <h3 class="case-category-title">文字</h3>
+          <div class="case-cards" id="caseTextCards"></div>
+        </div>
+        <!-- 图片类 -->
+        <div class="case-category">
+          <h3 class="case-category-title">图片</h3>
+          <div class="case-cards" id="caseImageCards"></div>
+        </div>
+        <!-- 视频类 -->
+        <div class="case-category">
+          <h3 class="case-category-title">视频</h3>
+          <div id="caseVideoArea"></div>
+        </div>
+      </div>
+
+      <!-- 主题输入 -->
+      <div class="theme-input-section">
+        <div class="theme-input-row">
+          <input type="text" id="themeInput" placeholder="输入一个传播主题，生成文字/图片/视频全场景案例" autocomplete="off">
+          <button id="themeSubmit" class="theme-submit-btn">生成案例</button>
+        </div>
+        <div class="theme-presets" id="themePresets">
+          <button class="theme-preset" data-theme="关雎里的理想关系">关雎里的理想关系</button>
+          <button class="theme-preset" data-theme="庄子如何看待自由">庄子如何看待自由</button>
+          <button class="theme-preset" data-theme="论语中的学习方法">论语中的学习方法</button>
+        </div>
+        <div class="api-status-indicator" id="apiStatus">演示模式 · 数据为预设模板</div>
+      </div>
+    </section>
+
     <!-- 移动端书签 tabs -->
     <div class="shelf-tabs" id="shelfTabs">
       <div class="shelf-tabs-scroll" id="shelfTabsScroll"></div>
       <button class="shelf-input-fixed-btn" id="inputBtnMobile">+ 输入</button>
     </div>
-    
+
+    <div class="workspace-section-header">
+      <h2>进入创作</h2>
+      <p>选择古籍，选中原文，生成你自己的内容产物</p>
+    </div>
+
     <div class="workspace">
       <!-- 左侧书架 -->
       <aside class="shelf">
@@ -1744,6 +2306,13 @@
       document.getElementById('selectionHint').classList.remove('show');
       closeMobileResultSheet();
       renderSidePanel('demo');
+
+      // 更新案例展示区的来源信息
+      if(caseState.data){
+        caseState.data.book=currentBook;
+        renderCaseSourceBar(currentBook);
+        document.getElementById('caseThemeMeta').textContent=`基于《${currentBook.title}》· ${(currentBook.sourceInfo?.textSourceUrl?'来源可追溯':'用户输入待核验')}`;
+      }
     }
     
     // 渲染可信来源卡
@@ -2318,9 +2887,384 @@
       }
     });
     
+    // ============ API 客户端（预留端口，demo 兜底） ============
+    const ApiClient={
+      BASE_URL:'', // 空=无后端，用 demo 数据
+
+      async generateCase(payload){
+        // POST /api/case/generate
+        // payload: { bookId, theme, text, sourceInfo }
+        if(!this.BASE_URL){
+          console.log('[api] 无后端，使用 demo case 数据');
+          return this._fallbackCase(payload);
+        }
+        try{
+          const res=await fetch(`${this.BASE_URL}/api/case/generate`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(payload)
+          });
+          if(!res.ok) throw new Error(`HTTP ${res.status}`);
+          return await res.json();
+        }catch(e){
+          console.warn('[api] case/generate 失败，降级 demo',e);
+          return this._fallbackCase(payload);
+        }
+      },
+
+      async generateImage(payload){
+        // POST /api/image/generate
+        if(!this.BASE_URL) return {status:'demo',url:null,prompt:payload.prompt};
+        try{
+          const res=await fetch(`${this.BASE_URL}/api/image/generate`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(payload)
+          });
+          if(!res.ok) throw new Error(`HTTP ${res.status}`);
+          return await res.json();
+        }catch(e){
+          console.warn('[api] image/generate 失败，降级',e);
+          return {status:'failed',url:null,prompt:payload.prompt,error:e.message};
+        }
+      },
+
+      async generateVideo(payload){
+        // POST /api/video/generate
+        if(!this.BASE_URL) return {status:'demo',url:null,prompt:payload.prompt};
+        try{
+          const res=await fetch(`${this.BASE_URL}/api/video/generate`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(payload)
+          });
+          if(!res.ok) throw new Error(`HTTP ${res.status}`);
+          return await res.json();
+        }catch(e){
+          console.warn('[api] video/generate 失败，降级',e);
+          return {status:'failed',url:null,prompt:payload.prompt,error:e.message};
+        }
+      },
+
+      async getJobStatus(jobId){
+        // GET /api/jobs/:id
+        if(!this.BASE_URL) return {status:'completed',progress:100};
+        try{
+          const res=await fetch(`${this.BASE_URL}/api/jobs/${jobId}`);
+          if(!res.ok) throw new Error(`HTTP ${res.status}`);
+          return await res.json();
+        }catch(e){
+          console.warn('[api] jobs/:id 失败',e);
+          return {status:'failed',error:e.message};
+        }
+      },
+
+      _fallbackCase(payload){
+        // 基于 bookId 和 theme 返回 demo 案例数据
+        const book=books.find(b=>b.id===payload.bookId)||books[0];
+        const o=book.outputs||{};
+        return {
+          status:'demo',
+          theme:payload.theme,
+          book:book,
+          text:{
+            vernacular:{content:o.vernacular||'（演示）白话解读内容',badge:'考据',source:'基于原文'},
+            highlights:{content:(o.highlights||[]).join('\n'),badge:'考据',source:'基于原文'},
+            xiaohongshu:{content:demoData.xiaohongshu||'（演示）小红书文案',badge:'演绎',source:'演绎生成'}
+          },
+          image:{
+            quoteCard:{prompt:'金句卡片：窈窕淑女，君子好逑。竖排书法，朱砂印章，宣纸纹理',status:'demo'},
+            poster:{prompt:'竖版海报：河洲雎鸠，水墨晕染，古琴意境，竖排标题"关雎"',status:'demo'},
+            imagePrompt:{prompt:'A serene river scene at dawn, waterbirds gliding above a sandbar, ink wash painting style, traditional Chinese aesthetic, warm golden light',status:'demo'}
+          },
+          video:{
+            storyboard:o.storyboard||demoData.storyboard,
+            narration:'（旁白）关关雎鸠，在河之洲。这是中国人最古老的爱情诗篇...',
+            videoPrompt:'Cinematic shot of a river at dawn, waterbirds flying, ink wash transition, traditional Chinese music, 60 seconds',
+            titles:['诗经关雎：中国最古老的爱情诗','关雎里的理想关系 | 古籍新读'],
+            tags:['#诗经','#关雎','#传统文化','#古籍新读']
+          }
+        };
+      }
+    };
+
+    // 案例状态：idle | generating | completed | failed
+    let caseState={
+      status:'completed',
+      theme:'《关雎》如何表达理想关系？',
+      data:null
+    };
+
+    // 预设主题与书籍绑定
+    const themePresets=[
+      {theme:'关雎里的理想关系',bookId:'zhou-nan',displayTheme:'《关雎》如何表达理想关系？'},
+      {theme:'庄子如何看待自由',bookId:'xiaoyao',displayTheme:'庄子如何看待自由？'},
+      {theme:'论语中的学习方法',bookId:'xueer',displayTheme:'论语中的学习方法'}
+    ];
+
+    // 渲染案例展示区
+    function renderCaseShowcase(caseData){
+      const book=caseData.book||books[0];
+      const theme=caseData.theme||caseState.theme;
+
+      // 主题横幅
+      document.getElementById('caseThemeTitle').textContent=theme;
+      document.getElementById('caseThemeMeta').textContent=`基于《${book.title}》· ${(book.sourceInfo?.textSourceUrl?'来源可追溯':'用户输入待核验')}`;
+
+      // 来源条
+      renderCaseSourceBar(book);
+
+      // 文字类产物
+      renderCaseTextCards(caseData.text);
+
+      // 图片类产物
+      renderCaseImageCards(caseData.image);
+
+      // 视频类产物
+      renderCaseVideoArea(caseData.video);
+    }
+
+    function renderCaseSourceBar(book){
+      const si=book.sourceInfo||{};
+      const isTraceable=si.textSourceUrl&&si.textSourceUrl.includes('ctext.org');
+      const statusClass=isTraceable?'traceable':'pending';
+      const statusText=isTraceable?'可追溯':'待核验';
+      const sourceLink=si.textSourceUrl
+        ?`<a href="${si.textSourceUrl}" target="_blank">${si.textSourceName||'原文链接'}</a>`
+        :si.textSourceName||'用户输入';
+
+      document.getElementById('caseSourceBar').innerHTML=`
+        <span class="source-status ${statusClass}"><span class="source-status-icon"></span>${statusText}</span>
+        <span class="case-source-item">${si.canon||book.title}</span>
+        <span class="case-source-item">${si.version||'版本待确认'}</span>
+        <span class="case-source-item">${si.chapter||book.source||''}</span>
+        <span class="case-source-item">${sourceLink}</span>
+        ${si.referenceWorks&&si.referenceWorks.length>0?`<span class="case-source-ref">参考注本：${si.referenceWorks.join('、')}</span>`:''}
+      `;
+    }
+
+    function renderCaseTextCards(text){
+      if(!text){
+        document.getElementById('caseTextCards').innerHTML='<div class="case-status-tag">未生成</div>';
+        return;
+      }
+      const items=[
+        {key:'vernacular',label:'白话解读',badge:text.vernacular?.badge||'考据',source:text.vernacular?.source||'基于原文'},
+        {key:'highlights',label:'传播要点',badge:text.highlights?.badge||'考据',source:text.highlights?.source||'基于原文'},
+        {key:'xiaohongshu',label:'小红书文案',badge:text.xiaohongshu?.badge||'演绎',source:text.xiaohongshu?.source||'演绎生成'}
+      ];
+
+      document.getElementById('caseTextCards').innerHTML=items.map(item=>{
+        const content=text[item.key]?.content||'';
+        const isDemo=caseState.status==='completed'&&!ApiClient.BASE_URL;
+        return `
+          <div class="case-card">
+            <div class="case-card-header">
+              <span class="case-card-title">${item.label}</span>
+              <span class="case-badge ${item.badge==='考据'?'kaoju':'yanyi'}">${item.badge}</span>
+            </div>
+            <div class="case-card-body">${content.replace(/\n/g,'<br>')}</div>
+            <div class="case-card-footer">
+              <span class="case-source-tag">${item.source}</span>
+              ${isDemo?'<span class="case-status-tag demo">演示数据</span>':''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCaseImageCards(image){
+      if(!image){
+        document.getElementById('caseImageCards').innerHTML='<div class="case-status-tag">未生成</div>';
+        return;
+      }
+      const items=[
+        {key:'quoteCard',label:'金句卡片',icon:'📝'},
+        {key:'poster',label:'竖版海报',icon:'🖼'},
+        {key:'imagePrompt',label:'图片 Prompt',icon:'💡'}
+      ];
+
+      document.getElementById('caseImageCards').innerHTML=items.map(item=>{
+        const data=image[item.key]||{};
+        const status=data.status||'demo';
+        const statusText=status==='demo'?'演示数据':status==='completed'?'已生成':status==='generating'?'生成中':'未生成';
+        const statusClass=status==='demo'?'demo':status==='completed'?'done':status==='generating'?'loading':'idle';
+
+        return `
+          <div class="case-preview-card">
+            <div class="preview-visual preview-${item.key}">
+              <span class="preview-icon">${item.icon}</span>
+              <span class="preview-label">${item.label}</span>
+            </div>
+            <div class="preview-prompt">${data.prompt||''}</div>
+            <div class="preview-footer">
+              <span class="case-status-tag ${statusClass}">${statusText}</span>
+              ${status==='generating'?'<span class="loading-dots">···</span>':''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCaseVideoArea(video){
+      if(!video){
+        document.getElementById('caseVideoArea').innerHTML='<div class="case-status-tag">未生成</div>';
+        return;
+      }
+
+      // 分镜时间轴
+      const shots=video.storyboard||[];
+      const timelineHtml=shots.length>0?`
+        <div class="case-storyboard-timeline">
+          ${shots.map(s=>`
+            <div class="timeline-shot">
+              <div class="timeline-shot-time">${s.time}</div>
+              <div class="timeline-shot-title">${s.title}</div>
+              <div class="timeline-shot-desc">${s.desc}</div>
+              <div class="timeline-shot-basis">原文：${s.basis}</div>
+            </div>
+          `).join('')}
+        </div>
+      `:'<div class="case-status-tag">无分镜数据</div>';
+
+      // 旁白稿 + 视频prompt + 标题标签
+      const extraCards=`
+        <div class="case-cards" style="margin-top:12px">
+          <div class="case-card">
+            <div class="case-card-header">
+              <span class="case-card-title">旁白稿</span>
+              <span class="case-badge yanyi">演绎</span>
+            </div>
+            <div class="case-card-body">${video.narration||''}</div>
+          </div>
+          <div class="case-card">
+            <div class="case-card-header">
+              <span class="case-card-title">视频 Prompt</span>
+              <span class="case-badge yanyi">演绎</span>
+            </div>
+            <div class="case-card-body" style="font-family:monospace;font-size:12px">${video.videoPrompt||''}</div>
+          </div>
+          <div class="case-card">
+            <div class="case-card-header">
+              <span class="case-card-title">发布标题/标签</span>
+              <span class="case-badge yanyi">演绎</span>
+            </div>
+            <div class="case-card-body">
+              ${(video.titles||[]).map(t=>`<div>${t}</div>`).join('')}
+              <div style="margin-top:6px;color:var(--cinnabar)">${(video.tags||[]).join(' ')}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('caseVideoArea').innerHTML=timelineHtml+extraCards;
+    }
+
+    // 生成案例（主题输入触发）
+    async function generateCaseWithTheme(theme){
+      if(!currentBook){
+        alert('请先选择或输入古籍资源');
+        return;
+      }
+
+      caseState.status='generating';
+      caseState.theme=theme;
+      updateApiStatus('生成中...');
+
+      // 显示生成中状态
+      document.getElementById('caseTextCards').innerHTML='<div class="case-status-tag loading">文字类生成中···</div>';
+      document.getElementById('caseImageCards').innerHTML='<div class="case-status-tag loading">图片类生成中···</div>';
+      document.getElementById('caseVideoArea').innerHTML='<div class="case-status-tag loading">视频类生成中···</div>';
+
+      try{
+        const payload={
+          bookId:currentBook.id,
+          theme:theme,
+          text:currentBook.text,
+          sourceInfo:currentBook.sourceInfo
+        };
+
+        const result=await ApiClient.generateCase(payload);
+        caseState.data=result;
+        caseState.status='completed';
+
+        renderCaseShowcase(result);
+
+        if(result.status==='demo'){
+          updateApiStatus('演示模式 · 数据为预设模板');
+        }else{
+          updateApiStatus('已生成 · 基于API返回');
+        }
+      }catch(e){
+        console.error('[case] 生成失败',e);
+        caseState.status='failed';
+        updateApiStatus('生成失败 · 点击重试');
+        document.getElementById('caseCategories').innerHTML=`<div class="case-status-tag failed">生成失败：${e.message} <button onclick="generateCaseWithTheme('${theme}')">重试</button></div>`;
+      }
+    }
+
+    function updateApiStatus(text){
+      document.getElementById('apiStatus').textContent=text;
+    }
+
+    // 初始化案例展示
+    function initCaseShowcase(){
+      // 默认加载关雎案例
+      const defaultCase=ApiClient._fallbackCase({
+        bookId:'zhou-nan',
+        theme:'《关雎》如何表达理想关系？',
+        text:books[0].text,
+        sourceInfo:books[0].sourceInfo
+      });
+      caseState.data=defaultCase;
+      renderCaseShowcase(defaultCase);
+
+      // 主题输入按钮
+      document.getElementById('themeSubmit').addEventListener('click',()=>{
+        const theme=document.getElementById('themeInput').value.trim();
+        if(!theme){
+          alert('请输入传播主题');
+          return;
+        }
+        generateCaseWithTheme(theme);
+      });
+
+      // 回车提交
+      document.getElementById('themeInput').addEventListener('keydown',(e)=>{
+        if(e.key==='Enter'){
+          document.getElementById('themeSubmit').click();
+        }
+      });
+
+      // 预设主题
+      document.querySelectorAll('.theme-preset').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          const theme=btn.dataset.theme;
+          const preset=themePresets.find(p=>p.theme===theme);
+          if(preset){
+            // 切换到对应书籍
+            currentBook=books.find(b=>b.id===preset.bookId)||books[0];
+            // 更新书架激活状态
+            document.querySelectorAll('.shelf-book').forEach(e=>e.classList.remove('active'));
+            const shelfEl=document.querySelector(`.shelf-book[data-id="${preset.bookId}"]`);
+            if(shelfEl) shelfEl.classList.add('active');
+            // 更新移动端tabs
+            document.querySelectorAll('.shelf-tab').forEach(e=>e.classList.remove('active'));
+            const tabEl=document.querySelector(`.shelf-tab[data-id="${preset.bookId}"]`);
+            if(tabEl) tabEl.classList.add('active');
+            // 渲染阅读器和案例
+            renderReader();
+            generateCaseWithTheme(preset.displayTheme);
+            document.getElementById('themeInput').value=theme;
+          }
+        });
+      });
+    }
+
     // 初始化
     renderShelf();
     renderReader();
+    initCaseShowcase();
     if(isMobileView()){
       document.getElementById('sidePanel').classList.add('mobile-peek');
     }
