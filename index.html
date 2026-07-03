@@ -7,6 +7,7 @@
   <meta name="description" content="阅读古籍原文，选中片段后可生成白话解读、传播要点、分镜脚本、分享卡片等内容产物。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <script src="html2canvas.min.js" defer></script>
   <style>
     :root{
       --paper:#f7f3e9;
@@ -463,6 +464,7 @@
         max-height:none;
       }
     }
+    .mobile-sheet-handle{display:none}
     .panel-header{
       padding:14px 16px 10px;
       border-bottom:1px solid var(--border);
@@ -903,6 +905,46 @@
       margin-bottom:6px;
     }
     .demo-share-mini-tags{font-size:9px;color:var(--cinnabar)}
+    .demo-selected-text{
+      font-size:13px;
+      color:var(--ink);
+      line-height:1.8;
+      margin-bottom:12px;
+      font-style:italic;
+    }
+    .demo-expand-btn{
+      width:100%;
+      margin-top:10px;
+      padding:9px 12px;
+      border:1px dashed var(--border-strong);
+      background:rgba(255,255,255,.4);
+      color:var(--ink-light);
+      border-radius:5px;
+      font-family:inherit;
+      font-size:12px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      transition:all .2s;
+    }
+    .demo-expand-btn:hover{
+      background:var(--cinnabar-light);
+      border-color:var(--cinnabar);
+      color:var(--cinnabar);
+    }
+    .demo-expand-btn svg{
+      width:14px;height:14px;
+      transition:transform .2s;
+    }
+    .demo-expand-btn.open svg{transform:rotate(180deg)}
+    .demo-expand-content{
+      max-height:0;
+      overflow:hidden;
+      transition:max-height .3s ease;
+    }
+    .demo-expand-content.open{max-height:2000px}
     .panel-empty-hint{
       text-align:center;
       padding:28px 14px;
@@ -1168,6 +1210,47 @@
       .selection-hint{
         bottom:80px;
       }
+      
+      .product-side-panel{
+        position:fixed;
+        left:0;
+        right:0;
+        bottom:0;
+        top:auto;
+        max-height:none;
+        height:58vh;
+        z-index:120;
+        border-radius:12px 12px 0 0;
+        transform:translateY(100%);
+        transition:transform .3s ease;
+        box-shadow:0 -8px 30px rgba(26,20,16,.2);
+      }
+      .product-side-panel.mobile-open{
+        transform:translateY(0);
+      }
+      .mobile-sheet-handle{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        padding:8px 0 4px;
+        cursor:pointer;
+        background:rgba(255,255,255,.6);
+      }
+      .mobile-sheet-bar{
+        width:36px;
+        height:4px;
+        background:var(--border-strong);
+        border-radius:2px;
+        margin-bottom:4px;
+      }
+      .mobile-sheet-hint{
+        font-size:10px;
+        color:var(--ink-muted);
+      }
+      .panel-body{
+        padding-bottom:24px;
+      }
+      
       .workspace{gap:14px}
     }
   </style>
@@ -1221,7 +1304,7 @@
 
         <!-- 显性工具条 -->
         <div class="toolbar-wrap">
-          <span class="toolbar-hint">选中原文后生成</span>
+          <span class="toolbar-hint">选中一句原文，选择一种产物</span>
           <div class="toolbar-btns">
             <button class="toolbar-btn" data-type="vernacular" aria-label="白话解读" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6v12M6 12h12"/></svg>
@@ -1289,6 +1372,10 @@
       
       <!-- 右侧产物面板 -->
       <aside class="product-side-panel" id="sidePanel">
+        <div class="mobile-sheet-handle" id="mobileSheetHandle">
+          <span class="mobile-sheet-bar"></span>
+          <span class="mobile-sheet-hint">上滑查看更多</span>
+        </div>
         <div class="panel-header">
           <div class="panel-title" id="panelTitle">
             <span class="dot demo" id="panelTitleDot"></span>
@@ -1509,6 +1596,40 @@
     let activePanelTab='demo';
     let currentOutputType='';
     
+    // html2canvas 动态加载器（作为 defer 引入的兜底，并带诊断日志）
+    let html2canvasLoadPromise=null;
+    function ensureHtml2Canvas(){
+      if(html2canvasLoadPromise)return html2canvasLoadPromise;
+      html2canvasLoadPromise=new Promise((resolve,reject)=>{
+        if(typeof html2canvas==='function'){
+          console.log('[html2canvas] 已挂载，直接使用');
+          resolve(html2canvas);
+          return;
+        }
+        console.log('[html2canvas] 未挂载，尝试动态加载 html2canvas.min.js');
+        const script=document.createElement('script');
+        script.src='html2canvas.min.js';
+        script.async=true;
+        script.onload=()=>{
+          if(typeof html2canvas==='function'){
+            console.log('[html2canvas] 动态加载成功');
+            resolve(html2canvas);
+          }else{
+            const err='[html2canvas] 脚本加载后仍未挂载到 window';
+            console.error(err);
+            reject(new Error(err));
+          }
+        };
+        script.onerror=()=>{
+          const err='[html2canvas] 脚本加载失败，请检查网络或文件路径';
+          console.error(err);
+          reject(new Error(err));
+        };
+        document.head.appendChild(script);
+      });
+      return html2canvasLoadPromise;
+    }
+    
     // 默认示例数据（关雎）
     const demoData={
       selectedText:'关关雎鸠，在河之洲。窈窕淑女，君子好逑。',
@@ -1597,6 +1718,7 @@
       updateToolbarButtons(false);
       document.getElementById('productMenu').classList.remove('show');
       document.getElementById('selectionHint').classList.remove('show');
+      closeMobileResultSheet();
       renderSidePanel('demo');
     }
     
@@ -1695,6 +1817,15 @@
         panelTitleText.textContent='即时示例';
         panelTitleDot.className='dot demo';
         panelBody.innerHTML=renderDemoContent();
+        const expandBtn=document.getElementById('demoExpandBtn');
+        const expandContent=document.getElementById('demoExpandContent');
+        if(expandBtn&&expandContent){
+          expandBtn.addEventListener('click',()=>{
+            const isOpen=expandContent.classList.toggle('open');
+            expandBtn.classList.toggle('open',isOpen);
+            expandBtn.querySelector('span').textContent=isOpen?'收起完整案例':'查看完整案例';
+          });
+        }
         return;
       }
       
@@ -1717,40 +1848,44 @@
       }
     }
     
-    // 渲染示例内容
+    // 渲染示例内容（默认精简，可展开完整案例）
     function renderDemoContent(){
-      const storyboardHtml=demoData.storyboard.map(s=>`
-        <div class="demo-shot">
-          <span class="demo-shot-time">${s.time}</span>
-          <div class="demo-shot-title">${s.title}</div>
-          <div class="demo-shot-desc">${s.desc}</div>
-        </div>
-      `).join('');
-      
       return `
         <div class="demo-indicator">
           <span class="dot"></span>
           《关雎》示例
         </div>
         <div class="demo-section-label">选中原文</div>
-        <div style="font-size:13px;color:var(--ink);line-height:1.8;margin-bottom:12px;font-style:italic">${demoData.selectedText}</div>
+        <div class="demo-selected-text">${demoData.selectedText}</div>
         <div class="demo-section-label">白话解读</div>
         <div class="demo-vernacular">${demoData.vernacular}</div>
-        <div class="demo-section-label">传播要点</div>
-        <ul class="demo-highlights">${demoData.highlights.map(h=>`<li>${h}</li>`).join('')}</ul>
-        <div class="demo-section-label">分镜脚本</div>
-        <div class="demo-storyboard">${storyboardHtml}</div>
-        <div class="demo-section-label">小红书文案</div>
-        <div class="xhs-card" style="margin-bottom:12px">
-          <div class="xhs-title">诗经 · 关雎 · 读书笔记</div>
-          <div class="xhs-body">${demoData.xiaohongshu}</div>
-          <div class="xhs-tags">#关雎 #古籍 #传统文化 #每天学一点</div>
-        </div>
-        <div class="demo-section-label">分享卡片</div>
-        <div class="demo-share-mini">
-          <div class="demo-share-mini-title">关雎</div>
-          <div class="demo-share-mini-quote">${demoData.shareQuote}</div>
-          <div class="demo-share-mini-tags">${demoData.shareTags}</div>
+        <button type="button" class="demo-expand-btn" id="demoExpandBtn">
+          <span>查看完整案例</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="demo-expand-content" id="demoExpandContent">
+          <div class="demo-section-label">传播要点</div>
+          <ul class="demo-highlights">${demoData.highlights.map(h=>`<li>${h}</li>`).join('')}</ul>
+          <div class="demo-section-label">分镜脚本</div>
+          <div class="demo-storyboard">${demoData.storyboard.map(s=>`
+            <div class="demo-shot">
+              <span class="demo-shot-time">${s.time}</span>
+              <div class="demo-shot-title">${s.title}</div>
+              <div class="demo-shot-desc">${s.desc}</div>
+            </div>
+          `).join('')}</div>
+          <div class="demo-section-label">小红书文案</div>
+          <div class="xhs-card" style="margin-bottom:12px">
+            <div class="xhs-title">诗经 · 关雎 · 读书笔记</div>
+            <div class="xhs-body">${demoData.xiaohongshu}</div>
+            <div class="xhs-tags">#关雎 #古籍 #传统文化 #每天学一点</div>
+          </div>
+          <div class="demo-section-label">分享卡片</div>
+          <div class="demo-share-mini">
+            <div class="demo-share-mini-title">关雎</div>
+            <div class="demo-share-mini-quote">${demoData.shareQuote}</div>
+            <div class="demo-share-mini-tags">${demoData.shareTags}</div>
+          </div>
         </div>
       `;
     }
@@ -1946,6 +2081,21 @@
       `;
     }
     
+    // 移动端判断
+    function isMobileView(){
+      return window.innerWidth<=900;
+    }
+    
+    // 移动端产物面板底部抽屉开关
+    function openMobileResultSheet(){
+      if(isMobileView()){
+        document.getElementById('sidePanel').classList.add('mobile-open');
+      }
+    }
+    function closeMobileResultSheet(){
+      document.getElementById('sidePanel').classList.remove('mobile-open');
+    }
+    
     // 生成产物（入口）
     function generateProduct(type){
       if(!selectedText){
@@ -1956,6 +2106,7 @@
       renderSidePanel('product',type);
       document.getElementById('productMenu').classList.remove('show');
       document.getElementById('selectionHint').classList.remove('show');
+      openMobileResultSheet();
       
       if(type==='sharecard'){
         setTimeout(()=>{
@@ -1967,19 +2118,23 @@
     
     // 下载分享卡
     function downloadShareCard(){
-      if(typeof html2canvas==='undefined'){
-        alert('下载功能暂时不可用，请复制文案');
+      const card=document.getElementById('shareCard');
+      if(!card){
+        alert('分享卡未生成，请重新选择');
         return;
       }
-      const card=document.getElementById('shareCard');
-      html2canvas(card,{scale:2,backgroundColor:null,useCORS:true}).then(canvas=>{
+      ensureHtml2Canvas().then(h2c=>{
+        console.log('[html2canvas] 开始生成图片');
+        return h2c(card,{scale:2,backgroundColor:null,useCORS:true});
+      }).then(canvas=>{
         const link=document.createElement('a');
         link.download=`古籍_${currentBook.shortTitle||'分享'}.png`;
         link.href=canvas.toDataURL('image/png');
         link.click();
+        console.log('[html2canvas] 图片下载已触发');
       }).catch(err=>{
-        console.error(err);
-        alert('下载失败，请复制文案');
+        console.error('[html2canvas] 下载失败',err);
+        alert('下载暂时不可用，请复制文案');
       });
     }
     
@@ -2110,11 +2265,18 @@
       });
     });
     
-    // 点击其他区域关闭菜单（排除工具条按钮和面板）
+    // 移动端抽屉手柄：点击收起
+    document.getElementById('mobileSheetHandle').addEventListener('click',(e)=>{
+      e.stopPropagation();
+      closeMobileResultSheet();
+    });
+    
+    // 点击其他区域关闭菜单与移动端抽屉（排除工具条按钮和面板）
     document.addEventListener('click',(e)=>{
       if(!e.target.closest('#productMenu')&&!e.target.closest('#readerContent')&&!e.target.closest('.toolbar-btn')&&!e.target.closest('#sidePanel')){
         document.getElementById('productMenu').classList.remove('show');
         document.getElementById('selectionHint').classList.remove('show');
+        closeMobileResultSheet();
       }
     });
     
@@ -2122,6 +2284,5 @@
     renderShelf();
     renderReader();
   </script>
-  <script src="html2canvas.min.js"></script>
 </body>
 </html>
