@@ -95,6 +95,174 @@
     }
     .nav-links a:hover{color:var(--cinnabar)}
     
+    /* 案例展示区 */
+    .demo-section{
+      padding:60px 0 80px;
+      text-align:center;
+    }
+    .demo-header{
+      margin-bottom:48px;
+    }
+    .demo-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:42px;
+      letter-spacing:8px;
+      margin-bottom:12px;
+      color:var(--ink);
+    }
+    .demo-subtitle{
+      font-size:16px;
+      color:var(--ink-light);
+      letter-spacing:2px;
+    }
+    .demo-content{
+      display:grid;
+      grid-template-columns:320px 1fr;
+      gap:40px;
+      max-width:1200px;
+      margin:0 auto;
+      text-align:left;
+    }
+    @media(max-width:900px){
+      .demo-content{grid-template-columns:1fr;gap:28px}
+      .demo-title{font-size:32px;letter-spacing:4px}
+    }
+    .demo-original{
+      background:rgba(255,255,255,.6);
+      border:1px solid rgba(43,33,24,.12);
+      border-radius:12px;
+      padding:32px 28px;
+      position:relative;
+    }
+    .demo-original::before{
+      content:"";
+      position:absolute;
+      left:12px;top:12px;bottom:12px;width:4px;
+      background:linear-gradient(180deg, var(--cinnabar) 0%, var(--cinnabar-dark) 100%);
+      border-radius:2px;
+    }
+    .demo-original-label{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:14px;
+      color:var(--cinnabar);
+      margin-bottom:20px;
+      letter-spacing:2px;
+      padding-left:12px;
+    }
+    .demo-original-text{
+      font-size:18px;
+      line-height:2.2;
+      color:var(--ink);
+      padding-left:12px;
+      margin-bottom:20px;
+      font-weight:600;
+    }
+    .demo-original-text p{margin-bottom:8px}
+    .demo-original-source{
+      font-size:13px;
+      color:var(--ink-light);
+      padding-left:12px;
+      border-top:1px dashed rgba(43,33,24,.15);
+      padding-top:12px;
+    }
+    .demo-products{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:20px;
+    }
+    @media(max-width:600px){
+      .demo-products{grid-template-columns:1fr}
+    }
+    .demo-product-card{
+      background:rgba(255,255,255,.5);
+      border:1px solid rgba(43,33,24,.1);
+      border-radius:8px;
+      padding:20px;
+      transition:all .25s;
+    }
+    .demo-product-card:hover{
+      transform:translateY(-4px);
+      box-shadow:var(--shadow-sm);
+      border-color:var(--cinnabar);
+    }
+    .demo-product-icon{
+      font-size:28px;
+      margin-bottom:8px;
+    }
+    .demo-product-label{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:15px;
+      color:var(--ink);
+      margin-bottom:10px;
+      letter-spacing:1px;
+    }
+    .demo-product-content{
+      font-size:13px;
+      line-height:1.8;
+      color:var(--ink-light);
+    }
+    .demo-shot-time{
+      display:inline-block;
+      font-size:11px;
+      color:var(--green);
+      background:rgba(74,124,89,.1);
+      padding:2px 8px;
+      border-radius:10px;
+      margin-right:8px;
+    }
+    .demo-share-card{
+      grid-column:1/-1;
+    }
+    .demo-share-preview{
+      background:linear-gradient(135deg, rgba(43,33,24,.06) 0%, rgba(43,33,24,.03) 100%);
+      border:1px solid rgba(43,33,24,.1);
+      border-radius:6px;
+      padding:16px;
+      text-align:center;
+    }
+    .demo-share-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:20px;
+      color:var(--cinnabar);
+      margin-bottom:12px;
+      letter-spacing:2px;
+    }
+    .demo-share-quote{
+      font-size:14px;
+      color:var(--ink);
+      margin-bottom:12px;
+      font-style:italic;
+    }
+    .demo-share-tags{
+      font-size:12px;
+      color:var(--ink-light);
+    }
+    .demo-cta{
+      margin-top:48px;
+    }
+    .demo-cta-btn{
+      padding:16px 48px;
+      background:var(--cinnabar);
+      color:#fff;
+      border:none;
+      border-radius:50px;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:18px;
+      letter-spacing:4px;
+      cursor:pointer;
+      transition:all .3s;
+      box-shadow:0 8px 24px rgba(184,62,47,.35);
+    }
+    .demo-cta-btn:hover{
+      background:var(--cinnabar-dark);
+      transform:translateY(-2px);
+      box-shadow:0 12px 32px rgba(184,62,47,.45);
+    }
+    .demo-cta-btn:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:4px;
+    }
+    
     /* 主布局：书架 + 阅读器 */
     .main-layout{
       display:grid;
@@ -1064,6 +1232,67 @@
         <a href="https://github.com/wmglimpser-hash/btool" target="_blank">GitHub</a>
       </nav>
     </header>
+    
+    <!-- 案例展示区 -->
+    <section class="demo-section">
+      <div class="demo-header">
+        <h2 class="demo-title">选文成物</h2>
+        <p class="demo-subtitle">阅读古籍原文，选中片段后生成内容产物</p>
+      </div>
+      <div class="demo-content">
+        <div class="demo-original">
+          <div class="demo-original-label">原文</div>
+          <div class="demo-original-text">
+            <p>关关雎鸠，在河之洲。</p>
+            <p>窈窕淑女，君子好逑。</p>
+            <p>参差荇菜，左右流之。</p>
+            <p>窈窕淑女，寤寐求之。</p>
+          </div>
+          <div class="demo-original-source">《诗经·周南·关雎》</div>
+        </div>
+        <div class="demo-products">
+          <div class="demo-product-card">
+            <div class="demo-product-icon">📖</div>
+            <div class="demo-product-label">白话解读</div>
+            <div class="demo-product-content">水鸟关关和鸣，栖息在河中的小洲。那位文静美好的姑娘，正是君子心中理想的伴侣。</div>
+          </div>
+          <div class="demo-product-card">
+            <div class="demo-product-icon">✨</div>
+            <div class="demo-product-label">传播要点</div>
+            <div class="demo-product-content">"窈窕淑女，君子好逑"是中国人最熟悉的爱情金句，从求之不得的焦灼到琴瑟友之的圆满，情绪曲线完整。</div>
+          </div>
+          <div class="demo-product-card">
+            <div class="demo-product-icon">🎬</div>
+            <div class="demo-product-label">分镜脚本</div>
+            <div class="demo-product-content"><span class="demo-shot-time">0-8s</span>河洲晨雾，水墨晕染出河中小洲，雎鸠双飞入画，古琴泛音</div>
+          </div>
+          <div class="demo-product-card">
+            <div class="demo-product-icon">📕</div>
+            <div class="demo-product-label">小红书文案</div>
+            <div class="demo-product-content">📖 今天读到《诗经·周南·关雎》……古人的智慧放在今天依然闪闪发光。#关雎 #古籍 #传统文化</div>
+          </div>
+          <div class="demo-product-card">
+            <div class="demo-product-icon">📋</div>
+            <div class="demo-product-label">公众号长文</div>
+            <div class="demo-product-content">《诗经·周南·关雎》出自先秦时期，是中国最早的恋歌之一……白话解读：水鸟关关和鸣……</div>
+          </div>
+          <div class="demo-product-card demo-share-card">
+            <div class="demo-product-icon">🖼️</div>
+            <div class="demo-product-label">分享卡片</div>
+            <div class="demo-product-content">
+              <div class="demo-share-preview">
+                <div class="demo-share-title">关雎</div>
+                <div class="demo-share-quote">关关雎鸠，在河之洲……</div>
+                <div class="demo-share-tags">#关雎 #古籍</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-cta">
+        <button class="demo-cta-btn" onclick="document.getElementById('shelfBooks').querySelector('.shelf-book')?.click(); document.getElementById('readerContent').scrollIntoView({behavior:'smooth'})">开始阅读</button>
+      </div>
+    </section>
     
     <!-- 移动端书签 tabs -->
     <div class="shelf-tabs" id="shelfTabs">
