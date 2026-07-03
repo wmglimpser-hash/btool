@@ -7,7 +7,7 @@
   <meta name="description" content="阅读古籍原文，选中片段后可生成白话解读、传播要点、分镜脚本、分享卡片等内容产物。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
-  <script src="html2canvas.min.js" defer></script>
+  <script src="html2canvas.min.js"></script>
   <style>
     :root{
       --paper:#f7f3e9;
@@ -1221,12 +1221,17 @@
         height:58vh;
         z-index:120;
         border-radius:12px 12px 0 0;
-        transform:translateY(100%);
+        transform:translateY(calc(100% - 96px));
         transition:transform .3s ease;
-        box-shadow:0 -8px 30px rgba(26,20,16,.2);
+        box-shadow:0 -4px 16px rgba(26,20,16,.12);
+      }
+      .product-side-panel.mobile-peek{
+        transform:translateY(calc(100% - 96px));
+        box-shadow:0 -4px 16px rgba(26,20,16,.12);
       }
       .product-side-panel.mobile-open{
         transform:translateY(0);
+        box-shadow:0 -8px 30px rgba(26,20,16,.2);
       }
       .mobile-sheet-handle{
         display:flex;
@@ -1596,39 +1601,58 @@
     let activePanelTab='demo';
     let currentOutputType='';
     
-    // html2canvas 动态加载器（作为 defer 引入的兜底，并带诊断日志）
+    // html2canvas 加载保障：静态标签 + 初始化预检 + 动态加载兜底
     let html2canvasLoadPromise=null;
+    
+    function _loadHtml2CanvasScript(){
+      return new Promise((resolve,reject)=>{
+        const s=document.createElement('script');
+        s.src='html2canvas.min.js?v='+Date.now();
+        s.onload=function(){
+          if(typeof window.html2canvas==='function'){
+            console.log('[h2c] 动态加载成功, typeof=',typeof window.html2canvas);
+            resolve(window.html2canvas);
+          }else{
+            console.error('[h2c] 脚本已执行但 window.html2canvas 仍未定义');
+            reject(new Error('script executed but html2canvas not on window'));
+          }
+        };
+        s.onerror=function(e){
+          console.error('[h2c] 脚本 load 事件 error',e);
+          reject(new Error('script load failed'));
+        };
+        document.head.appendChild(s);
+      });
+    }
+
     function ensureHtml2Canvas(){
       if(html2canvasLoadPromise)return html2canvasLoadPromise;
       html2canvasLoadPromise=new Promise((resolve,reject)=>{
+        if(typeof window.html2canvas==='function'){
+          console.log('[h2c] 已挂载(window), 直接使用');
+          resolve(window.html2canvas);
+          return;
+        }
         if(typeof html2canvas==='function'){
-          console.log('[html2canvas] 已挂载，直接使用');
+          window.html2canvas=html2canvas;
+          console.log('[h2c] 挂载到全局变量, 直接使用');
           resolve(html2canvas);
           return;
         }
-        console.log('[html2canvas] 未挂载，尝试动态加载 html2canvas.min.js');
-        const script=document.createElement('script');
-        script.src='html2canvas.min.js';
-        script.async=true;
-        script.onload=()=>{
-          if(typeof html2canvas==='function'){
-            console.log('[html2canvas] 动态加载成功');
-            resolve(html2canvas);
-          }else{
-            const err='[html2canvas] 脚本加载后仍未挂载到 window';
-            console.error(err);
-            reject(new Error(err));
-          }
-        };
-        script.onerror=()=>{
-          const err='[html2canvas] 脚本加载失败，请检查网络或文件路径';
-          console.error(err);
-          reject(new Error(err));
-        };
-        document.head.appendChild(script);
+        console.warn('[h2c] 未检测到 html2canvas, 启动动态加载...');
+        _loadHtml2CanvasScript().then(resolve).catch(reject);
       });
       return html2canvasLoadPromise;
     }
+    
+    // 页面初始化后立即预检（不等用户点击下载才去修）
+    setTimeout(()=>{
+      ensureHtml2Canvas().then(function(h2c){
+        console.log('[h2c] 预检通过, 可用于分享卡下载');
+      }).catch(function(e){
+        console.error('[h2c] 预检失败',e);
+      });
+    },500);
     
     // 默认示例数据（关雎）
     const demoData={
@@ -2086,14 +2110,28 @@
       return window.innerWidth<=900;
     }
     
-    // 移动端产物面板底部抽屉开关
+    // 移动端产物面板底部抽屉：peek（露出 tab 栏）/ open（展开内容）
     function openMobileResultSheet(){
       if(isMobileView()){
-        document.getElementById('sidePanel').classList.add('mobile-open');
+        const panel=document.getElementById('sidePanel');
+        panel.classList.remove('mobile-peek');
+        panel.classList.add('mobile-open');
       }
     }
     function closeMobileResultSheet(){
-      document.getElementById('sidePanel').classList.remove('mobile-open');
+      const panel=document.getElementById('sidePanel');
+      panel.classList.remove('mobile-open');
+      if(isMobileView()){
+        panel.classList.add('mobile-peek');
+      }
+    }
+    function toggleMobileResultSheet(){
+      const panel=document.getElementById('sidePanel');
+      if(panel.classList.contains('mobile-open')){
+        closeMobileResultSheet();
+      }else{
+        openMobileResultSheet();
+      }
     }
     
     // 生成产物（入口）
@@ -2124,16 +2162,16 @@
         return;
       }
       ensureHtml2Canvas().then(h2c=>{
-        console.log('[html2canvas] 开始生成图片');
+        console.log('[h2c] 开始生成图片');
         return h2c(card,{scale:2,backgroundColor:null,useCORS:true});
       }).then(canvas=>{
         const link=document.createElement('a');
         link.download=`古籍_${currentBook.shortTitle||'分享'}.png`;
         link.href=canvas.toDataURL('image/png');
         link.click();
-        console.log('[html2canvas] 图片下载已触发');
+        console.log('[h2c] 图片下载已触发');
       }).catch(err=>{
-        console.error('[html2canvas] 下载失败',err);
+        console.error('[h2c] 下载失败',err);
         alert('下载暂时不可用，请复制文案');
       });
     }
@@ -2265,13 +2303,13 @@
       });
     });
     
-    // 移动端抽屉手柄：点击收起
+    // 移动端抽屉手柄：点击切换 peek/open
     document.getElementById('mobileSheetHandle').addEventListener('click',(e)=>{
       e.stopPropagation();
-      closeMobileResultSheet();
+      toggleMobileResultSheet();
     });
     
-    // 点击其他区域关闭菜单与移动端抽屉（排除工具条按钮和面板）
+    // 点击其他区域关闭菜单，移动端抽屉收起到 peek（不消失）
     document.addEventListener('click',(e)=>{
       if(!e.target.closest('#productMenu')&&!e.target.closest('#readerContent')&&!e.target.closest('.toolbar-btn')&&!e.target.closest('#sidePanel')){
         document.getElementById('productMenu').classList.remove('show');
@@ -2283,6 +2321,9 @@
     // 初始化
     renderShelf();
     renderReader();
+    if(isMobileView()){
+      document.getElementById('sidePanel').classList.add('mobile-peek');
+    }
   </script>
 </body>
 </html>
