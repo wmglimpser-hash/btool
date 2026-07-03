@@ -149,6 +149,11 @@
       transform:translateX(4px);
       box-shadow:var(--shadow-sm);
     }
+    .shelf-book:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
+      transform:translateX(4px);
+    }
     .shelf-book.active{
       border-color:var(--cinnabar);
       background:rgba(184,62,47,.06);
@@ -179,6 +184,13 @@
       font-size:14px;
     }
     .shelf-input-btn:hover{
+      background:rgba(43,33,24,.08);
+      border-color:var(--cinnabar);
+      color:var(--cinnabar);
+    }
+    .shelf-input-btn:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
       background:rgba(43,33,24,.08);
       border-color:var(--cinnabar);
       color:var(--cinnabar);
@@ -218,7 +230,56 @@
     }
     .reader-source a{color:var(--cinnabar);text-decoration:none}
     .reader-source a:hover{text-decoration:underline}
-    
+
+    /* 显性工具条 */
+    .toolbar-wrap{
+      margin-bottom:20px;
+      padding:14px 0 16px;
+      border-bottom:1px solid rgba(43,33,24,.1);
+      display:flex;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .toolbar-hint{
+      font-size:13px;
+      color:var(--ink-light);
+      opacity:.7;
+    }
+    .toolbar-btns{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .toolbar-btn{
+      padding:8px 14px;
+      border:1px solid rgba(43,33,24,.15);
+      background:rgba(255,255,255,.6);
+      color:var(--ink);
+      border-radius:4px;
+      font-family:inherit;
+      font-size:13px;
+      cursor:pointer;
+      transition:all .2s;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .toolbar-btn:hover:not(:disabled){
+      background:rgba(184,62,47,.08);
+      border-color:var(--cinnabar);
+      color:var(--cinnabar);
+    }
+    .toolbar-btn:disabled{
+      opacity:0.5;
+      cursor:not-allowed;
+    }
+    .toolbar-btn svg{
+      width:14px;height:14px;
+      opacity:.6;
+    }
+    .toolbar-btn:hover:not(:disabled) svg{opacity:1}
+
     /* 古籍正文 */
     .reader-content{
       font-size:18px;
@@ -289,13 +350,25 @@
       display:flex;
       align-items:center;
       gap:8px;
+      width:100%;
+      border:none;
+      background:transparent;
+      text-align:left;
+      font-family:inherit;
     }
     .product-menu-item:hover{background:rgba(184,62,47,.08);color:var(--cinnabar)}
+    .product-menu-item:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:-2px;
+      background:rgba(184,62,47,.08);
+      color:var(--cinnabar);
+    }
     .product-menu-item svg{
       width:16px;height:16px;
       opacity:.6;
     }
     .product-menu-item:hover svg{opacity:1}
+    .product-menu-item:focus-visible svg{opacity:1}
     
     /* 产物面板 */
     .product-panel{
@@ -329,6 +402,13 @@
       background:transparent;
     }
     .product-panel-close:hover{
+      background:rgba(184,62,47,.08);
+      color:var(--cinnabar);
+      border-color:var(--cinnabar);
+    }
+    .product-panel-close:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
       background:rgba(184,62,47,.08);
       color:var(--cinnabar);
       border-color:var(--cinnabar);
@@ -486,6 +566,12 @@
       transition:all .2s;
     }
     .share-actions button:hover{background:var(--cinnabar);color:#fff}
+    .share-actions button:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
+      background:var(--cinnabar);
+      color:#fff;
+    }
     
     /* 小红书文案 */
     .xhs-card{
@@ -615,6 +701,11 @@
       transition:color .2s;
     }
     .input-dialog-close:hover{color:var(--cinnabar)}
+    .input-dialog-close:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
+      color:var(--cinnabar);
+    }
     .input-dialog-body{
       padding:24px;
     }
@@ -636,11 +727,28 @@
       font-family:inherit;
       font-size:14px;
       color:var(--ink);
-      outline:none;
-      transition:border-color .2s;
+      transition:border-color .2s,box-shadow .2s;
     }
     .input-field input:focus,.input-field textarea:focus{
       border-color:var(--cinnabar);
+      box-shadow:0 0 0 3px rgba(184,62,47,.15);
+    }
+    .input-field input:focus-visible,.input-field textarea:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
+    }
+    .field-error{
+      font-size:13px;
+      color:var(--cinnabar);
+      margin-top:6px;
+      display:none;
+    }
+    .field-error.show{
+      display:block;
+    }
+    .input-field input.error,.input-field textarea.error{
+      border-color:var(--cinnabar);
+      background:rgba(184,62,47,.05);
     }
     .input-field textarea{
       min-height:120px;
@@ -678,12 +786,22 @@
     .input-actions .btn-cancel:hover{
       background:rgba(43,33,24,.05);
     }
+    .input-actions .btn-cancel:focus-visible{
+      outline:2px solid var(--ink-light);
+      outline-offset:2px;
+      background:rgba(43,33,24,.05);
+    }
     .input-actions .btn-submit{
       border:none;
       background:var(--cinnabar);
       color:#fff;
     }
     .input-actions .btn-submit:hover{
+      background:var(--cinnabar-dark);
+    }
+    .input-actions .btn-submit:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
       background:var(--cinnabar-dark);
     }
     
@@ -698,10 +816,103 @@
     }
     
     /* 响应式 */
+    /* 移动端专属元素默认隐藏 */
+    .shelf-tabs{display:none}
+    
     @media(max-width:900px){
+      /* 移动端书签 tabs */
+      .shelf-tabs{
+        display:flex;
+        align-items:center;
+        background:rgba(255,255,255,.5);
+        border:1px solid rgba(43,33,24,.12);
+        border-radius:8px;
+        padding:12px 16px;
+        margin-bottom:16px;
+        gap:12px;
+      }
+      .shelf-tabs-scroll{
+        display:flex;
+        gap:10px;
+        overflow-x:auto;
+        flex:1;
+        scrollbar-width:none;
+        -ms-overflow-style:none;
+      }
+      .shelf-tabs-scroll::-webkit-scrollbar{display:none}
+      .shelf-tab{
+        flex:0 0 auto;
+        padding:8px 14px;
+        background:rgba(139,69,19,.1);
+        border:1px solid rgba(43,33,24,.15);
+        border-radius:4px;
+        font-size:14px;
+        white-space:nowrap;
+        cursor:pointer;
+        transition:all .2s;
+        color:var(--ink);
+      }
+      .shelf-tab:hover{
+        background:rgba(139,69,19,.15);
+      }
+      .shelf-tab.active{
+        border-color:var(--cinnabar);
+        background:rgba(184,62,47,.08);
+        color:var(--cinnabar);
+      }
+      .shelf-input-fixed-btn{
+        flex:0 0 auto;
+        padding:8px 12px;
+        background:var(--cinnabar);
+        color:#fff;
+        border:none;
+        border-radius:4px;
+        font-size:13px;
+        cursor:pointer;
+        font-family:inherit;
+        white-space:nowrap;
+        transition:background .2s;
+      }
+      .shelf-input-fixed-btn:hover{
+        background:var(--cinnabar-dark);
+      }
+      
+      /* 桌面端书架隐藏 */
       .shelf{display:none}
+      
+      /* 阅读器调整 */
       .reader{padding:24px 20px}
       .share-card{width:100%;max-width:280px}
+      
+      /* 产物菜单改为底部 action sheet */
+      .product-menu{
+        position:fixed;
+        bottom:0;
+        left:0;
+        right:0;
+        top:auto;
+        width:100%;
+        max-width:none;
+        border-radius:8px 8px 0 0;
+        padding:0;
+        max-height:70vh;
+        overflow-y:auto;
+        animation:slideUp .3s ease;
+      }
+      @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+      .product-menu.show{display:block}
+      .product-menu-item{
+        padding:14px 20px;
+        border-bottom:1px solid rgba(43,33,24,.08);
+        font-size:15px;
+      }
+      .product-menu-item:last-child{border-bottom:none}
+      .product-menu-item svg{width:18px;height:18px}
+      
+      /* 选中提示调整位置 */
+      .selection-hint{
+        bottom:80px;
+      }
     }
   </style>
 </head>
@@ -725,6 +936,12 @@
       </nav>
     </header>
     
+    <!-- 移动端书签 tabs -->
+    <div class="shelf-tabs" id="shelfTabs">
+      <div class="shelf-tabs-scroll" id="shelfTabsScroll"></div>
+      <button class="shelf-input-fixed-btn" id="inputBtnMobile">+ 输入</button>
+    </div>
+    
     <div class="main-layout">
       <!-- 左侧书架 -->
       <aside class="shelf">
@@ -744,7 +961,38 @@
             </div>
           </div>
         </div>
-        
+
+        <!-- 显性工具条 -->
+        <div class="toolbar-wrap">
+          <span class="toolbar-hint">选中原文后生成</span>
+          <div class="toolbar-btns">
+            <button class="toolbar-btn" data-type="vernacular" aria-label="白话解读" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6v12M6 12h12"/></svg>
+              白话解读
+            </button>
+            <button class="toolbar-btn" data-type="highlights" aria-label="传播要点" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              传播要点
+            </button>
+            <button class="toolbar-btn" data-type="storyboard" aria-label="分镜脚本" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h4M6 12h4M14 8h4M14 12h4"/></svg>
+              分镜脚本
+            </button>
+            <button class="toolbar-btn" data-type="xiaohongshu" aria-label="小红书文案" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              小红书文案
+            </button>
+            <button class="toolbar-btn" data-type="gongzhonghao" aria-label="公众号长文" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/></svg>
+              公众号长文
+            </button>
+            <button class="toolbar-btn" data-type="sharecard" aria-label="分享卡片" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
+              分享卡片
+            </button>
+          </div>
+        </div>
+
         <div class="reader-content" id="readerContent">
           <p>关关雎鸠，在河之洲。窈窕淑女，君子好逑。</p>
           <p>参差荇菜，左右流之。窈窕淑女，寤寐求之。</p>
@@ -754,31 +1002,31 @@
         </div>
         
         <!-- 产物浮动菜单 -->
-        <div class="product-menu" id="productMenu">
-          <div class="product-menu-item" data-type="vernacular">
+        <div class="product-menu" id="productMenu" role="menu">
+          <button type="button" class="product-menu-item" data-type="vernacular" aria-label="生成白话解读" tabindex="0">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6v12M6 12h12"/></svg>
             白话解读
-          </div>
-          <div class="product-menu-item" data-type="highlights">
+          </button>
+          <button type="button" class="product-menu-item" data-type="highlights" aria-label="生成传播要点" tabindex="0">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
             传播要点
-          </div>
-          <div class="product-menu-item" data-type="storyboard">
+          </button>
+          <button type="button" class="product-menu-item" data-type="storyboard" aria-label="生成分镜脚本" tabindex="0">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h4M6 12h4M14 8h4M14 12h4"/></svg>
             分镜脚本
-          </div>
-          <div class="product-menu-item" data-type="xiaohongshu">
+          </button>
+          <button type="button" class="product-menu-item" data-type="xiaohongshu" aria-label="生成小红书文案" tabindex="0">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
             小红书文案
-          </div>
-          <div class="product-menu-item" data-type="gongzhonghao">
+          </button>
+          <button type="button" class="product-menu-item" data-type="gongzhonghao" aria-label="生成公众号长文" tabindex="0">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/></svg>
             公众号长文
-          </div>
-          <div class="product-menu-item" data-type="sharecard">
+          </button>
+          <button type="button" class="product-menu-item" data-type="sharecard" aria-label="生成分享卡片" tabindex="0">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
             分享卡片
-          </div>
+          </button>
         </div>
         
         <!-- 产物面板 -->
@@ -803,28 +1051,30 @@
     <div class="input-dialog">
       <div class="input-dialog-header">
         <h4 class="input-dialog-title">输入古籍文本</h4>
-        <button class="input-dialog-close" id="inputModalClose">×</button>
+        <button class="input-dialog-close" id="inputModalClose" aria-label="关闭输入弹窗">×</button>
       </div>
       <div class="input-dialog-body">
         <div class="input-field">
-          <label>典籍名称 <span style="color:var(--cinnabar)">*</span></label>
-          <input type="text" id="inputTitle" placeholder="如：楚辞 · 橘颂">
+          <label for="inputTitle">典籍名称 <span style="color:var(--cinnabar)">*</span></label>
+          <input type="text" id="inputTitle" name="title" autocomplete="off" placeholder="如：楚辞 · 橘颂">
+          <div class="field-error" id="inputTitleError"></div>
         </div>
         <div class="input-field">
-          <label>原文内容 <span style="color:var(--cinnabar)">*</span></label>
-          <textarea id="inputText" placeholder="在此粘贴可追溯的古籍原文..."></textarea>
+          <label for="inputText">原文内容 <span style="color:var(--cinnabar)">*</span></label>
+          <textarea id="inputText" name="text" autocomplete="off" placeholder="在此粘贴可追溯的古籍原文..."></textarea>
+          <div class="field-error" id="inputTextError"></div>
         </div>
         <div class="input-field">
-          <label>朝代/出处</label>
-          <input type="text" id="inputDynasty" placeholder="如：战国 · 楚">
+          <label for="inputDynasty">朝代/出处</label>
+          <input type="text" id="inputDynasty" name="dynasty" autocomplete="off" placeholder="如：战国 · 楚">
         </div>
         <div class="input-field">
-          <label>原文来源</label>
-          <input type="text" id="inputSourceName" placeholder="如：中国哲学书电子化计划">
+          <label for="inputSourceName">原文来源</label>
+          <input type="text" id="inputSourceName" name="sourceName" autocomplete="off" placeholder="如：中国哲学书电子化计划">
         </div>
         <div class="input-field">
-          <label>来源链接</label>
-          <input type="url" id="inputSourceUrl" placeholder="https://...">
+          <label for="inputSourceUrl">来源链接</label>
+          <input type="url" id="inputSourceUrl" name="sourceUrl" autocomplete="url" placeholder="https://...">
         </div>
         <div class="input-tip">
           <strong>提示：</strong>输入内容将进入阅读器，选中片段后可生成白话解读、传播要点、分镜脚本、分享卡片等内容产物。请尽量提供可核验的古籍来源。
@@ -1006,6 +1256,28 @@
           renderReader();
         });
       });
+      
+      // 渲染移动端 tabs
+      const tabsScroll=document.getElementById('shelfTabsScroll');
+      if(tabsScroll){
+        tabsScroll.innerHTML=books.map((b,i)=>`
+          <div class="shelf-tab ${i===0?'active':''}" data-id="${b.id}">${b.shortTitle||b.title.split('·').pop().trim()}</div>
+        `).join('');
+        
+        tabsScroll.querySelectorAll('.shelf-tab').forEach(el=>{
+          el.addEventListener('click',()=>{
+            tabsScroll.querySelectorAll('.shelf-tab').forEach(e=>e.classList.remove('active'));
+            el.classList.add('active');
+            // 同步桌面端书架选中状态
+            shelf.querySelectorAll('.shelf-book').forEach(e=>e.classList.remove('active'));
+            shelf.querySelector(`.shelf-book[data-id="${el.dataset.id}"]`)?.classList.add('active');
+            currentBook=books.find(b=>b.id===el.dataset.id);
+            renderReader();
+            // 滚动到选中的 tab
+            el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+          });
+        });
+      }
     }
     
     // 渲染阅读器
@@ -1031,20 +1303,31 @@
       document.getElementById('productMenu').classList.remove('show');
     }
     
+    // 更新工具条按钮状态
+    function updateToolbarButtons(hasSelection){
+      const toolbarBtns=document.querySelectorAll('.toolbar-btn');
+      toolbarBtns.forEach(btn=>{
+        btn.disabled=!hasSelection;
+      });
+    }
+
     // 处理文本选中
     function handleSelection(){
       const selection=window.getSelection();
       const text=selection.toString().trim();
-      
+
       if(text.length>0){
         selectedText=text;
         selectedRange=selection.getRangeAt(0);
-        
+
+        // 更新工具条按钮状态
+        updateToolbarButtons(true);
+
         // 显示提示
         const hint=document.getElementById('selectionHint');
         hint.textContent=`已选中 ${text.length} 字，点击可生成内容产物`;
         hint.classList.add('show');
-        
+
         // 定位菜单
         const menu=document.getElementById('productMenu');
         const rect=selectedRange.getBoundingClientRect();
@@ -1052,6 +1335,8 @@
         menu.style.left=`${rect.left+rect.width/2-80}px`;
         menu.classList.add('show');
       }else{
+        // 更新工具条按钮状态
+        updateToolbarButtons(false);
         document.getElementById('selectionHint').classList.remove('show');
         // 不立即隐藏菜单，让用户有时间点击
       }
@@ -1241,24 +1526,71 @@
     }
     
     // 输入弹窗
-    document.getElementById('inputBtn').addEventListener('click',()=>{
+    function openInputModal(){
       document.getElementById('inputModal').classList.add('show');
-    });
-    document.getElementById('inputModalClose').addEventListener('click',()=>{
-      document.getElementById('inputModal').classList.remove('show');
-    });
-    document.getElementById('inputCancel').addEventListener('click',()=>{
-      document.getElementById('inputModal').classList.remove('show');
-    });
+      // 自动聚焦第一个输入框
+      setTimeout(()=>{
+        document.getElementById('inputTitle').focus();
+      },100);
+    }
     
-    document.getElementById('inputSubmit').addEventListener('click',()=>{
+    function closeInputModal(){
+      document.getElementById('inputModal').classList.remove('show');
+      clearValidationErrors();
+    }
+    
+    function clearValidationErrors(){
+      // 清除所有错误状态
+      document.querySelectorAll('.field-error').forEach(el=>{
+        el.classList.remove('show');
+        el.textContent='';
+      });
+      document.querySelectorAll('.input-field input, .input-field textarea').forEach(el=>{
+        el.classList.remove('error');
+      });
+    }
+    
+    function showFieldError(fieldId,message){
+      const errorEl=document.getElementById(fieldId+'Error');
+      const inputEl=document.getElementById(fieldId);
+      if(errorEl&&inputEl){
+        errorEl.textContent=message;
+        errorEl.classList.add('show');
+        inputEl.classList.add('error');
+      }
+    }
+    
+    function validateInputForm(){
+      clearValidationErrors();
+      let isValid=true;
+      
       const title=document.getElementById('inputTitle').value.trim();
       const text=document.getElementById('inputText').value.trim();
-      if(!title||!text){
-        alert('请填写典籍名称和原文内容');
+      
+      if(!title){
+        showFieldError('inputTitle','请填写典籍名称');
+        isValid=false;
+      }
+      
+      if(!text){
+        showFieldError('inputText','请填写原文内容');
+        isValid=false;
+      }
+      
+      return isValid;
+    }
+    
+    document.getElementById('inputBtn').addEventListener('click',openInputModal);
+    document.getElementById('inputModalClose').addEventListener('click',closeInputModal);
+    document.getElementById('inputCancel').addEventListener('click',closeInputModal);
+    
+    document.getElementById('inputSubmit').addEventListener('click',()=>{
+      if(!validateInputForm()){
         return;
       }
       
+      const title=document.getElementById('inputTitle').value.trim();
+      const text=document.getElementById('inputText').value.trim();
       const dynasty=document.getElementById('inputDynasty').value.trim();
       const sourceName=document.getElementById('inputSourceName').value.trim();
       const sourceUrl=document.getElementById('inputSourceUrl').value.trim();
@@ -1284,7 +1616,7 @@
       document.querySelectorAll('.shelf-book').forEach(e=>e.classList.remove('active'));
       
       renderReader();
-      document.getElementById('inputModal').classList.remove('show');
+      closeInputModal();
       
       // 清空输入
       document.getElementById('inputTitle').value='';
@@ -1297,7 +1629,24 @@
     // 事件绑定
     document.getElementById('readerContent').addEventListener('mouseup',handleSelection);
     document.getElementById('readerContent').addEventListener('touchend',handleSelection);
-    
+
+    // 监听 selectionchange 更新按钮状态
+    document.addEventListener('selectionchange',()=>{
+      const selection=window.getSelection();
+      const text=selection.toString().trim();
+      updateToolbarButtons(text.length>0);
+    });
+
+    // 工具条按钮点击事件
+    document.querySelectorAll('.toolbar-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const type=btn.dataset.type;
+        if(!btn.disabled && selectedText){
+          generateProduct(type);
+        }
+      });
+    });
+
     document.getElementById('productMenu').querySelectorAll('.product-menu-item').forEach(el=>{
       el.addEventListener('click',()=>{
         generateProduct(el.dataset.type);
@@ -1308,9 +1657,9 @@
       document.getElementById('productPanel').classList.remove('show');
     });
     
-    // 点击其他区域关闭菜单
+    // 点击其他区域关闭菜单（排除工具条按钮）
     document.addEventListener('click',(e)=>{
-      if(!e.target.closest('#productMenu')&&!e.target.closest('#readerContent')){
+      if(!e.target.closest('#productMenu')&&!e.target.closest('#readerContent')&&!e.target.closest('.toolbar-btn')){
         document.getElementById('productMenu').classList.remove('show');
         document.getElementById('selectionHint').classList.remove('show');
       }
