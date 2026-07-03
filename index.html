@@ -7,19 +7,24 @@
   <meta name="description" content="阅读古籍原文，选中片段后可生成白话解读、传播要点、分镜脚本、分享卡片等内容产物。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
-  <script src="html2canvas.min.js"></script>
   <style>
     :root{
       --paper:#f7f3e9;
       --paper-dark:#efe8d8;
-      --ink:#2b2118;
+      --paper-deep:#e8dfca;
+      --ink:#1a1410;
       --ink-light:#5c4d3c;
-      --cinnabar:#b83e2f;
-      --cinnabar-dark:#8f2e22;
-      --gold:#c9a227;
-      --green:#4a7c59;
-      --shadow:0 12px 40px rgba(43,33,24,.12);
-      --shadow-sm:0 4px 12px rgba(43,33,24,.08);
+      --ink-muted:#8a7b6a;
+      --cinnabar:#a3321f;
+      --cinnabar-dark:#7a2416;
+      --cinnabar-light:rgba(163,50,31,.12);
+      --gold:#b8941f;
+      --green:#3a6b4a;
+      --green-light:rgba(58,107,74,.12);
+      --shadow:0 12px 40px rgba(26,20,16,.15);
+      --shadow-sm:0 4px 12px rgba(26,20,16,.1);
+      --border:rgba(26,20,16,.12);
+      --border-strong:rgba(26,20,16,.2);
     }
     *{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
@@ -57,24 +62,24 @@
     .ink-wash:nth-child(2){width:400px;height:400px;background:#8b4513;bottom:-100px;right:-80px;animation-delay:-7s}
     .ink-wash:nth-child(3){width:300px;height:300px;background:#2b2118;top:40%;left:60%;animation-delay:-14s}
     @keyframes inkFlow{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,40px) scale(1.1)}}
-    .wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 32px}
+    .wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 24px}
     
     header{
-      padding:24px 0 16px;
+      padding:18px 0 12px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      border-bottom:1px solid rgba(43,33,24,.1);
-      margin-bottom:32px;
+      border-bottom:1px solid var(--border);
+      margin-bottom:16px;
     }
-    .brand{display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:12px}
     .seal{
-      width:48px;height:48px;
+      width:42px;height:42px;
       background:var(--cinnabar);
       color:#fff;
       display:grid;place-items:center;
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:24px;
+      font-size:22px;
       font-weight:900;
       border-radius:6px;
       box-shadow:inset 0 0 0 3px rgba(255,255,255,.25), var(--shadow-sm);
@@ -82,382 +87,216 @@
     }
     .brand-text h1{
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:24px;
-      letter-spacing:4px;
+      font-size:22px;
+      letter-spacing:3px;
     }
-    .brand-text p{font-size:12px;color:var(--ink-light);letter-spacing:1px}
+    .brand-text p{font-size:11px;color:var(--ink-muted);letter-spacing:1px}
     .nav-links a{
       color:var(--ink-light);
       text-decoration:none;
-      margin-left:24px;
-      font-size:14px;
+      margin-left:20px;
+      font-size:13px;
       transition:color .2s;
     }
     .nav-links a:hover{color:var(--cinnabar)}
     
-    /* 案例展示区 */
-    .demo-section{
-      padding:60px 0 80px;
-      text-align:center;
-    }
-    .demo-header{
-      margin-bottom:48px;
-    }
-    .demo-title{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:42px;
-      letter-spacing:8px;
-      margin-bottom:12px;
-      color:var(--ink);
-    }
-    .demo-subtitle{
-      font-size:16px;
-      color:var(--ink-light);
-      letter-spacing:2px;
-    }
-    .demo-content{
+    /* 工作台主布局：书架 | 阅读器 | 产物面板 */
+    .workspace{
       display:grid;
-      grid-template-columns:320px 1fr;
-      gap:40px;
-      max-width:1200px;
-      margin:0 auto;
-      text-align:left;
+      grid-template-columns:220px 1fr 380px;
+      gap:16px;
+      min-height:calc(100vh - 120px);
+      align-items:start;
+    }
+    @media(max-width:1200px){
+      .workspace{grid-template-columns:200px 1fr 340px}
     }
     @media(max-width:900px){
-      .demo-content{grid-template-columns:1fr;gap:28px}
-      .demo-title{font-size:32px;letter-spacing:4px}
-    }
-    .demo-original{
-      background:rgba(255,255,255,.6);
-      border:1px solid rgba(43,33,24,.12);
-      border-radius:12px;
-      padding:32px 28px;
-      position:relative;
-    }
-    .demo-original::before{
-      content:"";
-      position:absolute;
-      left:12px;top:12px;bottom:12px;width:4px;
-      background:linear-gradient(180deg, var(--cinnabar) 0%, var(--cinnabar-dark) 100%);
-      border-radius:2px;
-    }
-    .demo-original-label{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:14px;
-      color:var(--cinnabar);
-      margin-bottom:20px;
-      letter-spacing:2px;
-      padding-left:12px;
-    }
-    .demo-original-text{
-      font-size:18px;
-      line-height:2.2;
-      color:var(--ink);
-      padding-left:12px;
-      margin-bottom:20px;
-      font-weight:600;
-    }
-    .demo-original-text p{margin-bottom:8px}
-    .demo-original-source{
-      font-size:13px;
-      color:var(--ink-light);
-      padding-left:12px;
-      border-top:1px dashed rgba(43,33,24,.15);
-      padding-top:12px;
-    }
-    .demo-products{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:20px;
-    }
-    @media(max-width:600px){
-      .demo-products{grid-template-columns:1fr}
-    }
-    .demo-product-card{
-      background:rgba(255,255,255,.5);
-      border:1px solid rgba(43,33,24,.1);
-      border-radius:8px;
-      padding:20px;
-      transition:all .25s;
-    }
-    .demo-product-card:hover{
-      transform:translateY(-4px);
-      box-shadow:var(--shadow-sm);
-      border-color:var(--cinnabar);
-    }
-    .demo-product-icon{
-      font-size:28px;
-      margin-bottom:8px;
-    }
-    .demo-product-label{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:15px;
-      color:var(--ink);
-      margin-bottom:10px;
-      letter-spacing:1px;
-    }
-    .demo-product-content{
-      font-size:13px;
-      line-height:1.8;
-      color:var(--ink-light);
-    }
-    .demo-shot-time{
-      display:inline-block;
-      font-size:11px;
-      color:var(--green);
-      background:rgba(74,124,89,.1);
-      padding:2px 8px;
-      border-radius:10px;
-      margin-right:8px;
-    }
-    .demo-share-card{
-      grid-column:1/-1;
-    }
-    .demo-share-preview{
-      background:linear-gradient(135deg, rgba(43,33,24,.06) 0%, rgba(43,33,24,.03) 100%);
-      border:1px solid rgba(43,33,24,.1);
-      border-radius:6px;
-      padding:16px;
-      text-align:center;
-    }
-    .demo-share-title{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:20px;
-      color:var(--cinnabar);
-      margin-bottom:12px;
-      letter-spacing:2px;
-    }
-    .demo-share-quote{
-      font-size:14px;
-      color:var(--ink);
-      margin-bottom:12px;
-      font-style:italic;
-    }
-    .demo-share-tags{
-      font-size:12px;
-      color:var(--ink-light);
-    }
-    .demo-cta{
-      margin-top:48px;
-    }
-    .demo-cta-btn{
-      padding:16px 48px;
-      background:var(--cinnabar);
-      color:#fff;
-      border:none;
-      border-radius:50px;
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:18px;
-      letter-spacing:4px;
-      cursor:pointer;
-      transition:all .3s;
-      box-shadow:0 8px 24px rgba(184,62,47,.35);
-    }
-    .demo-cta-btn:hover{
-      background:var(--cinnabar-dark);
-      transform:translateY(-2px);
-      box-shadow:0 12px 32px rgba(184,62,47,.45);
-    }
-    .demo-cta-btn:focus-visible{
-      outline:2px solid var(--cinnabar);
-      outline-offset:4px;
-    }
-    
-    /* 主布局：书架 + 阅读器 */
-    .main-layout{
-      display:grid;
-      grid-template-columns:260px 1fr;
-      gap:32px;
-      min-height:calc(100vh - 140px);
-    }
-    @media(max-width:900px){
-      .main-layout{grid-template-columns:1fr}
+      .workspace{grid-template-columns:1fr;gap:14px}
     }
     
     /* 左侧书架 */
     .shelf{
-      background:rgba(255,255,255,.3);
-      border:1px solid rgba(43,33,24,.12);
+      background:rgba(255,255,255,.45);
+      border:1px solid var(--border);
       border-radius:8px;
-      padding:20px 16px;
-      position:relative;
+      padding:16px 14px;
+      position:sticky;
+      top:16px;
     }
     .shelf-title{
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:16px;
+      font-size:15px;
       letter-spacing:2px;
-      margin-bottom:16px;
-      padding-bottom:12px;
-      border-bottom:1px solid rgba(43,33,24,.1);
+      margin-bottom:12px;
+      padding-bottom:10px;
+      border-bottom:1px solid var(--border);
     }
     .shelf-books{
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:10px;
     }
     .shelf-book{
-      background:linear-gradient(135deg, rgba(139,69,19,.1) 0%, rgba(139,69,19,.05) 50%, rgba(139,69,19,.1) 100%);
-      border:1px solid rgba(43,33,24,.15);
+      background:linear-gradient(135deg, rgba(139,69,19,.1) 0%, rgba(139,69,19,.04) 50%, rgba(139,69,19,.1) 100%);
+      border:1px solid var(--border);
       border-radius:4px;
-      padding:12px 14px;
+      padding:11px 12px;
       cursor:pointer;
-      transition:all .25s;
+      transition:all .2s;
       position:relative;
       overflow:hidden;
     }
     .shelf-book::before{
       content:"";
       position:absolute;
-      left:6px;top:6px;bottom:6px;width:3px;
+      left:5px;top:5px;bottom:5px;width:3px;
       background:var(--cinnabar);
       border-radius:2px;
-      opacity:.6;
+      opacity:.5;
     }
     .shelf-book:hover{
-      transform:translateX(4px);
+      transform:translateX(3px);
       box-shadow:var(--shadow-sm);
+      border-color:var(--cinnabar);
     }
     .shelf-book:focus-visible{
       outline:2px solid var(--cinnabar);
       outline-offset:2px;
-      transform:translateX(4px);
+      transform:translateX(3px);
     }
     .shelf-book.active{
       border-color:var(--cinnabar);
-      background:rgba(184,62,47,.06);
+      background:var(--cinnabar-light);
     }
     .shelf-book.active::before{opacity:1;width:4px}
     .shelf-book-title{
-      font-size:15px;
+      font-size:14px;
       font-weight:600;
-      margin-bottom:4px;
-      padding-left:10px;
+      margin-bottom:3px;
+      padding-left:9px;
     }
     .shelf-book-dynasty{
-      font-size:12px;
+      font-size:11px;
       color:var(--ink-light);
-      padding-left:10px;
+      padding-left:9px;
     }
     
     /* 输入入口 */
     .shelf-input-btn{
-      background:rgba(43,33,24,.05);
-      border:1px dashed rgba(43,33,24,.2);
+      margin-top:12px;
+      background:rgba(26,20,16,.04);
+      border:1px dashed var(--border-strong);
       border-radius:4px;
-      padding:14px;
+      padding:12px;
       cursor:pointer;
       transition:all .2s;
       text-align:center;
       color:var(--ink-light);
-      font-size:14px;
+      font-size:13px;
     }
     .shelf-input-btn:hover{
-      background:rgba(43,33,24,.08);
+      background:var(--cinnabar-light);
       border-color:var(--cinnabar);
       color:var(--cinnabar);
     }
     .shelf-input-btn:focus-visible{
       outline:2px solid var(--cinnabar);
       outline-offset:2px;
-      background:rgba(43,33,24,.08);
+      background:var(--cinnabar-light);
       border-color:var(--cinnabar);
       color:var(--cinnabar);
     }
     
-    /* 右侧阅读器 */
+    /* 中间阅读器 */
     .reader{
-      background:rgba(255,255,255,.5);
-      border:1px solid rgba(43,33,24,.12);
+      background:rgba(255,255,255,.55);
+      border:1px solid var(--border);
       border-radius:8px;
-      padding:32px 40px;
-      min-height:500px;
+      padding:24px 28px;
+      min-height:520px;
       position:relative;
     }
     .reader-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:24px;
-      padding-bottom:16px;
-      border-bottom:1px solid rgba(43,33,24,.1);
+      margin-bottom:18px;
+      padding-bottom:14px;
+      border-bottom:1px solid var(--border);
     }
     .reader-title{
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:22px;
-      letter-spacing:3px;
+      font-size:20px;
+      letter-spacing:2px;
+      margin-bottom:4px;
     }
     .reader-meta{
-      font-size:13px;
-      color:var(--ink-light);
+      font-size:12px;
+      color:var(--ink-muted);
+      margin-bottom:10px;
     }
     .reader-source{
-      margin-top:8px;
       font-size:12px;
-      color:var(--ink-light);
-      opacity:.7;
+      color:var(--ink-muted);
     }
     .reader-source a{color:var(--cinnabar);text-decoration:none}
     .reader-source a:hover{text-decoration:underline}
 
     /* 可信来源卡 */
     .source-card{
-      margin-bottom:20px;
-      padding:16px 20px;
-      background:rgba(255,255,255,.4);
-      border:1px solid rgba(43,33,24,.12);
+      margin-bottom:16px;
+      padding:14px 16px;
+      background:rgba(255,255,255,.5);
+      border:1px solid var(--border);
       border-radius:6px;
-      display:none;
     }
-    .source-card.show{display:block;animation:cardFade .2s ease}
-    @keyframes cardFade{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
     .source-card-header{
       display:flex;
       align-items:center;
-      gap:12px;
-      margin-bottom:12px;
+      gap:10px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
     }
     .source-status{
       display:inline-flex;
       align-items:center;
-      gap:6px;
-      padding:5px 12px;
-      border-radius:14px;
-      font-size:13px;
+      gap:5px;
+      padding:4px 10px;
+      border-radius:12px;
+      font-size:12px;
       font-weight:600;
       letter-spacing:1px;
     }
     .source-status.traceable{
-      background:rgba(74,124,89,.12);
+      background:var(--green-light);
       color:var(--green);
       border:1px solid var(--green);
     }
     .source-status.pending{
-      background:rgba(201,162,27,.12);
+      background:rgba(184,148,31,.12);
       color:var(--gold);
       border:1px solid var(--gold);
     }
     .source-status-icon{
-      width:8px;height:8px;
+      width:6px;height:6px;
       border-radius:50%;
       background:currentColor;
     }
     .source-card-title{
-      font-size:15px;
+      font-size:14px;
       font-weight:600;
       color:var(--ink);
       letter-spacing:1px;
     }
     .source-card-body{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-      gap:10px 20px;
-      font-size:13px;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:8px 16px;
+      font-size:12px;
       color:var(--ink-light);
       line-height:1.7;
     }
     .source-card-item{
       display:flex;
-      gap:8px;
+      gap:6px;
     }
     .source-card-item-label{
       color:var(--ink);
@@ -473,10 +312,10 @@
     .source-card-reference{
       margin-top:10px;
       padding-top:10px;
-      border-top:1px dashed rgba(43,33,24,.1);
-      font-size:12px;
+      border-top:1px dashed var(--border);
+      font-size:11px;
       color:var(--ink-light);
-      opacity:.8;
+      line-height:1.7;
     }
     .source-card-reference-label{
       color:var(--ink);
@@ -485,80 +324,64 @@
 
     /* 显性工具条 */
     .toolbar-wrap{
-      margin-bottom:20px;
-      padding:14px 0 16px;
-      border-bottom:1px solid rgba(43,33,24,.1);
+      margin-bottom:16px;
+      padding:12px 0 14px;
+      border-bottom:1px solid var(--border);
       display:flex;
       align-items:center;
-      gap:16px;
+      gap:12px;
       flex-wrap:wrap;
     }
     .toolbar-hint{
-      font-size:13px;
-      color:var(--ink-light);
-      opacity:.7;
+      font-size:12px;
+      color:var(--ink-muted);
     }
     .toolbar-btns{
       display:flex;
-      gap:8px;
+      gap:6px;
       flex-wrap:wrap;
     }
     .toolbar-btn{
-      padding:8px 14px;
-      border:1px solid rgba(43,33,24,.15);
+      padding:7px 12px;
+      border:1px solid var(--border);
       background:rgba(255,255,255,.6);
       color:var(--ink);
       border-radius:4px;
       font-family:inherit;
-      font-size:13px;
+      font-size:12px;
       cursor:pointer;
       transition:all .2s;
       display:flex;
       align-items:center;
-      gap:6px;
+      gap:5px;
     }
     .toolbar-btn:hover:not(:disabled){
-      background:rgba(184,62,47,.08);
+      background:var(--cinnabar-light);
       border-color:var(--cinnabar);
       color:var(--cinnabar);
     }
     .toolbar-btn:disabled{
-      opacity:0.5;
+      opacity:0.45;
       cursor:not-allowed;
     }
     .toolbar-btn svg{
-      width:14px;height:14px;
+      width:13px;height:13px;
       opacity:.6;
     }
     .toolbar-btn:hover:not(:disabled) svg{opacity:1}
 
     /* 古籍正文 */
     .reader-content{
-      font-size:18px;
+      font-size:17px;
       line-height:2.2;
       letter-spacing:1px;
       user-select:text;
-      padding:20px 0;
+      padding:10px 0;
       position:relative;
     }
-    .reader-content.vertical{
-      writing-mode:vertical-rl;
-      text-orientation:upright;
-      font-size:20px;
-      line-height:2.5;
-      letter-spacing:4px;
-      max-height:400px;
-      overflow-x:auto;
-      padding:20px 40px;
-    }
     .reader-content p{
-      margin-bottom:16px;
+      margin-bottom:14px;
       text-indent:2em;
-    }
-    .reader-content.vertical p{
-      text-indent:0;
-      margin-bottom:0;
-      margin-right:24px;
     }
     
     /* 选中提示 */
@@ -567,7 +390,7 @@
       bottom:24px;
       left:50%;
       transform:translateX(-50%);
-      background:rgba(43,33,24,.9);
+      background:rgba(26,20,16,.9);
       color:#fff;
       padding:10px 20px;
       border-radius:20px;
@@ -583,7 +406,7 @@
     .product-menu{
       position:absolute;
       background:#fff;
-      border:1px solid rgba(43,33,24,.15);
+      border:1px solid var(--border);
       border-radius:8px;
       box-shadow:var(--shadow);
       padding:8px 0;
@@ -608,11 +431,11 @@
       text-align:left;
       font-family:inherit;
     }
-    .product-menu-item:hover{background:rgba(184,62,47,.08);color:var(--cinnabar)}
+    .product-menu-item:hover{background:var(--cinnabar-light);color:var(--cinnabar)}
     .product-menu-item:focus-visible{
       outline:2px solid var(--cinnabar);
       outline-offset:-2px;
-      background:rgba(184,62,47,.08);
+      background:var(--cinnabar-light);
       color:var(--cinnabar);
     }
     .product-menu-item svg{
@@ -622,105 +445,130 @@
     .product-menu-item:hover svg{opacity:1}
     .product-menu-item:focus-visible svg{opacity:1}
     
-    /* 产物面板 */
-    .product-panel{
-      margin-top:32px;
-      border-top:1px solid rgba(43,33,24,.1);
-      padding-top:24px;
-      display:none;
+    /* 右侧产物面板 */
+    .product-side-panel{
+      background:rgba(255,255,255,.55);
+      border:1px solid var(--border);
+      border-radius:8px;
+      overflow:hidden;
+      position:sticky;
+      top:16px;
+      max-height:calc(100vh - 32px);
+      display:flex;
+      flex-direction:column;
     }
-    .product-panel.show{display:block;animation:panelSlide .3s ease}
-    @keyframes panelSlide{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-    .product-panel-header{
+    @media(max-width:900px){
+      .product-side-panel{
+        position:static;
+        max-height:none;
+      }
+    }
+    .panel-header{
+      padding:14px 16px 10px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,.3) 100%);
+    }
+    .panel-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:15px;
+      letter-spacing:2px;
+      color:var(--ink);
+      margin-bottom:8px;
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      margin-bottom:16px;
+      gap:7px;
     }
-    .product-panel-title{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:18px;
-      letter-spacing:2px;
+    .panel-title .dot{
+      width:7px;height:7px;
+      border-radius:50%;
+      background:var(--green);
     }
-    .product-panel-close{
-      width:28px;height:28px;
-      border:1px solid rgba(43,33,24,.15);
+    .panel-title .dot.demo{
+      background:var(--gold);
+    }
+    .panel-tabs{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:5px;
+    }
+    .panel-tab{
+      padding:5px 0;
+      font-size:11px;
+      text-align:center;
+      border:1px solid var(--border);
       border-radius:4px;
       cursor:pointer;
-      display:grid;place-items:center;
-      font-size:16px;
-      color:var(--ink-light);
-      transition:all .2s;
+      color:var(--ink-muted);
       background:transparent;
+      font-family:inherit;
+      transition:all .2s;
     }
-    .product-panel-close:hover{
-      background:rgba(184,62,47,.08);
-      color:var(--cinnabar);
+    .panel-tab:hover{
       border-color:var(--cinnabar);
+      color:var(--cinnabar);
     }
-    .product-panel-close:focus-visible{
+    .panel-tab.active{
+      background:var(--cinnabar-light);
+      border-color:var(--cinnabar);
+      color:var(--cinnabar);
+      font-weight:600;
+    }
+    .panel-tab:focus-visible{
       outline:2px solid var(--cinnabar);
       outline-offset:2px;
-      background:rgba(184,62,47,.08);
-      color:var(--cinnabar);
-      border-color:var(--cinnabar);
     }
-    .product-panel-body{
-      font-size:15px;
-      line-height:1.9;
-      color:var(--ink-light);
+    .panel-body{
+      flex:1;
+      overflow-y:auto;
+      padding:14px 16px;
     }
-
-    /* 三段布局样式 */
-    .product-selected-section,
-    .product-content-section,
-    .product-source-section{
-      padding:14px 20px;
-    }
+    .panel-body::-webkit-scrollbar{width:5px}
+    .panel-body::-webkit-scrollbar-thumb{background:rgba(26,20,16,.15);border-radius:3px}
+    
+    /* 产物内容通用 */
     .product-section-label{
-      font-size:12px;
-      color:var(--ink-light);
-      opacity:.7;
-      margin-bottom:8px;
+      font-size:11px;
+      color:var(--ink-muted);
       letter-spacing:1px;
+      margin-bottom:6px;
+      font-weight:500;
     }
     .product-selected-section{
-      min-height:60px;
-      background:rgba(43,33,24,.04);
-      border-bottom:1px solid rgba(43,33,24,.1);
+      padding:12px 14px;
+      background:rgba(26,20,16,.04);
+      border-bottom:1px solid var(--border);
     }
     .product-selected-text{
-      font-size:14px;
+      font-size:13px;
       color:var(--ink);
       line-height:1.7;
       font-style:italic;
-      opacity:.9;
     }
     .product-content-section{
-      min-height:120px;
+      padding:14px;
       background:rgba(255,255,255,.5);
-      border-bottom:1px solid rgba(43,33,24,.1);
+      border-bottom:1px solid var(--border);
     }
     .product-content-body{
-      font-size:15px;
-      line-height:1.9;
+      font-size:13px;
+      line-height:1.85;
       color:var(--ink-light);
     }
     .product-source-section{
-      min-height:50px;
-      background:rgba(43,33,24,.06);
+      padding:12px 14px;
+      background:rgba(26,20,16,.05);
     }
     .product-source-body{
-      font-size:13px;
+      font-size:12px;
       color:var(--ink-light);
       line-height:1.6;
     }
     
     /* 白话解读 */
     .vernacular-text{
-      padding:16px 20px;
+      padding:12px 14px;
       background:rgba(255,255,255,.6);
-      border-radius:6px;
+      border-radius:4px;
       border-left:3px solid var(--green);
     }
     
@@ -730,14 +578,14 @@
       padding:0;
     }
     .highlights-list li{
-      padding:10px 0 10px 20px;
+      padding:8px 0 8px 18px;
       position:relative;
-      border-bottom:1px dashed rgba(43,33,24,.1);
+      border-bottom:1px dashed var(--border);
     }
     .highlights-list li:last-child{border-bottom:none}
     .highlights-list li::before{
       content:"·";
-      position:absolute;left:6px;
+      position:absolute;left:5px;
       color:var(--cinnabar);
       font-weight:bold;
     }
@@ -745,50 +593,50 @@
     /* 分镜脚本 */
     .storyboard{
       display:flex;
-      gap:16px;
+      gap:12px;
       overflow-x:auto;
-      padding-bottom:12px;
+      padding-bottom:10px;
     }
     .shot-card{
-      flex:0 0 200px;
+      flex:0 0 180px;
       background:rgba(255,255,255,.7);
-      border:1px solid rgba(43,33,24,.12);
-      border-radius:6px;
-      padding:14px;
+      border:1px solid var(--border);
+      border-radius:5px;
+      padding:12px;
     }
     .shot-time{
       display:inline-block;
       background:var(--cinnabar);
       color:#fff;
-      font-size:11px;
-      padding:3px 8px;
-      border-radius:12px;
-      margin-bottom:10px;
+      font-size:10px;
+      padding:3px 7px;
+      border-radius:10px;
+      margin-bottom:8px;
     }
-    .shot-title{font-weight:600;font-size:14px;margin-bottom:6px;color:var(--ink)}
-    .shot-desc{font-size:12px;color:var(--ink-light);line-height:1.7}
+    .shot-title{font-weight:600;font-size:13px;margin-bottom:5px;color:var(--ink)}
+    .shot-desc{font-size:11px;color:var(--ink-light);line-height:1.7}
     .shot-basis{
-      font-size:11px;
+      font-size:10px;
       color:var(--gold);
-      margin-top:8px;
-      padding-top:6px;
-      border-top:1px dashed rgba(43,33,24,.1);
+      margin-top:7px;
+      padding-top:5px;
+      border-top:1px dashed var(--border);
     }
     
     /* 分享卡 */
     .share-card-wrap{
       display:flex;
-      gap:24px;
+      gap:16px;
       align-items:flex-start;
       flex-wrap:wrap;
     }
     .share-card{
-      width:280px;
+      width:240px;
       aspect-ratio:9/16;
       background:linear-gradient(135deg, #f7f3e9 0%, #efe8d8 100%);
-      border:6px solid var(--cinnabar);
-      border-radius:4px;
-      padding:28px 20px;
+      border:5px solid var(--cinnabar);
+      border-radius:3px;
+      padding:24px 18px;
       display:flex;flex-direction:column;
       justify-content:space-between;
       position:relative;
@@ -797,7 +645,7 @@
     .share-card::before{
       content:"";
       position:absolute;
-      inset:10px;
+      inset:8px;
       border:1px solid rgba(139,69,19,.25);
       pointer-events:none;
     }
@@ -805,7 +653,7 @@
     .share-card-dynasty{
       writing-mode:vertical-rl;
       text-orientation:upright;
-      font-size:12px;
+      font-size:11px;
       letter-spacing:3px;
       color:var(--ink-light);
     }
@@ -813,52 +661,52 @@
       writing-mode:vertical-rl;
       text-orientation:upright;
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:32px;
-      letter-spacing:8px;
+      font-size:28px;
+      letter-spacing:7px;
       color:var(--ink);
-      max-height:280px;
+      max-height:240px;
     }
     .share-card-quote{
-      font-size:13px;
+      font-size:12px;
       color:var(--ink-light);
       line-height:1.8;
-      margin:20px 0;
-      padding:12px;
-      border-top:1px solid rgba(43,33,24,.12);
-      border-bottom:1px solid rgba(43,33,24,.12);
+      margin:16px 0;
+      padding:10px;
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
     }
     .share-card-bottom{display:flex;justify-content:space-between;align-items:flex-end}
-    .share-card-tags{font-size:11px;color:var(--cinnabar)}
+    .share-card-tags{font-size:10px;color:var(--cinnabar)}
     .share-card-seal{
-      width:44px;height:44px;
+      width:38px;height:38px;
       background:var(--cinnabar);
       color:#fff;
       display:grid;place-items:center;
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:18px;
-      border-radius:4px;
+      font-size:16px;
+      border-radius:3px;
       transform:rotate(8deg);
       box-shadow:inset 0 0 0 2px rgba(255,255,255,.3);
     }
     .share-card-source{
       position:absolute;
-      bottom:14px;left:0;right:0;
+      bottom:12px;left:0;right:0;
       text-align:center;
-      font-size:10px;color:var(--ink-light);
+      font-size:9px;color:var(--ink-light);
     }
     .share-actions{
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap:8px;
     }
     .share-actions button{
-      padding:12px 20px;
+      padding:10px 16px;
       border:1px solid var(--cinnabar);
       background:transparent;
       color:var(--cinnabar);
-      border-radius:6px;
+      border-radius:5px;
       font-family:inherit;
-      font-size:14px;
+      font-size:13px;
       cursor:pointer;
       transition:all .2s;
     }
@@ -873,92 +721,206 @@
     /* 小红书文案 */
     .xhs-card{
       background:rgba(255,255,255,.7);
-      border:1px solid rgba(43,33,24,.1);
-      border-radius:8px;
-      padding:20px;
-      font-size:14px;
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:16px;
+      font-size:13px;
       line-height:1.8;
       color:var(--ink);
     }
     .xhs-card .xhs-title{
       font-weight:700;
-      font-size:16px;
-      margin-bottom:10px;
+      font-size:15px;
+      margin-bottom:8px;
       color:var(--cinnabar);
     }
-    .xhs-card .xhs-body{white-space:pre-wrap;margin-bottom:12px}
-    .xhs-card .xhs-tags{font-size:13px;color:var(--ink-light)}
+    .xhs-card .xhs-body{white-space:pre-wrap;margin-bottom:10px}
+    .xhs-card .xhs-tags{font-size:12px;color:var(--ink-light)}
     
     /* 公众号长文 */
     .gzh-article{
       background:rgba(255,255,255,.7);
-      border:1px solid rgba(43,33,24,.1);
-      border-radius:8px;
-      padding:24px;
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:18px;
     }
     .gzh-article h5{
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:18px;
-      margin-bottom:14px;
+      font-size:16px;
+      margin-bottom:10px;
       letter-spacing:2px;
     }
     .gzh-article .gzh-meta{
-      font-size:12px;
+      font-size:11px;
       color:var(--ink-light);
-      margin-bottom:16px;
-      padding-bottom:10px;
-      border-bottom:1px solid rgba(43,33,24,.1);
+      margin-bottom:12px;
+      padding-bottom:8px;
+      border-bottom:1px solid var(--border);
     }
     .gzh-article .gzh-body{
-      font-size:15px;
-      line-height:2;
+      font-size:14px;
+      line-height:1.9;
       color:var(--ink-light);
     }
-    .gzh-article .gzh-body p{margin-bottom:14px}
+    .gzh-article .gzh-body p{margin-bottom:10px}
     
     /* 可信度标签 */
     .reliability-tag{
       display:inline-flex;
       align-items:center;
-      gap:6px;
-      font-size:12px;
-      padding:4px 10px;
-      border-radius:12px;
-      margin-bottom:12px;
+      gap:5px;
+      font-size:11px;
+      padding:3px 9px;
+      border-radius:10px;
+      margin-bottom:10px;
     }
     .reliability-tag.proof{
-      background:rgba(74,124,89,.1);
+      background:var(--green-light);
       color:var(--green);
       border:1px solid var(--green);
     }
     .reliability-tag.creation{
-      background:rgba(184,62,47,.08);
+      background:var(--cinnabar-light);
       color:var(--cinnabar);
       border:1px solid var(--cinnabar);
     }
     .reliability-tag .dot{
-      width:6px;height:6px;
+      width:5px;height:5px;
       border-radius:50%;
       background:currentColor;
     }
     
     /* 来源标注 */
     .source-footer{
-      margin-top:16px;
-      padding-top:12px;
-      border-top:1px dashed rgba(43,33,24,.15);
-      font-size:12px;
+      margin-top:12px;
+      padding-top:10px;
+      border-top:1px dashed var(--border);
+      font-size:11px;
       color:var(--ink-light);
-      opacity:.75;
     }
     .source-footer a{color:var(--cinnabar);text-decoration:none}
     .source-footer a:hover{text-decoration:underline}
+    
+    /* 默认示例 */
+    .demo-indicator{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      padding:3px 9px;
+      background:rgba(184,148,31,.1);
+      color:var(--gold);
+      border:1px solid var(--gold);
+      border-radius:10px;
+      font-size:11px;
+      margin-bottom:10px;
+    }
+    .demo-indicator .dot{
+      width:5px;height:5px;
+      border-radius:50%;
+      background:currentColor;
+    }
+    .demo-section-label{
+      font-size:11px;
+      color:var(--ink-muted);
+      letter-spacing:1px;
+      margin-bottom:5px;
+      margin-top:12px;
+      font-weight:500;
+    }
+    .demo-section-label:first-child{margin-top:0}
+    .demo-vernacular{
+      padding:10px 12px;
+      background:var(--green-light);
+      border-left:3px solid var(--green);
+      border-radius:0 4px 4px 0;
+      font-size:12px;
+      line-height:1.8;
+      color:var(--ink);
+    }
+    .demo-highlights{
+      list-style:none;
+      padding:0;
+    }
+    .demo-highlights li{
+      padding:6px 0 6px 14px;
+      position:relative;
+      border-bottom:1px dashed var(--border);
+      font-size:12px;
+      line-height:1.7;
+      color:var(--ink-light);
+    }
+    .demo-highlights li:last-child{border-bottom:none}
+    .demo-highlights li::before{
+      content:"·";
+      position:absolute;left:3px;
+      color:var(--cinnabar);
+      font-weight:bold;
+    }
+    .demo-storyboard{
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      padding-bottom:6px;
+    }
+    .demo-shot{
+      flex:0 0 130px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--border);
+      border-radius:5px;
+      padding:8px 10px;
+    }
+    .demo-shot-time{
+      display:inline-block;
+      background:var(--cinnabar);
+      color:#fff;
+      font-size:9px;
+      padding:2px 5px;
+      border-radius:7px;
+      margin-bottom:5px;
+    }
+    .demo-shot-title{font-weight:600;font-size:11px;margin-bottom:3px;color:var(--ink)}
+    .demo-shot-desc{font-size:10px;color:var(--ink-light);line-height:1.6}
+    .demo-share-mini{
+      background:linear-gradient(135deg, var(--paper) 0%, var(--paper-dark) 100%);
+      border:3px solid var(--cinnabar);
+      border-radius:3px;
+      padding:14px 12px;
+      text-align:center;
+      position:relative;
+    }
+    .demo-share-mini-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:16px;
+      color:var(--cinnabar);
+      margin-bottom:6px;
+      letter-spacing:2px;
+    }
+    .demo-share-mini-quote{
+      font-size:11px;
+      color:var(--ink);
+      line-height:1.7;
+      font-style:italic;
+      margin-bottom:6px;
+    }
+    .demo-share-mini-tags{font-size:9px;color:var(--cinnabar)}
+    .panel-empty-hint{
+      text-align:center;
+      padding:28px 14px;
+      color:var(--ink-muted);
+      font-size:12px;
+      line-height:1.8;
+    }
+    .panel-empty-hint .icon{
+      font-size:30px;
+      margin-bottom:8px;
+      opacity:.4;
+    }
     
     /* 输入面板 */
     .input-modal{
       position:fixed;
       inset:0;
-      background:rgba(43,33,24,.4);
+      background:rgba(26,20,16,.4);
       z-index:200;
       display:none;
       align-items:center;
@@ -971,25 +933,25 @@
       background:#fff;
       border-radius:8px;
       width:90%;
-      max-width:560px;
-      max-height:80vh;
+      max-width:520px;
+      max-height:84vh;
       overflow-y:auto;
       box-shadow:var(--shadow);
     }
     .input-dialog-header{
-      padding:20px 24px;
-      border-bottom:1px solid rgba(43,33,24,.1);
+      padding:18px 22px;
+      border-bottom:1px solid var(--border);
       display:flex;
       align-items:center;
       justify-content:space-between;
     }
     .input-dialog-title{
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:18px;
+      font-size:17px;
       letter-spacing:2px;
     }
     .input-dialog-close{
-      width:32px;height:32px;
+      width:30px;height:30px;
       border:none;
       background:transparent;
       cursor:pointer;
@@ -1004,40 +966,40 @@
       color:var(--cinnabar);
     }
     .input-dialog-body{
-      padding:24px;
+      padding:22px;
     }
     .input-field{
-      margin-bottom:18px;
+      margin-bottom:16px;
     }
     .input-field label{
       display:block;
-      font-size:14px;
-      margin-bottom:8px;
+      font-size:13px;
+      margin-bottom:6px;
       color:var(--ink-light);
     }
     .input-field input,.input-field textarea{
       width:100%;
-      padding:12px 14px;
-      border:1px solid rgba(43,33,24,.18);
+      padding:10px 12px;
+      border:1px solid var(--border-strong);
       background:rgba(255,255,255,.8);
-      border-radius:6px;
+      border-radius:5px;
       font-family:inherit;
-      font-size:14px;
+      font-size:13px;
       color:var(--ink);
       transition:border-color .2s,box-shadow .2s;
     }
     .input-field input:focus,.input-field textarea:focus{
       border-color:var(--cinnabar);
-      box-shadow:0 0 0 3px rgba(184,62,47,.15);
+      box-shadow:0 0 0 3px rgba(163,50,31,.12);
     }
     .input-field input:focus-visible,.input-field textarea:focus-visible{
       outline:2px solid var(--cinnabar);
       outline-offset:2px;
     }
     .field-error{
-      font-size:13px;
+      font-size:12px;
       color:var(--cinnabar);
-      margin-top:6px;
+      margin-top:5px;
       display:none;
     }
     .field-error.show{
@@ -1045,48 +1007,48 @@
     }
     .input-field input.error,.input-field textarea.error{
       border-color:var(--cinnabar);
-      background:rgba(184,62,47,.05);
+      background:rgba(163,50,31,.05);
     }
     .input-field textarea{
-      min-height:120px;
+      min-height:100px;
       resize:vertical;
       line-height:1.8;
     }
     .input-tip{
-      padding:14px 16px;
-      background:rgba(184,62,47,.06);
-      border-radius:6px;
+      padding:12px 14px;
+      background:var(--cinnabar-light);
+      border-radius:5px;
       border-left:3px solid var(--cinnabar);
-      font-size:13px;
+      font-size:12px;
       color:var(--ink-light);
       line-height:1.7;
     }
     .input-actions{
       display:flex;
-      gap:12px;
-      margin-top:24px;
+      gap:10px;
+      margin-top:20px;
     }
     .input-actions button{
       flex:1;
-      padding:14px 20px;
-      border-radius:6px;
+      padding:12px 18px;
+      border-radius:5px;
       font-family:inherit;
-      font-size:15px;
+      font-size:14px;
       cursor:pointer;
       transition:all .2s;
     }
     .input-actions .btn-cancel{
-      border:1px solid rgba(43,33,24,.15);
+      border:1px solid var(--border);
       background:transparent;
       color:var(--ink-light);
     }
     .input-actions .btn-cancel:hover{
-      background:rgba(43,33,24,.05);
+      background:rgba(26,20,16,.04);
     }
     .input-actions .btn-cancel:focus-visible{
       outline:2px solid var(--ink-light);
       outline-offset:2px;
-      background:rgba(43,33,24,.05);
+      background:rgba(26,20,16,.04);
     }
     .input-actions .btn-submit{
       border:none;
@@ -1105,32 +1067,31 @@
     /* 页脚 */
     footer{
       text-align:center;
-      padding:40px 0 32px;
+      padding:32px 0 28px;
       color:var(--ink-light);
-      font-size:13px;
-      border-top:1px solid rgba(43,33,24,.1);
-      margin-top:48px;
+      font-size:12px;
+      border-top:1px solid var(--border);
+      margin-top:40px;
     }
     
     /* 响应式 */
-    /* 移动端专属元素默认隐藏 */
     .shelf-tabs{display:none}
     
     @media(max-width:900px){
-      /* 移动端书签 tabs */
+      .wrap{padding:0 16px}
       .shelf-tabs{
         display:flex;
         align-items:center;
         background:rgba(255,255,255,.5);
-        border:1px solid rgba(43,33,24,.12);
+        border:1px solid var(--border);
         border-radius:8px;
-        padding:12px 16px;
-        margin-bottom:16px;
-        gap:12px;
+        padding:10px 12px;
+        margin-bottom:12px;
+        gap:10px;
       }
       .shelf-tabs-scroll{
         display:flex;
-        gap:10px;
+        gap:8px;
         overflow-x:auto;
         flex:1;
         scrollbar-width:none;
@@ -1139,11 +1100,11 @@
       .shelf-tabs-scroll::-webkit-scrollbar{display:none}
       .shelf-tab{
         flex:0 0 auto;
-        padding:8px 14px;
+        padding:7px 12px;
         background:rgba(139,69,19,.1);
-        border:1px solid rgba(43,33,24,.15);
+        border:1px solid var(--border);
         border-radius:4px;
-        font-size:14px;
+        font-size:13px;
         white-space:nowrap;
         cursor:pointer;
         transition:all .2s;
@@ -1154,17 +1115,17 @@
       }
       .shelf-tab.active{
         border-color:var(--cinnabar);
-        background:rgba(184,62,47,.08);
+        background:var(--cinnabar-light);
         color:var(--cinnabar);
       }
       .shelf-input-fixed-btn{
         flex:0 0 auto;
-        padding:8px 12px;
+        padding:7px 10px;
         background:var(--cinnabar);
         color:#fff;
         border:none;
         border-radius:4px;
-        font-size:13px;
+        font-size:12px;
         cursor:pointer;
         font-family:inherit;
         white-space:nowrap;
@@ -1174,14 +1135,12 @@
         background:var(--cinnabar-dark);
       }
       
-      /* 桌面端书架隐藏 */
       .shelf{display:none}
       
-      /* 阅读器调整 */
-      .reader{padding:24px 20px}
-      .share-card{width:100%;max-width:280px}
+      .reader{padding:18px 16px;min-height:auto}
+      .reader-content{font-size:16px}
+      .share-card{width:100%;max-width:240px}
       
-      /* 产物菜单改为底部 action sheet */
       .product-menu{
         position:fixed;
         bottom:0;
@@ -1200,16 +1159,16 @@
       .product-menu.show{display:block}
       .product-menu-item{
         padding:14px 20px;
-        border-bottom:1px solid rgba(43,33,24,.08);
+        border-bottom:1px solid rgba(26,20,16,.08);
         font-size:15px;
       }
       .product-menu-item:last-child{border-bottom:none}
       .product-menu-item svg{width:18px;height:18px}
       
-      /* 选中提示调整位置 */
       .selection-hint{
         bottom:80px;
       }
+      .workspace{gap:14px}
     }
   </style>
 </head>
@@ -1233,74 +1192,13 @@
       </nav>
     </header>
     
-    <!-- 案例展示区 -->
-    <section class="demo-section">
-      <div class="demo-header">
-        <h2 class="demo-title">选文成物</h2>
-        <p class="demo-subtitle">阅读古籍原文，选中片段后生成内容产物</p>
-      </div>
-      <div class="demo-content">
-        <div class="demo-original">
-          <div class="demo-original-label">原文</div>
-          <div class="demo-original-text">
-            <p>关关雎鸠，在河之洲。</p>
-            <p>窈窕淑女，君子好逑。</p>
-            <p>参差荇菜，左右流之。</p>
-            <p>窈窕淑女，寤寐求之。</p>
-          </div>
-          <div class="demo-original-source">《诗经·周南·关雎》</div>
-        </div>
-        <div class="demo-products">
-          <div class="demo-product-card">
-            <div class="demo-product-icon">📖</div>
-            <div class="demo-product-label">白话解读</div>
-            <div class="demo-product-content">水鸟关关和鸣，栖息在河中的小洲。那位文静美好的姑娘，正是君子心中理想的伴侣。</div>
-          </div>
-          <div class="demo-product-card">
-            <div class="demo-product-icon">✨</div>
-            <div class="demo-product-label">传播要点</div>
-            <div class="demo-product-content">"窈窕淑女，君子好逑"是中国人最熟悉的爱情金句，从求之不得的焦灼到琴瑟友之的圆满，情绪曲线完整。</div>
-          </div>
-          <div class="demo-product-card">
-            <div class="demo-product-icon">🎬</div>
-            <div class="demo-product-label">分镜脚本</div>
-            <div class="demo-product-content"><span class="demo-shot-time">0-8s</span>河洲晨雾，水墨晕染出河中小洲，雎鸠双飞入画，古琴泛音</div>
-          </div>
-          <div class="demo-product-card">
-            <div class="demo-product-icon">📕</div>
-            <div class="demo-product-label">小红书文案</div>
-            <div class="demo-product-content">📖 今天读到《诗经·周南·关雎》……古人的智慧放在今天依然闪闪发光。#关雎 #古籍 #传统文化</div>
-          </div>
-          <div class="demo-product-card">
-            <div class="demo-product-icon">📋</div>
-            <div class="demo-product-label">公众号长文</div>
-            <div class="demo-product-content">《诗经·周南·关雎》出自先秦时期，是中国最早的恋歌之一……白话解读：水鸟关关和鸣……</div>
-          </div>
-          <div class="demo-product-card demo-share-card">
-            <div class="demo-product-icon">🖼️</div>
-            <div class="demo-product-label">分享卡片</div>
-            <div class="demo-product-content">
-              <div class="demo-share-preview">
-                <div class="demo-share-title">关雎</div>
-                <div class="demo-share-quote">关关雎鸠，在河之洲……</div>
-                <div class="demo-share-tags">#关雎 #古籍</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="demo-cta">
-        <button class="demo-cta-btn" onclick="document.getElementById('shelfBooks').querySelector('.shelf-book')?.click(); document.getElementById('readerContent').scrollIntoView({behavior:'smooth'})">开始阅读</button>
-      </div>
-    </section>
-    
     <!-- 移动端书签 tabs -->
     <div class="shelf-tabs" id="shelfTabs">
       <div class="shelf-tabs-scroll" id="shelfTabsScroll"></div>
       <button class="shelf-input-fixed-btn" id="inputBtnMobile">+ 输入</button>
     </div>
     
-    <div class="main-layout">
+    <div class="workspace">
       <!-- 左侧书架 -->
       <aside class="shelf">
         <h3 class="shelf-title">书架</h3>
@@ -1308,17 +1206,15 @@
         <div class="shelf-input-btn" id="inputBtn">+ 输入古籍文本</div>
       </aside>
       
-      <!-- 右侧阅读器 -->
+      <!-- 中间阅读器 -->
       <main class="reader" id="reader">
         <div class="reader-header">
-          <div>
-            <h2 class="reader-title" id="readerTitle">诗经 · 关雎</h2>
-            <div class="reader-meta" id="readerMeta">先秦 · 周南</div>
-            <div class="reader-source" id="readerSource">
-              来源：<a href="https://ctext.org/book-of-poetry/guan-ju/zh" target="_blank">中国哲学书电子化计划</a>
-            </div>
+          <h2 class="reader-title" id="readerTitle">诗经 · 周南</h2>
+          <div class="reader-meta" id="readerMeta">先秦 · 国风 · 周南</div>
+          <div class="reader-source" id="readerSource">
+            来源：<a href="https://ctext.org/book-of-poetry/zhounan/zh" target="_blank">中国哲学书电子化计划</a>
           </div>
-    </div>
+        </div>
 
         <!-- 可信来源卡 -->
         <div class="source-card" id="sourceCard"></div>
@@ -1341,15 +1237,15 @@
             </button>
             <button class="toolbar-btn" data-type="xiaohongshu" aria-label="小红书文案" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              小红书文案
+              小红书
             </button>
             <button class="toolbar-btn" data-type="gongzhonghao" aria-label="公众号长文" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/></svg>
-              公众号长文
+              公众号
             </button>
             <button class="toolbar-btn" data-type="sharecard" aria-label="分享卡片" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
-              分享卡片
+              分享卡
             </button>
           </div>
         </div>
@@ -1389,28 +1285,28 @@
             分享卡片
           </button>
         </div>
-        
-        <!-- 产物面板 -->
-        <div class="product-panel" id="productPanel">
-          <div class="product-panel-header">
-            <h4 class="product-panel-title" id="productPanelTitle">白话解读</h4>
-            <button class="product-panel-close" id="productPanelClose">×</button>
+      </main>
+      
+      <!-- 右侧产物面板 -->
+      <aside class="product-side-panel" id="sidePanel">
+        <div class="panel-header">
+          <div class="panel-title" id="panelTitle">
+            <span class="dot demo" id="panelTitleDot"></span>
+            <span id="panelTitleText">即时示例</span>
           </div>
-          <!-- 三段布局：选中原文 / 生成内容 / 来源说明 -->
-          <div class="product-selected-section" id="productSelectedSection">
-            <div class="product-section-label">当前选中原文</div>
-            <div class="product-selected-text" id="productSelectedText"></div>
-          </div>
-          <div class="product-content-section" id="productContentSection">
-            <div class="product-section-label">生成内容</div>
-            <div class="product-content-body" id="productPanelBody"></div>
-          </div>
-          <div class="product-source-section" id="productSourceSection">
-            <div class="product-section-label">来源 / 可信度</div>
-            <div class="product-source-body" id="productSourceBody"></div>
+          <div class="panel-tabs" id="panelTabs">
+            <button class="panel-tab active" data-tab="demo" id="tabDemo">示例</button>
+            <button class="panel-tab" data-tab="product" id="tabProduct">产物</button>
+            <button class="panel-tab" data-tab="source" id="tabSource">出处</button>
           </div>
         </div>
-      </main>
+        <div class="panel-body" id="panelBody">
+          <div class="panel-empty-hint">
+            <div class="icon">✨</div>
+            <p>在左侧阅读器中选中任意原文<br>即可在此处生成内容产物</p>
+          </div>
+        </div>
+      </aside>
     </div>
     
     <footer>
@@ -1610,6 +1506,29 @@
     let currentBook=books[0];
     let selectedText='';
     let selectedRange=null;
+    let activePanelTab='demo';
+    let currentOutputType='';
+    
+    // 默认示例数据（关雎）
+    const demoData={
+      selectedText:'关关雎鸠，在河之洲。窈窕淑女，君子好逑。',
+      vernacular:'水鸟关关和鸣，栖息在河中的小洲。那位文静美好的姑娘，正是君子心中理想的伴侣。',
+      highlights:[
+        '"窈窕淑女，君子好逑"是中国人最熟悉的爱情金句',
+        '从求之不得的焦灼到琴瑟友之的圆满，情绪曲线完整',
+        '适合作为传统文化短视频的情感开场'
+      ],
+      storyboard:[
+        {time:'0-8s',title:'河洲晨雾',desc:'水墨晕染出河中小洲，雎鸠双飞入画，古琴泛音',basis:'关关雎鸠，在河之洲'},
+        {time:'9-18s',title:'淑女入镜',desc:'蒹葭摇曳，女子采荇菜，衣袂飘飘',basis:'参差荇菜，左右流之'},
+        {time:'19-28s',title:'君子求之',desc:'岸边君子凝望，特写眼神，转入辗转反侧的夜戏',basis:'窈窕淑女，寤寐求之'}
+      ],
+      xiaohongshu:'📖 今天读到《诗经·周南·关雎》\n\n"关关雎鸠，在河之洲。窈窕淑女，君子好逑。"\n\n水鸟关关和鸣，栖息在河中的小洲。那位文静美好的姑娘，正是君子心中理想的伴侣。\n\n古人的爱情表达，比今天的"我爱你"更含蓄，也更长久。\n\n你怎么看？评论区聊聊👇',
+      gongzhonghao:'《诗经·周南·关雎》出自先秦时期，是中国最早的恋歌之一。原文如下：\n\n"关关雎鸠，在河之洲。窈窕淑女，君子好逑。"\n\n白话解读：水鸟关关和鸣，栖息在河中的小洲。那位文静美好的姑娘，正是君子心中理想的伴侣。\n\n在当下的传播环境中，这段文字值得注意的角度：它是中国人最熟悉的爱情金句；从求之不得到琴瑟友之，情绪曲线完整；适合作为传统文化短视频的情感开场。',
+      shareTitle:'关雎',
+      shareQuote:'关关雎鸠，在河之洲。窈窕淑女，君子好逑。',
+      shareTags:'#关雎 #古籍 #传统文化'
+    };
     
     // 渲染书架
     function renderShelf(){
@@ -1641,12 +1560,10 @@
           el.addEventListener('click',()=>{
             tabsScroll.querySelectorAll('.shelf-tab').forEach(e=>e.classList.remove('active'));
             el.classList.add('active');
-            // 同步桌面端书架选中状态
             shelf.querySelectorAll('.shelf-book').forEach(e=>e.classList.remove('active'));
             shelf.querySelector(`.shelf-book[data-id="${el.dataset.id}"]`)?.classList.add('active');
             currentBook=books.find(b=>b.id===el.dataset.id);
             renderReader();
-            // 滚动到选中的 tab
             el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
           });
         });
@@ -1668,45 +1585,38 @@
         sourceEl.innerHTML='';
       }
       
-      // 渲染可信来源卡
       renderSourceCard(book);
       
       const contentEl=document.getElementById('readerContent');
       contentEl.innerHTML=book.text.split('\n').map(p=>`<p>${p}</p>`).join('');
       
-      // 关闭产物面板
-      document.getElementById('productPanel').classList.remove('show');
+      // 重置产物面板
+      selectedText='';
+      selectedRange=null;
+      currentOutputType='';
+      updateToolbarButtons(false);
       document.getElementById('productMenu').classList.remove('show');
+      document.getElementById('selectionHint').classList.remove('show');
+      renderSidePanel('demo');
     }
     
     // 渲染可信来源卡
     function renderSourceCard(book){
       const cardEl=document.getElementById('sourceCard');
       const sourceInfo=book.sourceInfo||{};
-      
-      // 判断是否为内置书目（有完整的 sourceInfo 且 textSourceUrl 包含 ctext.org）
       const isBuiltin=sourceInfo.textSourceUrl&&sourceInfo.textSourceUrl.includes('ctext.org');
       const isTraceable=isBuiltin;
-      
-      // 状态标签
       const statusClass=isTraceable?'traceable':'pending';
       const statusText=isTraceable?'可追溯':'待核验';
-      
-      // 来源链接
       const sourceLink=sourceInfo.textSourceUrl
         ?`<a href="${sourceInfo.textSourceUrl}" target="_blank">${sourceInfo.textSourceName||'原文链接'}</a>`
         :sourceInfo.textSourceName||'用户输入';
-      
-      // 版本信息
-      const version=sourceInfo.version||(isTraceable?'版本待确认':'版本待确认');
-      
-      // 参考注本
+      const version=sourceInfo.version||'版本待确认';
       const referenceHtml=sourceInfo.referenceWorks&&sourceInfo.referenceWorks.length>0
         ?`<div class="source-card-reference"><span class="source-card-reference-label">参考注本：</span>${sourceInfo.referenceWorks.join('、')}</div>`
         :'';
       
-      // 构建来源卡内容
-      const cardContent=`
+      cardEl.innerHTML=`
         <div class="source-card-header">
           <div class="source-status ${statusClass}">
             <span class="source-status-icon"></span>
@@ -1734,15 +1644,11 @@
         </div>
         ${referenceHtml}
       `;
-      
-      cardEl.innerHTML=cardContent;
-      cardEl.classList.add('show');
     }
     
     // 更新工具条按钮状态
     function updateToolbarButtons(hasSelection){
-      const toolbarBtns=document.querySelectorAll('.toolbar-btn');
-      toolbarBtns.forEach(btn=>{
+      document.querySelectorAll('.toolbar-btn').forEach(btn=>{
         btn.disabled=!hasSelection;
       });
     }
@@ -1755,57 +1661,114 @@
       if(text.length>0){
         selectedText=text;
         selectedRange=selection.getRangeAt(0);
-
-        // 更新工具条按钮状态
         updateToolbarButtons(true);
 
-        // 显示提示
         const hint=document.getElementById('selectionHint');
         hint.textContent=`已选中 ${text.length} 字，点击可生成内容产物`;
         hint.classList.add('show');
 
-        // 定位菜单
         const menu=document.getElementById('productMenu');
         const rect=selectedRange.getBoundingClientRect();
         menu.style.top=`${rect.bottom+8+window.scrollY}px`;
         menu.style.left=`${rect.left+rect.width/2-80}px`;
         menu.classList.add('show');
       }else{
-        // 更新工具条按钮状态
         updateToolbarButtons(false);
         document.getElementById('selectionHint').classList.remove('show');
-        // 不立即隐藏菜单，让用户有时间点击
       }
     }
     
-    // 生成产物
-    function generateProduct(type){
-      if(!selectedText){
-        alert('请先选中一段原文');
+    // 渲染右侧产物面板
+    function renderSidePanel(mode,type){
+      const panelTitleText=document.getElementById('panelTitleText');
+      const panelTitleDot=document.getElementById('panelTitleDot');
+      const panelBody=document.getElementById('panelBody');
+      const tabDemo=document.getElementById('tabDemo');
+      const tabProduct=document.getElementById('tabProduct');
+      const tabSource=document.getElementById('tabSource');
+      
+      document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
+      
+      if(mode==='demo'){
+        activePanelTab='demo';
+        tabDemo.classList.add('active');
+        panelTitleText.textContent='即时示例';
+        panelTitleDot.className='dot demo';
+        panelBody.innerHTML=renderDemoContent();
         return;
       }
       
-      const panel=document.getElementById('productPanel');
-      const titleEl=document.getElementById('productPanelTitle');
-      const selectedTextEl=document.getElementById('productSelectedText');
-      const bodyEl=document.getElementById('productPanelBody');
-      const sourceBodyEl=document.getElementById('productSourceBody');
+      if(mode==='product' && type){
+        activePanelTab='product';
+        tabProduct.classList.add('active');
+        panelTitleText.textContent='生成产物';
+        panelTitleDot.className='dot';
+        panelBody.innerHTML=renderProductContent(type);
+        return;
+      }
       
-      // 从当前书籍的 outputs 中提取，或动态生成
+      if(mode==='source'){
+        activePanelTab='source';
+        tabSource.classList.add('active');
+        panelTitleText.textContent='出处说明';
+        panelTitleDot.className='dot';
+        panelBody.innerHTML=renderSourceContent();
+        return;
+      }
+    }
+    
+    // 渲染示例内容
+    function renderDemoContent(){
+      const storyboardHtml=demoData.storyboard.map(s=>`
+        <div class="demo-shot">
+          <span class="demo-shot-time">${s.time}</span>
+          <div class="demo-shot-title">${s.title}</div>
+          <div class="demo-shot-desc">${s.desc}</div>
+        </div>
+      `).join('');
+      
+      return `
+        <div class="demo-indicator">
+          <span class="dot"></span>
+          《关雎》示例
+        </div>
+        <div class="demo-section-label">选中原文</div>
+        <div style="font-size:13px;color:var(--ink);line-height:1.8;margin-bottom:12px;font-style:italic">${demoData.selectedText}</div>
+        <div class="demo-section-label">白话解读</div>
+        <div class="demo-vernacular">${demoData.vernacular}</div>
+        <div class="demo-section-label">传播要点</div>
+        <ul class="demo-highlights">${demoData.highlights.map(h=>`<li>${h}</li>`).join('')}</ul>
+        <div class="demo-section-label">分镜脚本</div>
+        <div class="demo-storyboard">${storyboardHtml}</div>
+        <div class="demo-section-label">小红书文案</div>
+        <div class="xhs-card" style="margin-bottom:12px">
+          <div class="xhs-title">诗经 · 关雎 · 读书笔记</div>
+          <div class="xhs-body">${demoData.xiaohongshu}</div>
+          <div class="xhs-tags">#关雎 #古籍 #传统文化 #每天学一点</div>
+        </div>
+        <div class="demo-section-label">分享卡片</div>
+        <div class="demo-share-mini">
+          <div class="demo-share-mini-title">关雎</div>
+          <div class="demo-share-mini-quote">${demoData.shareQuote}</div>
+          <div class="demo-share-mini-tags">${demoData.shareTags}</div>
+        </div>
+      `;
+    }
+    
+    // 渲染产物内容（三段式）
+    function renderProductContent(type){
       const outputs=currentBook.outputs||{};
       const bookShortTitle=currentBook.shortTitle||currentBook.title.split('·').pop().trim();
       
       let content='';
       let title='';
       
-      // 可信度：内置书目有预设 outputs 的视为考据，手动输入或演绎类产物视为演绎
       const isPreset=!!outputs.vernacular;
       const isCreation=['xiaohongshu','gongzhonghao'].includes(type);
       const reliability=isCreation||!isPreset?'creation':'proof';
       const reliabilityLabel=isCreation||!isPreset?'演绎':'考据';
       const reliabilityTag=`<div class="reliability-tag ${reliability}"><span class="dot"></span>${reliabilityLabel}</div>`;
       
-      // 来源标注
       const sourceInfo=currentBook.sourceInfo||{};
       let sourceHtml='';
       if(sourceInfo.textSourceUrl){
@@ -1822,12 +1785,11 @@
           title='白话解读';
           if(outputs.vernacular){
             content=`<div class="vernacular-text">${outputs.vernacular}</div>
-              <p style="margin-top:12px;font-size:13px;color:var(--ink-light)">—— 以上为全篇白话解读，您选中的片段可在文中对应段落找到。</p>`;
+              <p style="margin-top:10px;font-size:12px;color:var(--ink-muted)">—— 以上为全篇白话解读，您选中的片段可在文中对应段落找到。</p>`;
           }else{
             content=`<div class="vernacular-text">【演示】"${selectedText}"的白话解读：这是用户选中的古籍片段，实际传播前请结合权威注本进行解读。</div>`;
           }
           break;
-          
         case 'highlights':
           title='传播要点';
           if(outputs.highlights){
@@ -1836,7 +1798,6 @@
             content='<ul class="highlights-list"><li>选中片段共 '+selectedText.length+' 字</li><li>手动输入内容建议补充来源后传播</li></ul>';
           }
           break;
-          
         case 'storyboard':
           title='分镜脚本';
           if(outputs.storyboard){
@@ -1852,7 +1813,6 @@
             content='<div class="storyboard"><div class="shot-card"><span class="shot-time">0-10s</span><div class="shot-title">原文呈现</div><div class="shot-desc">以竖排或卷轴形式呈现选中文本</div><div class="shot-basis">依据：'+selectedText.slice(0,20)+'...</div></div></div>';
           }
           break;
-          
         case 'xiaohongshu':
           title='小红书文案';
           const xhsQuote=selectedText.length>60?selectedText.slice(0,60)+'……':selectedText;
@@ -1871,19 +1831,18 @@
             </div>
           `;
           break;
-          
         case 'gongzhonghao':
           title='公众号长文';
           let gzhBody='';
           if(outputs.vernacular){
             gzhBody=`<p>《${currentBook.title}》出自${currentBook.dynasty||''}时期，是${currentBook.source||''}中的经典篇章。原文如下：</p>
-            <p style="padding:12px;background:rgba(43,33,24,.04);border-radius:4px;font-style:italic">${selectedText.length>200?selectedText.slice(0,200)+'……':selectedText}</p>
+            <p style="padding:10px;background:rgba(26,20,16,.04);border-radius:4px;font-style:italic">${selectedText.length>200?selectedText.slice(0,200)+'……':selectedText}</p>
             <p>白话解读：${outputs.vernacular}</p>
             <p>在当下的传播环境中，这段文字至少有以下几个值得关注的角度：${outputs.highlights?outputs.highlights.map(h=>'<br>· '+h).join(''):''}</p>
             <p>古籍不是故纸堆，而是我们与古人对话的桥梁。每一次重读，都是一次新的相遇。</p>`;
           }else{
             gzhBody=`<p>《${currentBook.title}》出自${currentBook.dynasty||''}时期。原文如下：</p>
-            <p style="padding:12px;background:rgba(43,33,24,.04);border-radius:4px;font-style:italic">${selectedText.length>200?selectedText.slice(0,200)+'……':selectedText}</p>
+            <p style="padding:10px;background:rgba(26,20,16,.04);border-radius:4px;font-style:italic">${selectedText.length>200?selectedText.slice(0,200)+'……':selectedText}</p>
             <p>这段文字蕴含着古人的智慧，值得我们今天细细品读。实际传播前，请结合权威注本进行解读。</p>`;
           }
           content=`
@@ -1894,7 +1853,6 @@
             </div>
           `;
           break;
-          
         case 'sharecard':
           title='分享卡片';
           const quote=selectedText.length>40?selectedText.slice(0,40)+'……':selectedText;
@@ -1921,32 +1879,96 @@
           break;
       }
       
-      titleEl.textContent=title;
-      // 三段布局渲染
-      // 1. 顶部：选中原文（截取前100字）
       const displaySelectedText=selectedText.length>100?selectedText.slice(0,100)+'……':selectedText;
-      selectedTextEl.textContent=displaySelectedText;
-      // 2. 中间：生成内容
-      bodyEl.innerHTML=content;
-      // 3. 底部：来源/可信度说明
-      sourceBodyEl.innerHTML=sourceFooter;
-      panel.classList.add('show');
+      return `
+        <div class="product-selected-section">
+          <div class="product-section-label">当前选中原文</div>
+          <div class="product-selected-text">${displaySelectedText}</div>
+        </div>
+        <div class="product-content-section">
+          <div class="product-section-label">${title}</div>
+          <div class="product-content-body">${content}</div>
+        </div>
+        <div class="product-source-section">
+          <div class="product-section-label">来源 / 可信度</div>
+          <div class="product-source-body">${sourceFooter}</div>
+        </div>
+      `;
+    }
+    
+    // 渲染出处说明
+    function renderSourceContent(){
+      const sourceInfo=currentBook.sourceInfo||{};
+      const isBuiltin=sourceInfo.textSourceUrl&&sourceInfo.textSourceUrl.includes('ctext.org');
+      const statusClass=isBuiltin?'traceable':'pending';
+      const statusText=isBuiltin?'可追溯':'待核验';
+      const sourceLink=sourceInfo.textSourceUrl
+        ?`<a href="${sourceInfo.textSourceUrl}" target="_blank">${sourceInfo.textSourceName||'原文链接'}</a>`
+        :sourceInfo.textSourceName||'用户输入';
+      const version=sourceInfo.version||'版本待确认';
+      const referenceHtml=sourceInfo.referenceWorks&&sourceInfo.referenceWorks.length>0
+        ?`<div class="source-card-reference"><span class="source-card-reference-label">参考注本：</span>${sourceInfo.referenceWorks.join('、')}</div>`
+        :'';
       
-      // 隐藏菜单
+      return `
+        <div class="source-card" style="display:block;margin-bottom:0">
+          <div class="source-card-header">
+            <div class="source-status ${statusClass}">
+              <span class="source-status-icon"></span>
+              ${statusText}
+            </div>
+            <div class="source-card-title">${sourceInfo.canon||currentBook.title}</div>
+          </div>
+          <div class="source-card-body">
+            <div class="source-card-item">
+              <span class="source-card-item-label">原文来源：</span>
+              <span class="source-card-item-value">${sourceLink}</span>
+            </div>
+            <div class="source-card-item">
+              <span class="source-card-item-label">版本：</span>
+              <span class="source-card-item-value">${version}</span>
+            </div>
+            <div class="source-card-item">
+              <span class="source-card-item-label">篇章：</span>
+              <span class="source-card-item-value">${sourceInfo.chapter||currentBook.source||''}</span>
+            </div>
+            <div class="source-card-item">
+              <span class="source-card-item-label">时代：</span>
+              <span class="source-card-item-value">${sourceInfo.era||currentBook.dynasty||''}</span>
+            </div>
+          </div>
+          ${referenceHtml}
+          <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);font-size:12px;color:var(--ink-muted);line-height:1.7">
+            <strong>可信度说明</strong><br>
+            「考据」表示内容基于内置书目与权威注本整理；「演绎」表示内容为 AI 基于原文结构的二次创作，传播前请人工核验。
+          </div>
+        </div>
+      `;
+    }
+    
+    // 生成产物（入口）
+    function generateProduct(type){
+      if(!selectedText){
+        alert('请先选中一段原文');
+        return;
+      }
+      currentOutputType=type;
+      renderSidePanel('product',type);
       document.getElementById('productMenu').classList.remove('show');
       document.getElementById('selectionHint').classList.remove('show');
       
-      // 绑定分享卡操作
       if(type==='sharecard'){
-        document.getElementById('downloadCard')?.addEventListener('click',downloadShareCard);
-        document.getElementById('copyCardText')?.addEventListener('click',copyShareCardText);
+        setTimeout(()=>{
+          document.getElementById('downloadCard')?.addEventListener('click',downloadShareCard);
+          document.getElementById('copyCardText')?.addEventListener('click',copyShareCardText);
+        },0);
       }
     }
     
     // 下载分享卡
     function downloadShareCard(){
       if(typeof html2canvas==='undefined'){
-        alert('下载暂不可用，可复制文案');
+        alert('下载功能暂时不可用，请复制文案');
         return;
       }
       const card=document.getElementById('shareCard');
@@ -1957,7 +1979,7 @@
         link.click();
       }).catch(err=>{
         console.error(err);
-        alert('下载暂不可用，可复制文案');
+        alert('下载失败，请复制文案');
       });
     }
     
@@ -1972,28 +1994,19 @@
     // 输入弹窗
     function openInputModal(){
       document.getElementById('inputModal').classList.add('show');
-      // 自动聚焦第一个输入框
-      setTimeout(()=>{
-        document.getElementById('inputTitle').focus();
-      },100);
+      setTimeout(()=>document.getElementById('inputTitle').focus(),100);
     }
-    
     function closeInputModal(){
       document.getElementById('inputModal').classList.remove('show');
       clearValidationErrors();
     }
-    
     function clearValidationErrors(){
-      // 清除所有错误状态
       document.querySelectorAll('.field-error').forEach(el=>{
         el.classList.remove('show');
         el.textContent='';
       });
-      document.querySelectorAll('.input-field input, .input-field textarea').forEach(el=>{
-        el.classList.remove('error');
-      });
+      document.querySelectorAll('.input-field input, .input-field textarea').forEach(el=>el.classList.remove('error'));
     }
-    
     function showFieldError(fieldId,message){
       const errorEl=document.getElementById(fieldId+'Error');
       const inputEl=document.getElementById(fieldId);
@@ -2003,35 +2016,23 @@
         inputEl.classList.add('error');
       }
     }
-    
     function validateInputForm(){
       clearValidationErrors();
       let isValid=true;
-      
       const title=document.getElementById('inputTitle').value.trim();
       const text=document.getElementById('inputText').value.trim();
-      
-      if(!title){
-        showFieldError('inputTitle','请填写典籍名称');
-        isValid=false;
-      }
-      
-      if(!text){
-        showFieldError('inputText','请填写原文内容');
-        isValid=false;
-      }
-      
+      if(!title){showFieldError('inputTitle','请填写典籍名称');isValid=false;}
+      if(!text){showFieldError('inputText','请填写原文内容');isValid=false;}
       return isValid;
     }
     
     document.getElementById('inputBtn').addEventListener('click',openInputModal);
+    document.getElementById('inputBtnMobile').addEventListener('click',openInputModal);
     document.getElementById('inputModalClose').addEventListener('click',closeInputModal);
     document.getElementById('inputCancel').addEventListener('click',closeInputModal);
     
     document.getElementById('inputSubmit').addEventListener('click',()=>{
-      if(!validateInputForm()){
-        return;
-      }
+      if(!validateInputForm())return;
       
       const title=document.getElementById('inputTitle').value.trim();
       const text=document.getElementById('inputText').value.trim();
@@ -2053,16 +2054,14 @@
           textSourceName:sourceName||'用户输入',
           textSourceUrl:sourceUrl
         },
-        outputs:null // 手动输入没有预设 outputs
+        outputs:null
       };
       
-      // 更新书架选中状态
       document.querySelectorAll('.shelf-book').forEach(e=>e.classList.remove('active'));
-      
+      document.querySelectorAll('.shelf-tab').forEach(e=>e.classList.remove('active'));
       renderReader();
       closeInputModal();
       
-      // 清空输入
       document.getElementById('inputTitle').value='';
       document.getElementById('inputText').value='';
       document.getElementById('inputDynasty').value='';
@@ -2074,14 +2073,12 @@
     document.getElementById('readerContent').addEventListener('mouseup',handleSelection);
     document.getElementById('readerContent').addEventListener('touchend',handleSelection);
 
-    // 监听 selectionchange 更新按钮状态
     document.addEventListener('selectionchange',()=>{
       const selection=window.getSelection();
       const text=selection.toString().trim();
       updateToolbarButtons(text.length>0);
     });
 
-    // 工具条按钮点击事件
     document.querySelectorAll('.toolbar-btn').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const type=btn.dataset.type;
@@ -2097,13 +2094,25 @@
       });
     });
     
-    document.getElementById('productPanelClose').addEventListener('click',()=>{
-      document.getElementById('productPanel').classList.remove('show');
+    // 右侧面板 tab 切换
+    document.getElementById('panelTabs').querySelectorAll('.panel-tab').forEach(el=>{
+      el.addEventListener('click',()=>{
+        const tab=el.dataset.tab;
+        if(tab==='demo')renderSidePanel('demo');
+        if(tab==='source')renderSidePanel('source');
+        if(tab==='product'){
+          if(currentOutputType && selectedText){
+            renderSidePanel('product',currentOutputType);
+          }else{
+            renderSidePanel('demo');
+          }
+        }
+      });
     });
     
-    // 点击其他区域关闭菜单（排除工具条按钮）
+    // 点击其他区域关闭菜单（排除工具条按钮和面板）
     document.addEventListener('click',(e)=>{
-      if(!e.target.closest('#productMenu')&&!e.target.closest('#readerContent')&&!e.target.closest('.toolbar-btn')){
+      if(!e.target.closest('#productMenu')&&!e.target.closest('#readerContent')&&!e.target.closest('.toolbar-btn')&&!e.target.closest('#sidePanel')){
         document.getElementById('productMenu').classList.remove('show');
         document.getElementById('selectionHint').classList.remove('show');
       }
@@ -2113,5 +2122,6 @@
     renderShelf();
     renderReader();
   </script>
+  <script src="html2canvas.min.js"></script>
 </body>
 </html>
