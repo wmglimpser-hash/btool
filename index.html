@@ -1222,7 +1222,7 @@
         height:58vh;
         z-index:120;
         border-radius:12px 12px 0 0;
-        transform:translateY(calc(100% - 96px));
+        transform:translateY(100%);
         transition:transform .3s ease;
         box-shadow:0 -4px 16px rgba(26,20,16,.12);
       }
@@ -1301,7 +1301,7 @@
       align-items:flex-start;
       justify-content:space-between;
       gap:18px;
-      padding:22px 28px 16px;
+      padding:18px 26px 14px;
       border-bottom:1px solid var(--border);
       background:linear-gradient(180deg, rgba(255,255,255,.35) 0%, transparent 100%);
     }
@@ -1395,7 +1395,7 @@
       border-bottom:1px solid var(--border);
     }
     .case-source{
-      padding:22px 24px;
+      padding:18px 22px;
       border-right:1px solid var(--border);
       background:rgba(255,255,255,.22);
     }
@@ -1426,14 +1426,14 @@
       color:var(--ink);
     }
     .case-source-text{
-      max-height:260px;
+      max-height:130px;
       overflow-y:auto;
-      font-size:14px;
-      line-height:2.1;
+      font-size:13px;
+      line-height:1.9;
       color:var(--ink);
       letter-spacing:1px;
       padding:2px 8px 2px 0;
-      margin-bottom:16px;
+      margin-bottom:12px;
       font-family:"Noto Serif SC",serif;
     }
     .case-source-text p{margin-bottom:2px}
@@ -1472,16 +1472,16 @@
 
     /* 右·产物 */
     .case-products{
-      padding:20px 26px 22px;
+      padding:16px 24px 18px;
       display:flex;
       flex-direction:column;
     }
     .case-products > *{
-      padding:16px 0;
+      padding:13px 0;
       border-bottom:1px solid var(--border);
     }
-    .case-products > *:first-child{padding-top:4px}
-    .case-products > *:last-child{border-bottom:none;padding-bottom:4px}
+    .case-products > *:first-child{padding-top:2px}
+    .case-products > *:last-child{border-bottom:none;padding-bottom:2px}
 
     /* 案卷底栏·来源声明 */
     .case-declaration{
@@ -1944,6 +1944,10 @@
       display:flex;
       align-items:center;
       gap:6px;
+      padding:3px 9px;
+      border:1px solid var(--border);
+      border-radius:2px;
+      background:rgba(184,148,31,.06);
     }
     .api-status-indicator::before{
       content:"";
@@ -1951,6 +1955,33 @@
       height:6px;
       border-radius:50%;
       background:var(--gold);
+      flex-shrink:0;
+    }
+    .api-status-indicator.live{
+      background:rgba(58,107,74,.08);
+      border-color:var(--green);
+      color:var(--green);
+    }
+    .api-status-indicator.live::before{
+      background:var(--green);
+    }
+    .api-status-indicator.loading{
+      background:rgba(26,20,16,.05);
+      border-color:var(--border-strong);
+      color:var(--ink-light);
+    }
+    .api-status-indicator.loading::before{
+      background:var(--ink-muted);
+      animation:statusPulse 1s ease-in-out infinite;
+    }
+    @keyframes statusPulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .api-status-indicator.failed{
+      background:rgba(163,50,31,.06);
+      border-color:var(--cinnabar);
+      color:var(--cinnabar);
+    }
+    .api-status-indicator.failed::before{
+      background:var(--cinnabar);
     }
 
     /* API 配置面板 */
@@ -2050,30 +2081,40 @@
 
     /* 案卷响应式 */
     @media(max-width:900px){
-      .case-file-header{flex-direction:column;align-items:flex-start;gap:14px;padding:18px 18px 14px}
-      .case-file-title{font-size:22px;letter-spacing:3px}
+      .case-file{outline-offset:2px}
+      .case-file-header{flex-direction:column;align-items:flex-start;gap:12px;padding:16px 16px 12px}
+      .case-file-title{font-size:21px;letter-spacing:2px}
       .case-file-controls{width:100%;justify-content:space-between;gap:10px}
-      .scenario-tabs{flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch}
-      .case-file-body{grid-template-columns:1fr}
-      .case-source{border-right:none;border-bottom:1px solid var(--border);padding:18px}
-      .case-source-text{max-height:200px}
-      .case-products{padding:18px}
-      .case-declaration{padding:12px 18px}
-      .case-file-theme{padding:14px 18px 18px}
+      .scenario-tabs{flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:0}
+      .case-file-body{grid-template-columns:1fr;min-width:0}
+      .case-source{border-right:none;border-bottom:1px solid var(--border);padding:16px;min-width:0;overflow-x:hidden}
+      .case-source-text{max-height:160px;font-size:13px;line-height:1.85;overflow-x:hidden}
+      .case-products{padding:16px;min-width:0;overflow-x:hidden}
+      .case-products > *{padding:12px 0}
+      .case-declaration{padding:11px 16px}
+      .case-file-theme{padding:12px 16px 16px}
       .case-file-config .api-config-panel{position:static;min-width:0;box-shadow:none;margin-top:8px}
       .theme-input-row input{font-size:14px}
+      .case-storyboard-timeline{overflow-x:auto;-webkit-overflow-scrolling:touch}
     }
     @media(max-width:390px){
-      .case-file-title{font-size:19px;letter-spacing:2px}
-      .case-source{padding:14px}
-      .case-products{padding:14px}
-      .case-declaration{padding:10px 14px;flex-wrap:wrap}
-      .case-declaration-text{font-size:11px}
-      .timeline-shot{flex:0 0 130px}
-      .preview-visual{height:72px}
-      .scenario-tab{padding:6px 11px;font-size:12px;letter-spacing:1px}
+      .case-file{outline-offset:2px}
+      .case-file-header{padding:14px 12px 10px;gap:10px}
+      .case-file-title{font-size:18px;letter-spacing:1px}
+      .case-file-meta{font-size:11px;letter-spacing:0}
+      .scenario-tab{padding:6px 10px;font-size:12px;letter-spacing:1px}
       .case-file-settings span{display:none}
       .case-file-settings{padding:7px 10px}
+      .case-source{padding:12px}
+      .case-source-text{max-height:140px;font-size:12px;line-height:1.8;padding-right:4px}
+      .case-products{padding:12px}
+      .case-products > *{padding:11px 0}
+      .case-declaration{padding:9px 12px;flex-wrap:wrap;gap:8px}
+      .case-declaration-seal{width:24px;height:24px;font-size:13px}
+      .case-declaration-text{font-size:10.5px;line-height:1.6;letter-spacing:0}
+      .timeline-shot{flex:0 0 120px}
+      .preview-visual{height:68px}
+      .case-file-theme{padding:10px 12px 14px}
     }
 
     /* 1.7.0：原 hero-narrative / scenario-entry / metrics-strip 已收敛进 .case-file，样式见上 */
@@ -2343,7 +2384,7 @@
           <button class="theme-preset" data-theme="庄子如何看待自由" type="button">庄子如何看待自由</button>
           <button class="theme-preset" data-theme="论语中的学习方法" type="button">论语中的学习方法</button>
         </div>
-        <div class="api-status-indicator" id="apiStatus">示例模式 · 数据为预设模板</div>
+        <div class="api-status-indicator" id="apiStatus">示例数据 · 配置 API 后可真实生成</div>
       </div>
 
       <!-- 隐藏的 packMeta，保留 JS 引用兼容 -->
@@ -2835,7 +2876,7 @@
       const isBuiltin=sourceInfo.textSourceUrl&&sourceInfo.textSourceUrl.includes('ctext.org');
       const isTraceable=isBuiltin;
       const statusClass=isTraceable?'traceable':'pending';
-      const statusText=isTraceable?'可追溯':'待核验';
+      const statusText=isTraceable?'考据':'待核验';
       const sourceLink=sourceInfo.textSourceUrl
         ?`<a href="${sourceInfo.textSourceUrl}" target="_blank">${sourceInfo.textSourceName||'原文链接'}</a>`
         :sourceInfo.textSourceName||'用户输入';
@@ -3142,7 +3183,7 @@
       const sourceInfo=currentBook.sourceInfo||{};
       const isBuiltin=sourceInfo.textSourceUrl&&sourceInfo.textSourceUrl.includes('ctext.org');
       const statusClass=isBuiltin?'traceable':'pending';
-      const statusText=isBuiltin?'可追溯':'待核验';
+      const statusText=isBuiltin?'考据':'待核验';
       const sourceLink=sourceInfo.textSourceUrl
         ?`<a href="${sourceInfo.textSourceUrl}" target="_blank">${sourceInfo.textSourceName||'原文链接'}</a>`
         :sourceInfo.textSourceName||'用户输入';
@@ -3705,34 +3746,6 @@
       renderCitationPack(book);
     }
 
-    // 同步首屏可信来源条
-    function updateHeroSourceStrip(book){
-      const el=document.getElementById('heroSourceStrip');
-      if(!el||!book)return;
-      const si=book.sourceInfo||{};
-      const isTraceable=si.textSourceUrl&&si.textSourceUrl.includes('ctext.org');
-      const sourceName=si.canon||book.title||'未知典籍';
-      const chapter=si.chapter||book.source||'';
-      const version=si.version||'版本待确认';
-      const sourceUrl=si.textSourceUrl||'';
-      const linkHtml=sourceUrl
-        ?`<a href="${safeURL(sourceUrl)}" target="_blank" rel="noopener">原文链接</a>`
-        :'<span>原文链接</span>';
-      const badge=isTraceable
-        ?'<span class="source-badge">可追溯</span>'
-        :'<span class="source-badge" style="color:var(--gold);border-color:var(--gold);background:rgba(184,148,31,.15)">待核验</span>';
-      el.innerHTML=`
-        <span class="source-dot traceable"></span>
-        <span>来源：${escapeHTML(sourceName)}${chapter?('· '+escapeHTML(chapter)):''}</span>
-        <span>·</span>
-        <span>版本：${escapeHTML(version)}</span>
-        <span>·</span>
-        ${linkHtml}
-        <span>·</span>
-        ${badge}
-      `;
-    }
-
     // 渲染发布包：发布标题 + 标签
     function renderPublishPack(data){
       const el=document.getElementById('publishPack');
@@ -3806,20 +3819,22 @@
         document.getElementById('caseTextCards').innerHTML='<div class="case-status-tag">未生成</div>';
         return;
       }
+      // 1.7.1 根据当前场景动态使用 textLabel（口播稿/课堂讲解/导览文案/商品文案）
+      const sc=scenarioData[currentScenario]||scenarioData.video;
       const allItems=[
-        {key:'vernacular',label:'白话解读',badge:text.vernacular?.badge||'考据',source:text.vernacular?.source||'基于原文'},
+        {key:'vernacular',label:sc.textLabel,badge:text.vernacular?.badge||'考据',source:text.vernacular?.source||'基于原文'},
         {key:'highlights',label:'传播要点',badge:text.highlights?.badge||'考据',source:text.highlights?.source||'基于原文'},
         {key:'xiaohongshu',label:'小红书文案',badge:text.xiaohongshu?.badge||'演绎',source:text.xiaohongshu?.source||'演绎生成'}
       ];
 
       const isExpanded=caseExpandState.text;
-      const visibleItems=isExpanded?allItems:allItems.slice(0,2);
+      const visibleItems=isExpanded?allItems:allItems.slice(0,1);
 
       const cardsHtml=visibleItems.map(item=>{
         let content=text[item.key]?.content||'';
         if(!isExpanded&&item.key!=='xiaohongshu'){
-          if(content.length>80){
-            content=content.slice(0,80)+'...';
+          if(content.length>60){
+            content=content.slice(0,60)+'...';
           }
         }
         const isDemo=caseState.status==='completed'&&!ApiClient.BASE_URL;
@@ -3853,14 +3868,16 @@
         document.getElementById('caseImageCards').innerHTML='<div class="case-status-tag">未生成</div>';
         return;
       }
+      // 1.7.1 根据当前场景动态使用 imageLabel（金句封面/板书金句卡/展签海报/金句卡海报）
+      const sc=scenarioData[currentScenario]||scenarioData.video;
       const allItems=[
-        {key:'quoteCard',label:'金句卡片',seal:'句'},
+        {key:'quoteCard',label:sc.imageLabel,seal:'句'},
         {key:'poster',label:'竖版海报',seal:'画'},
         {key:'imagePrompt',label:'图片 Prompt',seal:'引'}
       ];
 
       const isExpanded=caseExpandState.image;
-      const visibleItems=isExpanded?allItems:allItems.slice(0,2);
+      const visibleItems=isExpanded?allItems:allItems.slice(0,1);
 
       const cardsHtml=visibleItems.map(item=>{
         const data=image[item.key]||{};
@@ -3948,7 +3965,7 @@
 
       const isExpanded=caseExpandState.video;
       const shots=video.storyboard||[];
-      const visibleShots=isExpanded?shots:shots.slice(0,3);
+      const visibleShots=isExpanded?shots:shots.slice(0,1);
 
       const timelineHtml=visibleShots.length>0?`
         <div class="case-storyboard-timeline">
@@ -4035,7 +4052,7 @@
         animatePackTransition();
 
         if(result.status==='demo'){
-          updateApiStatus('示例模式 · 数据为预设模板');
+          updateApiStatus('示例数据 · 配置 API 后可真实生成');
         }else{
           updateApiStatus('已生成 · 基于API返回');
         }
@@ -4047,7 +4064,7 @@
           caseState.data=fallback;
           caseState.status='completed';
           renderCaseShowcase(fallback);
-          updateApiStatus('示例模式 · 数据为预设模板');
+          updateApiStatus('示例数据 · 配置 API 后可真实生成');
         }else{
           // 有后端失败时显示错误+重试按钮
           caseState.status='failed';
@@ -4146,7 +4163,18 @@
     }
 
     function updateApiStatus(text){
-      document.getElementById('apiStatus').textContent=text;
+      const el=document.getElementById('apiStatus');
+      el.textContent=text;
+      // 1.7.1 根据文字内容设置状态类，让示例/真实/生成中/失败一目了然
+      el.classList.remove('live','loading','failed');
+      if(text.includes('API 已配置')||text.includes('已生成')){
+        el.classList.add('live');
+      }else if(text.includes('生成中')||text.includes('重试')){
+        el.classList.add('loading');
+      }else if(text.includes('失败')){
+        el.classList.add('failed');
+      }
+      // 默认（示例模式）保持金色 ::before，不加类
     }
 
     // API 配置面板初始化
@@ -4172,11 +4200,11 @@
         if(baseUrl){
           statusEl.textContent='配置已保存，已启用后端 API';
           statusEl.className='api-config-status success';
-          updateApiStatus('API 已配置 · 可调用真实生成接口');
+          updateApiStatus('API 已配置 · 可真实生成');
         }else{
-          statusEl.textContent='配置已保存，使用示例模式';
+          statusEl.textContent='配置已保存，当前为示例数据';
           statusEl.className='api-config-status info';
-          updateApiStatus('示例模式 · 数据为预设模板');
+          updateApiStatus('示例数据 · 配置 API 后可真实生成');
         }
         setTimeout(()=>{
           statusEl.textContent='';
@@ -4189,9 +4217,9 @@
         document.getElementById('apiBaseUrl').value='';
         document.getElementById('apiKey').value='';
         const statusEl=document.getElementById('apiConfigStatus');
-        statusEl.textContent='已重置为示例模式';
+        statusEl.textContent='已重置为示例数据';
         statusEl.className='api-config-status info';
-        updateApiStatus('示例模式 · 数据为预设模板');
+        updateApiStatus('示例数据 · 配置 API 后可真实生成');
         setTimeout(()=>{
           statusEl.textContent='';
           statusEl.className='api-config-status';
@@ -4205,7 +4233,7 @@
       });
 
       if(ApiClient.BASE_URL){
-        updateApiStatus('API 已配置 · 可调用真实生成接口');
+        updateApiStatus('API 已配置 · 可真实生成');
       }
     }
 
@@ -4398,8 +4426,23 @@
     initApiConfigPanel();
     // 1.6.0 启动产品叙事入场时间线（必须在 initCaseShowcase 之后，确保传播包已渲染）
     initNarrativeAnimation();
+    // 1.7.1 移动端 peek 抽屉延迟出现：首屏案卷区不显示，滚到"进入创作"工作台时才露出
     if(isMobileView()){
-      document.getElementById('sidePanel').classList.add('mobile-peek');
+      const wsHeader=document.querySelector('.workspace-section-header');
+      const sidePanel=document.getElementById('sidePanel');
+      if(wsHeader&&sidePanel&&'IntersectionObserver' in window){
+        const io=new IntersectionObserver((entries)=>{
+          entries.forEach(e=>{
+            if(e.isIntersecting){
+              sidePanel.classList.add('mobile-peek');
+            }else if(e.boundingClientRect.top>0){
+              // 工作台在视口下方（用户还在首屏案卷区），移除 peek 避免遮挡
+              sidePanel.classList.remove('mobile-peek');
+            }
+          });
+        },{threshold:0,rootMargin:'0px 0px -30% 0px'});
+        io.observe(wsHeader);
+      }
     }
   </script>
 </body>

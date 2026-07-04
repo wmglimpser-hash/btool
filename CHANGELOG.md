@@ -4,6 +4,39 @@
 
 ---
 
+## [1.7.1] 2026-07-04 · 案卷体验小修（不加功能，只修体验）
+
+> 本次为 1.7.0 案卷视觉收敛后的体验小修，聚焦 5 个体验问题，不新增业务功能。
+
+### 修复
+- **桌面案卷首屏压缩**：原文区 max-height 260px→130px；文字卡默认显示 2 项→1 项；图片卡默认 2 项→1 项；视频分镜默认 3 个→1 个；文字摘要 80 字→60 字；案卷总高从 2040px 降到 1674px（降 18%）
+- **移动端 390px 裁切修复**：case-file-body/case-source/case-products 加 min-width:0 + overflow-x:hidden；@media(max-width:900px) 加 case-file outline-offset:2px；390px scrollWidth=clientWidth=356，无横向溢出
+- **移动端 peek 抽屉延迟出现**：默认完全隐藏（translateY(100%)），用 IntersectionObserver 监听 .workspace-section-header，滚到"进入创作"才加 mobile-peek 露出 96px tab 栏；首屏案卷区不被遮挡
+- **旧函数残留清理**：删除孤立的 `updateHeroSourceStrip()`（无调用方）；阅读器 sourceCard 的"可追溯"标签统一改为"考据"（与案卷标签一致，只保留 2 类可信标识）
+- **场景切换产物标签 bug 修复**：`renderCaseTextCards` 用固定 label"白话解读"，改为 `scenarioData[currentScenario].textLabel`（口播稿/课堂讲解/导览文案/商品文案）；`renderCaseImageCards` 用 `imageLabel`
+
+### 优化
+- **示例 vs 真实生成状态更清晰**：apiStatus 从纯文字改为带状态类的徽章（金=示例数据 / 绿=API 已配置 / 灰=生成中 / 朱砂=失败）；文字统一为"示例数据 · 配置 API 后可真实生成"和"API 已配置 · 可真实生成"；新增 statusPulse 动画
+- **390px 字号和 padding 细化**：案卷标题 19px→18px，来源文字 12px，产物 padding 11px，声明文字 10.5px
+
+### 验证（子代理 Playwright 真实驱动，17/18 通过）
+- pageerror = 0 条
+- 案卷顶栏 4 场景 tab 可见，无 emoji
+- `.case-source-text` max-height=130px
+- **场景切换产物标签正确**：短视频→口播稿 / 教学→课堂讲解 / 文博→导览文案 / 文创→商品文案
+- apiStatus 默认"示例数据 · 配置 API 后可真实生成"，金色背景
+- 阅读器 .workspace 稳定，选中文字后 6 个工具条按钮可用
+- `typeof gsap.to` = `"function"`，`typeof html2canvas` = `"function"`
+- emoji = 0 处；`typeof updateHeroSourceStrip` = `"undefined"`；`.source-status` = "考据"
+- 文字卡默认只显示 1 项
+- **移动端 390px**：首屏无 peek 抽屉遮挡（#sidePanel 无 mobile-peek）；滚到"进入创作"后 peek 出现；scrollWidth=clientWidth=390；case-file 无溢出（scrollWidth=clientWidth=356）；案卷单列堆叠
+- prefers-reduced-motion: reduce：首屏元素 opacity 全为 1
+
+### 已知限制
+- **案卷首屏高度 1674px**：在 900px 视口下仍需滚动约 774px 才能看到底栏声明。案卷包含 5 类产物，完全塞进首屏不现实。首屏已能看到顶栏+左栏原文+右栏口播稿，闭环可理解。如需进一步压缩，可考虑把图片包/视频包/发布包默认折叠为标题行（仅点击展开），但属于较大改动，留待下一版评估
+
+---
+
 ## [1.7.0] 2026-07-04 · D10 案卷视觉收敛（水墨册页）
 
 > 本次为**视觉系统收敛**，不新增业务功能。把 D1 工作台 / D8 案例区 / D9 场景叙事三块叠加的碎裂首页，重构成一个统一的"可信传播案卷"。
