@@ -4301,8 +4301,9 @@
       const cardsHtml=visibleItems.map(item=>{
         const data=image[item.key]||{};
         const status=data.status||'demo';
-        const statusText=status==='demo'?'示例数据':status==='demo-preview'?'预览占位':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
-        const statusClass=status==='demo'||status==='demo-preview'?'demo':status==='completed'?'done':status==='generating'?'loading':status==='failed'?'failed':'idle';
+        // 1.8.0：demo 状态不再显示"示例数据"标签，改为中性"预览"，避免单卡反复出现示例说明
+        const statusText=status==='demo'?'预览':status==='demo-preview'?'预览占位':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
+        const statusClass=status==='demo'||status==='demo-preview'?'idle':status==='completed'?'done':status==='generating'?'loading':status==='failed'?'failed':'idle';
 
         let actionBtn='';
         if(ApiClient.BASE_URL){
@@ -4360,8 +4361,9 @@
       }
 
       const status=video.status||'demo';
-      const statusText=status==='demo'?'示例数据':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
-      const statusClass=status==='demo'?'demo':status==='completed'?'done':status==='generating'?'loading':status==='failed'?'failed':'idle';
+      // 1.8.0：demo 状态不再显示"示例数据"标签，改为中性"预览"
+      const statusText=status==='demo'?'预览':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
+      const statusClass=status==='demo'?'idle':status==='completed'?'done':status==='generating'?'loading':status==='failed'?'failed':'idle';
 
       let statusBar='';
       let actionBtn='';

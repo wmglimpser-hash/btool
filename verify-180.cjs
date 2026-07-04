@@ -63,9 +63,9 @@ const { chromium } = require('playwright-core');
   const heroText = await page.evaluate(()=>document.getElementById('heroTextLabel')?.textContent || '');
   test('场景切换hero标题→课堂讲解', heroText.includes('课堂讲解'), `text=${heroText}`);
 
-  // 7 无单卡示例数据标签
+  // 7 无单卡示例数据标签（覆盖 case-card / case-preview-card / case-video-status / case-status-tag）
   const demoCount = await page.evaluate(()=>{
-    const cards = document.querySelectorAll('.case-products .case-card, .case-products .preview-card');
+    const cards = document.querySelectorAll('.case-products .case-card, .case-products .case-preview-card, .case-products .case-video-status, .case-products .case-status-tag');
     let n = 0;
     cards.forEach(c => { const t=c.textContent; if(t.includes('示例') && t.length<60) n++; });
     return n;

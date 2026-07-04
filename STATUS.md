@@ -83,7 +83,8 @@
 - 平台：GitHub Pages（Static HTML workflow）
 - 地址：https://wmglimpser-hash.github.io/btool/
 - 分支：main
-- 当前推送 commit：`e2b8187`（feat: D11 主案例优先 + 折叠传播包 1.8.0）
+- 当前推送 HEAD：`9ad5c42`（docs: STATUS.md 更新1.8.0部署信息+里程碑）
+- 主体功能 commit：`e2b8187`（feat: D11 主案例优先 + 折叠传播包 1.8.0）
 - 推送时间：2026-07-05
 - Pages 部署状态：待 GitHub Actions 完成后验证
 - 上一版线上验证：**1.7.0** commit `a13db2d`（run success）
