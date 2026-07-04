@@ -83,10 +83,10 @@
 - 平台：GitHub Pages（Static HTML workflow）
 - 地址：https://wmglimpser-hash.github.io/btool/
 - 分支：main
-- 线上已验证版本：**1.7.0**
-- 线上已验证 commit：`a13db2d`（feat: D10 案卷视觉收敛 - 水墨册页）
-- GitHub Pages run：https://github.com/wmglimpser-hash/btool/actions/runs/28708956199（completed · success）
-- 验证时间：2026-07-04
+- 当前推送 commit：`e2b8187`（feat: D11 主案例优先 + 折叠传播包 1.8.0）
+- 推送时间：2026-07-05
+- Pages 部署状态：待 GitHub Actions 完成后验证
+- 上一版线上验证：**1.7.0** commit `a13db2d`（run success）
 
 ---
 
@@ -118,3 +118,4 @@
 | 1.6.0 | 2026-07-04 | GSAP 产品叙事动画（首屏入场/节点点亮/场景切换stagger） |
 | 1.7.0 | 2026-07-04 | D10 案卷视觉收敛（水墨册页，四区块→单一案卷） |
 | 1.7.1 | 2026-07-04 | 案卷体验小修（首屏压缩+移动端裁切+peek延迟+旧函数清理+状态徽章） |
+| 1.8.0 | 2026-07-05 | D11 主案例优先 + 折叠传播包（hero-case-card + 5类pack-collapsible） |
