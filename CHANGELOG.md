@@ -4,6 +4,28 @@
 
 ---
 
+## [1.4.2] 2026-07-04 · API 配置面板 + 异步任务轮询 + 部署信息补全
+
+### 新增
+- **API 配置面板**：新增"API 配置"按钮，点击弹出配置面板（API 基础地址 + API Key 输入框），配置自动保存到 localStorage，刷新页面后保留；支持重置为演示模式
+- **异步任务轮询机制**：`ApiClient.pollJob()` 实现异步任务轮询（默认超时 60s，间隔 2s），`generateImageItem` 和 `generateVideo` 接入轮询流程；API 返回 `pending + jobId` 时自动轮询直到完成/失败/超时
+- **Bearer Token 认证**：所有 API 请求支持 `Authorization: Bearer ${API_KEY}` 头
+
+### 优化
+- **视频区域进度显示**：状态条中添加进度百分比显示（`progress-text`），异步生成时显示实时进度
+- **STATUS.md 部署信息补全**：补充线上已验证版本、commit、GitHub Pages run、验证时间
+
+### 验证
+- 页面自身 JS 报错 0 条
+- `typeof window.html2canvas` = `"function"`
+- `typeof ApiClient.loadConfig` = `"function"`
+- `typeof ApiClient.pollJob` = `"function"`
+- API 配置面板：打开/关闭/保存/重置均正常，localStorage 持久化正常
+- 图片/视频生成：demo 模式正常执行，轮询逻辑已接入代码
+- 移动端 390px：无横向滚动
+
+---
+
 ## [1.4.1] 2026-07-04 · P1 安全加固、API 接入流、首屏压缩
 
 ### 修复

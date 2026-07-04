@@ -1807,6 +1807,79 @@
       background:var(--gold);
     }
 
+    /* API 配置面板 */
+    .api-config-section{
+      margin-bottom:12px;
+      position:relative;
+    }
+    .api-config-toggle{
+      padding:6px 12px;
+      background:rgba(255,255,255,.6);
+      border:1px solid var(--border);
+      border-radius:4px;
+      font-size:11px;
+      cursor:pointer;
+      color:var(--ink-light);
+      transition:all .2s;
+    }
+    .api-config-toggle:hover{
+      background:var(--green-light);
+      border-color:var(--green);
+      color:var(--green);
+    }
+    .api-config-panel{
+      position:absolute;
+      top:calc(100% + 6px);
+      right:0;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:8px;
+      box-shadow:var(--shadow);
+      padding:14px;
+      width:300px;
+      z-index:200;
+    }
+    .api-config-panel.hidden{display:none}
+    .api-config-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+      padding-bottom:8px;
+      border-bottom:1px solid var(--border);
+    }
+    .api-config-header h4{font-size:14px;font-weight:600}
+    .api-config-close{
+      background:none;border:none;font-size:18px;cursor:pointer;color:var(--ink-muted);
+    }
+    .api-config-close:hover{color:var(--cinnabar)}
+    .api-config-row{margin-bottom:10px}
+    .api-config-row label{
+      display:block;font-size:12px;margin-bottom:4px;color:var(--ink);font-weight:500;
+    }
+    .api-config-row input{
+      width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:4px;
+      font-size:12px;font-family:monospace;background:var(--paper);
+    }
+    .api-config-actions{display:flex;gap:8px;margin-top:12px}
+    .api-config-save{
+      flex:1;padding:8px;background:var(--green);color:#fff;border:none;border-radius:4px;
+      cursor:pointer;font-size:12px;
+    }
+    .api-config-save:hover{background:#2d563b}
+    .api-config-reset{
+      padding:8px 12px;background:rgba(26,20,16,.04);border:1px solid var(--border);
+      border-radius:4px;cursor:pointer;font-size:12px;color:var(--ink-light);
+    }
+    .api-config-reset:hover{background:var(--cinnabar-light);border-color:var(--cinnabar);color:var(--cinnabar)}
+    .api-config-status{
+      margin-top:10px;padding:8px;font-size:11px;border-radius:4px;text-align:center;
+    }
+    .api-config-status.success{background:var(--green-light);color:var(--green)}
+    .api-config-status.error{background:var(--cinnabar-light);color:var(--cinnabar)}
+    .api-config-status.info{background:rgba(26,20,16,.04);color:var(--ink-light)}
+    .progress-text{color:var(--green);font-weight:500}
+
     /* 工作台区域标题 */
     .workspace-section-header{
       margin:8px 0 14px;
@@ -1899,6 +1972,32 @@
           <button class="theme-preset" data-theme="论语中的学习方法">论语中的学习方法</button>
         </div>
         <div class="api-status-indicator" id="apiStatus">演示模式 · 数据为预设模板</div>
+      </div>
+
+      <!-- API 配置面板 -->
+      <div class="api-config-section">
+        <button id="apiConfigToggle" class="api-config-toggle">API 配置</button>
+        <div id="apiConfigPanel" class="api-config-panel hidden">
+          <div class="api-config-header">
+            <h4>后端 API 配置</h4>
+            <button id="apiConfigClose" class="api-config-close">×</button>
+          </div>
+          <div class="api-config-body">
+            <div class="api-config-row">
+              <label for="apiBaseUrl">API 基础地址</label>
+              <input type="text" id="apiBaseUrl" placeholder="如 https://api.example.com" autocomplete="off">
+            </div>
+            <div class="api-config-row">
+              <label for="apiKey">API Key</label>
+              <input type="password" id="apiKey" placeholder="留空则无需认证" autocomplete="off">
+            </div>
+            <div class="api-config-actions">
+              <button id="apiConfigSave" class="api-config-save">保存配置</button>
+              <button id="apiConfigReset" class="api-config-reset">重置为演示模式</button>
+            </div>
+            <div id="apiConfigStatus" class="api-config-status"></div>
+          </div>
+        </div>
       </div>
 
       <div class="case-categories" id="caseCategories">
@@ -2987,11 +3086,35 @@
 
     // ============ API 客户端（预留端口，demo 兜底） ============
     const ApiClient={
-      BASE_URL:'', // 空=无后端，用 demo 数据
+      BASE_URL:'',
+      API_KEY:'',
+
+      loadConfig(){
+        try{
+          const saved=localStorage.getItem('btool-api-config');
+          if(saved){
+            const config=JSON.parse(saved);
+            this.BASE_URL=config.baseUrl||'';
+            this.API_KEY=config.apiKey||'';
+            return config;
+          }
+        }catch(e){
+          console.warn('[api] 加载配置失败',e);
+        }
+        return {baseUrl:'',apiKey:''};
+      },
+
+      saveConfig(config){
+        try{
+          localStorage.setItem('btool-api-config',JSON.stringify(config));
+          this.BASE_URL=config.baseUrl||'';
+          this.API_KEY=config.apiKey||'';
+        }catch(e){
+          console.warn('[api] 保存配置失败',e);
+        }
+      },
 
       async generateCase(payload){
-        // POST /api/case/generate
-        // payload: { bookId, theme, text, sourceInfo }
         if(!this.BASE_URL){
           console.log('[api] 无后端，使用 demo case 数据');
           return this._fallbackCase(payload);
@@ -2999,7 +3122,7 @@
         try{
           const res=await fetch(`${this.BASE_URL}/api/case/generate`,{
             method:'POST',
-            headers:{'Content-Type':'application/json'},
+            headers:{'Content-Type':'application/json',...(this.API_KEY?{'Authorization':`Bearer ${this.API_KEY}`}:{})},
             body:JSON.stringify(payload)
           });
           if(!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -3011,44 +3134,43 @@
       },
 
       async generateImage(payload){
-        // POST /api/image/generate
         if(!this.BASE_URL) return {status:'demo',url:null,prompt:payload.prompt};
         try{
           const res=await fetch(`${this.BASE_URL}/api/image/generate`,{
             method:'POST',
-            headers:{'Content-Type':'application/json'},
+            headers:{'Content-Type':'application/json',...(this.API_KEY?{'Authorization':`Bearer ${this.API_KEY}`}:{})},
             body:JSON.stringify(payload)
           });
           if(!res.ok) throw new Error(`HTTP ${res.status}`);
           return await res.json();
         }catch(e){
-          console.warn('[api] image/generate 失败，降级',e);
+          console.warn('[api] image/generate 失败',e);
           return {status:'failed',url:null,prompt:payload.prompt,error:e.message};
         }
       },
 
       async generateVideo(payload){
-        // POST /api/video/generate
         if(!this.BASE_URL) return {status:'demo',url:null,prompt:payload.prompt};
         try{
           const res=await fetch(`${this.BASE_URL}/api/video/generate`,{
             method:'POST',
-            headers:{'Content-Type':'application/json'},
+            headers:{'Content-Type':'application/json',...(this.API_KEY?{'Authorization':`Bearer ${this.API_KEY}`}:{})},
             body:JSON.stringify(payload)
           });
           if(!res.ok) throw new Error(`HTTP ${res.status}`);
           return await res.json();
         }catch(e){
-          console.warn('[api] video/generate 失败，降级',e);
+          console.warn('[api] video/generate 失败',e);
           return {status:'failed',url:null,prompt:payload.prompt,error:e.message};
         }
       },
 
       async getJobStatus(jobId){
-        // GET /api/jobs/:id
         if(!this.BASE_URL) return {status:'completed',progress:100};
         try{
-          const res=await fetch(`${this.BASE_URL}/api/jobs/${jobId}`);
+          const res=await fetch(`${this.BASE_URL}/api/jobs/${jobId}`,{
+            headers:this.API_KEY?{'Authorization':`Bearer ${this.API_KEY}`}:{}
+          });
           if(!res.ok) throw new Error(`HTTP ${res.status}`);
           return await res.json();
         }catch(e){
@@ -3057,8 +3179,26 @@
         }
       },
 
+      async pollJob(jobId,timeout=60000,interval=2000){
+        const start=Date.now();
+        return new Promise((resolve)=>{
+          const check=async()=>{
+            if(Date.now()-start>timeout){
+              resolve({status:'timeout',error:'超时'});
+              return;
+            }
+            const status=await this.getJobStatus(jobId);
+            if(status.status==='completed'||status.status==='failed'){
+              resolve(status);
+              return;
+            }
+            setTimeout(check,interval);
+          };
+          check();
+        });
+      },
+
       _fallbackCase(payload){
-        // 基于 bookId 和 theme 返回 demo 案例数据
         const book=books.find(b=>b.id===payload.bookId)||books[0];
         const o=book.outputs||{};
         return {
@@ -3076,6 +3216,7 @@
             imagePrompt:{prompt:'A serene river scene at dawn, waterbirds gliding above a sandbar, ink wash painting style, traditional Chinese aesthetic, warm golden light',status:'demo'}
           },
           video:{
+            status:'demo',
             storyboard:o.storyboard||demoData.storyboard,
             narration:'（旁白）关关雎鸠，在河之洲。这是中国人最古老的爱情诗篇...',
             videoPrompt:'Cinematic shot of a river at dawn, waterbirds flying, ink wash transition, traditional Chinese music, 60 seconds',
@@ -3286,6 +3427,7 @@
         <div class="case-video-status">
           <span class="case-status-tag ${statusClass}">${statusText}</span>
           ${status==='generating'?'<span class="loading-dots">···</span>':''}
+          ${video.progress!=null&&video.progress<100?`<span class="progress-text">进度 ${video.progress}%</span>`:''}
           ${status==='failed'&&video.error?`<span class="error-text">${escapeHTML(video.error)}</span>`:''}
           ${actionBtn}
         </div>
@@ -3407,58 +3549,149 @@
     }
 
     async function generateImageItem(key){
-      if(!caseState.data||!caseState.data.image||!caseState.data.image[key])return;
-      const imageData=caseState.data.image[key];
-      imageData.status='generating';
+      if(!caseState.data)return;
+      const imgData=caseState.data.image[key];
+      if(!imgData)return;
+
+      imgData.status='generating';
       renderCaseImageCards(caseState.data.image);
 
       try{
-        const payload={
-          key:key,
-          prompt:imageData.prompt,
-          theme:caseState.theme,
-          bookId:currentBook?.id
-        };
-        const result=await ApiClient.generateImage(payload);
-        imageData.status=result.status||'completed';
-        imageData.url=result.url||null;
-        imageData.prompt=result.prompt||imageData.prompt;
-        if(result.error)imageData.error=result.error;
+        const result=await ApiClient.generateImage({
+          prompt:imgData.prompt,
+          type:key,
+          bookId:currentBook?.id,
+          theme:caseState.theme
+        });
+
+        if(result.status==='completed'&&result.url){
+          imgData.status='completed';
+          imgData.url=result.url;
+        }else if(result.status==='pending'&&result.jobId){
+          imgData.status='generating';
+          imgData.jobId=result.jobId;
+          const jobResult=await ApiClient.pollJob(result.jobId);
+          if(jobResult.status==='completed'&&jobResult.url){
+            imgData.status='completed';
+            imgData.url=jobResult.url;
+          }else{
+            throw new Error(jobResult.error||'生成失败');
+          }
+        }else if(result.status==='demo'){
+          imgData.status='demo-preview';
+        }else{
+          throw new Error(result.error||'生成失败');
+        }
       }catch(e){
         console.error('[image] 生成失败',e);
-        imageData.status='failed';
-        imageData.error=e.message;
+        imgData.status='failed';
+        imgData.error=e.message;
       }
       renderCaseImageCards(caseState.data.image);
     }
 
     async function generateVideo(){
-      if(!caseState.data||!caseState.data.video)return;
-      const videoData=caseState.data.video;
-      videoData.status='generating';
-      renderCaseVideoArea(videoData);
+      if(!caseState.data)return;
+      const v=caseState.data.video;
+      v.status='generating';
+      renderCaseVideoArea(v);
 
       try{
-        const payload={
-          prompt:videoData.videoPrompt,
-          storyboard:videoData.storyboard,
-          theme:caseState.theme,
-          bookId:currentBook?.id
-        };
-        const result=await ApiClient.generateVideo(payload);
-        videoData.status=result.status||'completed';
-        videoData.url=result.url||null;
-        if(result.error)videoData.error=result.error;
+        const result=await ApiClient.generateVideo({
+          prompt:v.videoPrompt,
+          storyboard:v.storyboard,
+          bookId:currentBook?.id,
+          theme:caseState.theme
+        });
+
+        if(result.status==='completed'&&result.url){
+          v.status='completed';
+          v.videoUrl=result.url;
+        }else if(result.status==='pending'&&result.jobId){
+          v.status='generating';
+          v.jobId=result.jobId;
+          const jobResult=await ApiClient.pollJob(result.jobId);
+          if(jobResult.status==='completed'&&jobResult.url){
+            v.status='completed';
+            v.videoUrl=jobResult.url;
+          }else{
+            throw new Error(jobResult.error||'生成失败');
+          }
+        }else if(result.status==='demo'){
+          v.status='demo';
+        }else{
+          throw new Error(result.error||'生成失败');
+        }
       }catch(e){
         console.error('[video] 生成失败',e);
-        videoData.status='failed';
-        videoData.error=e.message;
+        v.status='failed';
+        v.error=e.message;
       }
-      renderCaseVideoArea(videoData);
+      renderCaseVideoArea(v);
     }
 
     function updateApiStatus(text){
       document.getElementById('apiStatus').textContent=text;
+    }
+
+    // API 配置面板初始化
+    function initApiConfigPanel(){
+      const config=ApiClient.loadConfig();
+      document.getElementById('apiBaseUrl').value=config.baseUrl||'';
+      document.getElementById('apiKey').value=config.apiKey||'';
+
+      document.getElementById('apiConfigToggle').addEventListener('click',()=>{
+        document.getElementById('apiConfigPanel').classList.toggle('hidden');
+      });
+
+      document.getElementById('apiConfigClose').addEventListener('click',()=>{
+        document.getElementById('apiConfigPanel').classList.add('hidden');
+      });
+
+      document.getElementById('apiConfigSave').addEventListener('click',()=>{
+        const baseUrl=document.getElementById('apiBaseUrl').value.trim();
+        const apiKey=document.getElementById('apiKey').value.trim();
+        ApiClient.saveConfig({baseUrl,apiKey});
+
+        const statusEl=document.getElementById('apiConfigStatus');
+        if(baseUrl){
+          statusEl.textContent='配置已保存，已启用后端 API';
+          statusEl.className='api-config-status success';
+          updateApiStatus('API 已配置 · 可调用真实生成接口');
+        }else{
+          statusEl.textContent='配置已保存，使用演示模式';
+          statusEl.className='api-config-status info';
+          updateApiStatus('演示模式 · 数据为预设模板');
+        }
+        setTimeout(()=>{
+          statusEl.textContent='';
+          statusEl.className='api-config-status';
+        },3000);
+      });
+
+      document.getElementById('apiConfigReset').addEventListener('click',()=>{
+        ApiClient.saveConfig({baseUrl:'',apiKey:''});
+        document.getElementById('apiBaseUrl').value='';
+        document.getElementById('apiKey').value='';
+        const statusEl=document.getElementById('apiConfigStatus');
+        statusEl.textContent='已重置为演示模式';
+        statusEl.className='api-config-status info';
+        updateApiStatus('演示模式 · 数据为预设模板');
+        setTimeout(()=>{
+          statusEl.textContent='';
+          statusEl.className='api-config-status';
+        },3000);
+      });
+
+      document.addEventListener('click',(e)=>{
+        if(!e.target.closest('.api-config-section')){
+          document.getElementById('apiConfigPanel').classList.add('hidden');
+        }
+      });
+
+      if(ApiClient.BASE_URL){
+        updateApiStatus('API 已配置 · 可调用真实生成接口');
+      }
     }
 
     // 初始化案例展示
@@ -3552,6 +3785,7 @@
     renderShelf();
     renderReader();
     initCaseShowcase();
+    initApiConfigPanel();
     if(isMobileView()){
       document.getElementById('sidePanel').classList.add('mobile-peek');
     }
