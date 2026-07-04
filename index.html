@@ -2033,6 +2033,15 @@
       width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:4px;
       font-size:12px;font-family:monospace;background:var(--paper);
     }
+    .api-config-hint{
+      font-size:11px;color:var(--ink-muted);margin-top:4px;line-height:1.5;
+    }
+    .api-config-note{
+      margin-top:10px;padding:8px 10px;font-size:11px;line-height:1.6;
+      background:rgba(184,148,31,.08);border:1px solid rgba(184,148,31,.2);
+      border-radius:4px;color:var(--ink-light);
+    }
+    .api-config-note strong{color:var(--gold);font-weight:600}
     .api-config-actions{display:flex;gap:8px;margin-top:12px}
     .api-config-save{
       flex:1;padding:8px;background:var(--green);color:#fff;border:none;border-radius:4px;
@@ -2578,17 +2587,25 @@
               <div class="api-config-body">
                 <div class="api-config-row">
                   <label for="apiBaseUrl">API 基础地址</label>
-                  <input type="text" id="apiBaseUrl" placeholder="如 https://api.example.com" autocomplete="off">
+                  <input type="text" id="apiBaseUrl" placeholder="OpenAI兼容：https://api.openai.com/v1" autocomplete="off">
+                  <div class="api-config-hint">支持 OpenAI 兼容接口（/v1），自动识别文字生成；图片/视频保留示例数据</div>
                 </div>
                 <div class="api-config-row">
                   <label for="apiKey">API Key</label>
                   <input type="password" id="apiKey" placeholder="留空则无需认证" autocomplete="off">
+                </div>
+                <div class="api-config-row">
+                  <label for="apiModel">模型名称（可选）</label>
+                  <input type="text" id="apiModel" placeholder="默认 gpt-4o-mini" autocomplete="off">
                 </div>
                 <div class="api-config-actions">
                   <button id="apiConfigSave" class="api-config-save" type="button">保存配置</button>
                   <button id="apiConfigReset" class="api-config-reset" type="button">重置为示例模式</button>
                 </div>
                 <div id="apiConfigStatus" class="api-config-status"></div>
+                <div class="api-config-note">
+                  <strong>安全提示：</strong>Key 仅保存在本地浏览器（localStorage），适合 demo / 参赛验证，不作为生产级密钥托管方案。
+                </div>
               </div>
             </div>
           </div>
@@ -3802,6 +3819,7 @@
     const ApiClient={
       BASE_URL:'',
       API_KEY:'',
+      MODEL:'',
 
       loadConfig(){
         try{
@@ -3810,12 +3828,13 @@
             const config=JSON.parse(saved);
             this.BASE_URL=config.baseUrl||'';
             this.API_KEY=config.apiKey||'';
+            this.MODEL=config.model||'';
             return config;
           }
         }catch(e){
           console.warn('[api] 加载配置失败',e);
         }
-        return {baseUrl:'',apiKey:''};
+        return {baseUrl:'',apiKey:'',model:''};
       },
 
       saveConfig(config){
@@ -3823,6 +3842,7 @@
           localStorage.setItem('btool-api-config',JSON.stringify(config));
           this.BASE_URL=config.baseUrl||'';
           this.API_KEY=config.apiKey||'';
+          this.MODEL=config.model||'';
         }catch(e){
           console.warn('[api] 保存配置失败',e);
         }
@@ -3833,6 +3853,13 @@
           console.log('[api] 无后端，使用 demo case 数据');
           return this._fallbackCase(payload);
         }
+
+        // 方案 A：OpenAI 兼容 LLM 直连（检测路径中含 /v1 或配置了 API Key）
+        if(this.BASE_URL.includes('/v1')||(this.API_KEY&&!this.BASE_URL.includes('/api/'))){
+          return this._generateWithLLM(payload);
+        }
+
+        // 原有后端 API 调用
         try{
           const res=await fetch(`${this.BASE_URL}/api/case/generate`,{
             method:'POST',
@@ -3845,6 +3872,121 @@
           console.error('[api] case/generate 失败',e);
           throw e;
         }
+      },
+
+      async _generateWithLLM(payload){
+        const book=books.find(b=>b.id===payload.bookId)||books[0];
+        const theme=payload.theme||'古籍解读';
+        const sc=scenarioData[currentScenario]||scenarioData.video;
+        const textLabel=sc.textLabel||'口播稿';
+
+        const systemPrompt=`你是古籍内容传播专家。基于给定的古籍原文和主题，生成适合传播的内容。
+要求：
+1. 内容必须基于原文，不编造原文中没有的信息
+2. 语言通俗易懂，适合普通读者
+3. 严格按 JSON 格式输出，不要额外解释文字`;
+
+        const userPrompt=`古籍：${book.title}
+章节：${book.source||''}
+主题：${theme}
+原文：
+${(payload.text||book.text||'').slice(0,3000)}
+
+请基于以上内容，生成适合${textLabel}场景的传播内容，返回 JSON 格式：
+{
+  "vernacular": "${textLabel}正文内容，200-300字，通俗流畅",
+  "highlights": ["传播要点1", "传播要点2", "传播要点3", "传播要点4", "传播要点5"],
+  "xiaohongshu": "小红书风格文案，带emoji和话题感，200字以内"
+}`;
+
+        try{
+          const baseUrl=this.BASE_URL.replace(/\/$/,'');
+          const res=await fetch(`${baseUrl}/chat/completions`,{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json',
+              ...(this.API_KEY?{'Authorization':`Bearer ${this.API_KEY}`}:{})
+            },
+            body:JSON.stringify({
+              model:this.MODEL||'gpt-4o-mini',
+              messages:[
+                {role:'system',content:systemPrompt},
+                {role:'user',content:userPrompt}
+              ],
+              temperature:0.7,
+              response_format:{type:'json_object'}
+            })
+          });
+
+          if(!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data=await res.json();
+
+          let content='';
+          if(data.choices&&data.choices[0]&&data.choices[0].message){
+            content=data.choices[0].message.content||'';
+          }
+
+          let parsed={vernacular:'',highlights:[],xiaohongshu:''};
+          try{
+            parsed=JSON.parse(content);
+          }catch(parseErr){
+            console.warn('[llm] JSON 解析失败，尝试文本提取',parseErr);
+            parsed=this._extractTextFallback(content);
+          }
+
+          const fallback=this._fallbackCase(payload);
+
+          return {
+            status:'completed',
+            theme:theme,
+            book:book,
+            text:{
+              vernacular:{
+                content:parsed.vernacular||fallback.text.vernacular.content,
+                badge:'考据',
+                source:'基于原文生成'
+              },
+              highlights:{
+                content:(parsed.highlights&&parsed.highlights.length>0)
+                  ?parsed.highlights.map((h,i)=>`${i+1}. ${h}`).join('\n')
+                  :fallback.text.highlights.content,
+                badge:'考据',
+                source:'基于原文生成'
+              },
+              xiaohongshu:{
+                content:parsed.xiaohongshu||fallback.text.xiaohongshu.content,
+                badge:'演绎',
+                source:'演绎生成'
+              }
+            },
+            image:fallback.image,
+            video:fallback.video
+          };
+        }catch(e){
+          console.error('[llm] 生成失败',e);
+          throw e;
+        }
+      },
+
+      _extractTextFallback(text){
+        const result={vernacular:'',highlights:[],xiaohongshu:''};
+
+        const vMatch=text.match(/vernacular["']?\s*[:：]\s*["']([^"']+)["']/i);
+        if(vMatch) result.vernacular=vMatch[1];
+
+        const hMatch=text.match(/highlights["']?\s*[:：]\s*\[([^\]]+)\]/i);
+        if(hMatch){
+          result.highlights=hMatch[1].split(/[,，]/).map(s=>s.replace(/["']/g,'').trim()).filter(Boolean);
+        }
+
+        const xMatch=text.match(/xiaohongshu["']?\s*[:：]\s*["']([^"']+)["']/i);
+        if(xMatch) result.xiaohongshu=xMatch[1];
+
+        if(!result.vernacular&&text.length>50){
+          result.vernacular=text.slice(0,300);
+        }
+
+        return result;
       },
 
       async generateImage(payload){
@@ -4603,6 +4745,7 @@
       const config=ApiClient.loadConfig();
       document.getElementById('apiBaseUrl').value=config.baseUrl||'';
       document.getElementById('apiKey').value=config.apiKey||'';
+      document.getElementById('apiModel').value=config.model||'';
 
       document.getElementById('apiConfigToggle').addEventListener('click',()=>{
         document.getElementById('apiConfigPanel').classList.toggle('hidden');
@@ -4615,11 +4758,13 @@
       document.getElementById('apiConfigSave').addEventListener('click',()=>{
         const baseUrl=document.getElementById('apiBaseUrl').value.trim();
         const apiKey=document.getElementById('apiKey').value.trim();
-        ApiClient.saveConfig({baseUrl,apiKey});
+        const model=document.getElementById('apiModel').value.trim();
+        ApiClient.saveConfig({baseUrl,apiKey,model});
 
         const statusEl=document.getElementById('apiConfigStatus');
         if(baseUrl){
-          statusEl.textContent='配置已保存，已启用后端 API';
+          const isLLM=baseUrl.includes('/v1');
+          statusEl.textContent=isLLM?'配置已保存，已启用文字 LLM 真实生成':'配置已保存，已启用后端 API';
           statusEl.className='api-config-status success';
           updateApiStatus('API 已配置 · 可真实生成');
         }else{
@@ -4634,9 +4779,10 @@
       });
 
       document.getElementById('apiConfigReset').addEventListener('click',()=>{
-        ApiClient.saveConfig({baseUrl:'',apiKey:''});
+        ApiClient.saveConfig({baseUrl:'',apiKey:'',model:''});
         document.getElementById('apiBaseUrl').value='';
         document.getElementById('apiKey').value='';
+        document.getElementById('apiModel').value='';
         const statusEl=document.getElementById('apiConfigStatus');
         statusEl.textContent='已重置为示例数据';
         statusEl.className='api-config-status info';
