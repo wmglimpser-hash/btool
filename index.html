@@ -1591,6 +1591,89 @@
     }
     @keyframes loadingPulse{0%,100%{opacity:.4}50%{opacity:1}}
 
+    .generate-btn{
+      padding:4px 12px;
+      border:1px solid var(--cinnabar);
+      background:var(--cinnabar-light);
+      color:var(--cinnabar);
+      border-radius:4px;
+      font-family:inherit;
+      font-size:11px;
+      cursor:pointer;
+      transition:all .2s;
+      letter-spacing:1px;
+    }
+    .generate-btn:hover{
+      background:var(--cinnabar);
+      color:#fff;
+    }
+    .generate-btn:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
+    }
+
+    .case-video-status{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:8px 12px;
+      background:rgba(255,255,255,.5);
+      border:1px solid var(--border);
+      border-radius:6px;
+      margin-bottom:12px;
+      font-size:12px;
+    }
+    .case-video-status .generate-btn{
+      margin-left:auto;
+    }
+
+    .error-text{
+      color:var(--cinnabar-dark);
+      font-size:11px;
+    }
+
+    .loading-overlay{
+      position:absolute;
+      inset:0;
+      background:rgba(26,20,16,.4);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:3;
+    }
+    .loading-overlay .loading-dots{
+      color:#fff;
+      font-size:20px;
+    }
+
+    .case-expand-btn{
+      width:100%;
+      margin-top:10px;
+      padding:8px 12px;
+      border:1px dashed var(--border-strong);
+      background:rgba(255,255,255,.4);
+      color:var(--ink-light);
+      border-radius:5px;
+      font-family:inherit;
+      font-size:12px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      transition:all .2s;
+    }
+    .case-expand-btn:hover{
+      background:var(--cinnabar-light);
+      border-color:var(--cinnabar);
+      color:var(--cinnabar);
+    }
+    .case-expand-btn:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
+    }
+
     /* 视频类分镜时间轴 */
     .case-storyboard-timeline{
       display:flex;
@@ -1804,6 +1887,20 @@
 
       <div class="case-source-bar" id="caseSourceBar"></div>
 
+      <!-- 主题输入 -->
+      <div class="theme-input-section" style="margin-top:0;margin-bottom:18px;padding-top:0;padding-bottom:16px;border-top:none;border-bottom:1px solid var(--border)">
+        <div class="theme-input-row">
+          <input type="text" id="themeInput" placeholder="输入一个传播主题，生成文字/图片/视频全场景案例" autocomplete="off">
+          <button id="themeSubmit" class="theme-submit-btn">生成案例</button>
+        </div>
+        <div class="theme-presets" id="themePresets">
+          <button class="theme-preset" data-theme="关雎里的理想关系">关雎里的理想关系</button>
+          <button class="theme-preset" data-theme="庄子如何看待自由">庄子如何看待自由</button>
+          <button class="theme-preset" data-theme="论语中的学习方法">论语中的学习方法</button>
+        </div>
+        <div class="api-status-indicator" id="apiStatus">演示模式 · 数据为预设模板</div>
+      </div>
+
       <div class="case-categories" id="caseCategories">
         <!-- 文字类 -->
         <div class="case-category">
@@ -1820,20 +1917,6 @@
           <h3 class="case-category-title">视频</h3>
           <div id="caseVideoArea"></div>
         </div>
-      </div>
-
-      <!-- 主题输入 -->
-      <div class="theme-input-section">
-        <div class="theme-input-row">
-          <input type="text" id="themeInput" placeholder="输入一个传播主题，生成文字/图片/视频全场景案例" autocomplete="off">
-          <button id="themeSubmit" class="theme-submit-btn">生成案例</button>
-        </div>
-        <div class="theme-presets" id="themePresets">
-          <button class="theme-preset" data-theme="关雎里的理想关系">关雎里的理想关系</button>
-          <button class="theme-preset" data-theme="庄子如何看待自由">庄子如何看待自由</button>
-          <button class="theme-preset" data-theme="论语中的学习方法">论语中的学习方法</button>
-        </div>
-        <div class="api-status-indicator" id="apiStatus">演示模式 · 数据为预设模板</div>
       </div>
     </section>
 
@@ -2887,6 +2970,21 @@
       }
     });
     
+    function escapeHTML(str){
+      if(str==null||str===undefined)return '';
+      return String(str)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+    }
+    function safeURL(url){
+      if(!url)return '#';
+      if(/^https?:\/\//i.test(url))return url;
+      return '#';
+    }
+
     // ============ API 客户端（预留端口，demo 兜底） ============
     const ApiClient={
       BASE_URL:'', // 空=无后端，用 demo 数据
@@ -2907,8 +3005,8 @@
           if(!res.ok) throw new Error(`HTTP ${res.status}`);
           return await res.json();
         }catch(e){
-          console.warn('[api] case/generate 失败，降级 demo',e);
-          return this._fallbackCase(payload);
+          console.error('[api] case/generate 失败',e);
+          throw e;
         }
       },
 
@@ -2973,8 +3071,8 @@
             xiaohongshu:{content:demoData.xiaohongshu||'（演示）小红书文案',badge:'演绎',source:'演绎生成'}
           },
           image:{
-            quoteCard:{prompt:'金句卡片：窈窕淑女，君子好逑。竖排书法，朱砂印章，宣纸纹理',status:'demo'},
-            poster:{prompt:'竖版海报：河洲雎鸠，水墨晕染，古琴意境，竖排标题"关雎"',status:'demo'},
+            quoteCard:{prompt:'金句卡片：窈窕淑女，君子好逑。竖排书法，朱砂印章，宣纸纹理',status:'demo-preview'},
+            poster:{prompt:'竖版海报：河洲雎鸠，水墨晕染，古琴意境，竖排标题"关雎"',status:'demo-preview'},
             imagePrompt:{prompt:'A serene river scene at dawn, waterbirds gliding above a sandbar, ink wash painting style, traditional Chinese aesthetic, warm golden light',status:'demo'}
           },
           video:{
@@ -2993,6 +3091,12 @@
       status:'completed',
       theme:'《关雎》如何表达理想关系？',
       data:null
+    };
+
+    let caseExpandState={
+      text:false,
+      image:false,
+      video:false
     };
 
     // 预设主题与书籍绑定
@@ -3030,16 +3134,16 @@
       const statusClass=isTraceable?'traceable':'pending';
       const statusText=isTraceable?'可追溯':'待核验';
       const sourceLink=si.textSourceUrl
-        ?`<a href="${si.textSourceUrl}" target="_blank">${si.textSourceName||'原文链接'}</a>`
-        :si.textSourceName||'用户输入';
+        ?`<a href="${safeURL(si.textSourceUrl)}" target="_blank">${escapeHTML(si.textSourceName||'原文链接')}</a>`
+        :escapeHTML(si.textSourceName||'用户输入');
 
       document.getElementById('caseSourceBar').innerHTML=`
         <span class="source-status ${statusClass}"><span class="source-status-icon"></span>${statusText}</span>
-        <span class="case-source-item">${si.canon||book.title}</span>
-        <span class="case-source-item">${si.version||'版本待确认'}</span>
-        <span class="case-source-item">${si.chapter||book.source||''}</span>
+        <span class="case-source-item">${escapeHTML(si.canon||book.title)}</span>
+        <span class="case-source-item">${escapeHTML(si.version||'版本待确认')}</span>
+        <span class="case-source-item">${escapeHTML(si.chapter||book.source||'')}</span>
         <span class="case-source-item">${sourceLink}</span>
-        ${si.referenceWorks&&si.referenceWorks.length>0?`<span class="case-source-ref">参考注本：${si.referenceWorks.join('、')}</span>`:''}
+        ${si.referenceWorks&&si.referenceWorks.length>0?`<span class="case-source-ref">参考注本：${escapeHTML(si.referenceWorks.join('、'))}</span>`:''}
       `;
     }
 
@@ -3048,29 +3152,46 @@
         document.getElementById('caseTextCards').innerHTML='<div class="case-status-tag">未生成</div>';
         return;
       }
-      const items=[
+      const allItems=[
         {key:'vernacular',label:'白话解读',badge:text.vernacular?.badge||'考据',source:text.vernacular?.source||'基于原文'},
         {key:'highlights',label:'传播要点',badge:text.highlights?.badge||'考据',source:text.highlights?.source||'基于原文'},
         {key:'xiaohongshu',label:'小红书文案',badge:text.xiaohongshu?.badge||'演绎',source:text.xiaohongshu?.source||'演绎生成'}
       ];
 
-      document.getElementById('caseTextCards').innerHTML=items.map(item=>{
-        const content=text[item.key]?.content||'';
+      const isExpanded=caseExpandState.text;
+      const visibleItems=isExpanded?allItems:allItems.slice(0,2);
+
+      const cardsHtml=visibleItems.map(item=>{
+        let content=text[item.key]?.content||'';
+        if(!isExpanded&&item.key!=='xiaohongshu'){
+          if(content.length>80){
+            content=content.slice(0,80)+'...';
+          }
+        }
         const isDemo=caseState.status==='completed'&&!ApiClient.BASE_URL;
         return `
           <div class="case-card">
             <div class="case-card-header">
-              <span class="case-card-title">${item.label}</span>
-              <span class="case-badge ${item.badge==='考据'?'kaoju':'yanyi'}">${item.badge}</span>
+              <span class="case-card-title">${escapeHTML(item.label)}</span>
+              <span class="case-badge ${item.badge==='考据'?'kaoju':'yanyi'}">${escapeHTML(item.badge)}</span>
             </div>
-            <div class="case-card-body">${content.replace(/\n/g,'<br>')}</div>
+            <div class="case-card-body">${escapeHTML(content).replace(/\n/g,'<br>')}</div>
             <div class="case-card-footer">
-              <span class="case-source-tag">${item.source}</span>
+              <span class="case-source-tag">${escapeHTML(item.source)}</span>
               ${isDemo?'<span class="case-status-tag demo">演示数据</span>':''}
             </div>
           </div>
         `;
       }).join('');
+
+      const expandBtn=`
+        <button class="case-expand-btn" data-expand="text">
+          <span>${isExpanded?'收起':'展开'}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;transition:transform .2s;${isExpanded?'transform:rotate(180deg)':''}"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      `;
+
+      document.getElementById('caseTextCards').innerHTML=cardsHtml+expandBtn;
     }
 
     function renderCaseImageCards(image){
@@ -3078,32 +3199,68 @@
         document.getElementById('caseImageCards').innerHTML='<div class="case-status-tag">未生成</div>';
         return;
       }
-      const items=[
+      const allItems=[
         {key:'quoteCard',label:'金句卡片',icon:'📝'},
         {key:'poster',label:'竖版海报',icon:'🖼'},
         {key:'imagePrompt',label:'图片 Prompt',icon:'💡'}
       ];
 
-      document.getElementById('caseImageCards').innerHTML=items.map(item=>{
+      const isExpanded=caseExpandState.image;
+      const visibleItems=isExpanded?allItems:allItems.slice(0,2);
+
+      const cardsHtml=visibleItems.map(item=>{
         const data=image[item.key]||{};
         const status=data.status||'demo';
-        const statusText=status==='demo'?'演示数据':status==='completed'?'已生成':status==='generating'?'生成中':'未生成';
-        const statusClass=status==='demo'?'demo':status==='completed'?'done':status==='generating'?'loading':'idle';
+        const statusText=status==='demo'?'演示数据':status==='demo-preview'?'预览占位':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
+        const statusClass=status==='demo'||status==='demo-preview'?'demo':status==='completed'?'done':status==='generating'?'loading':status==='failed'?'failed':'idle';
+
+        let actionBtn='';
+        if(ApiClient.BASE_URL){
+          if(status==='demo'||status==='demo-preview'){
+            actionBtn=`<button class="generate-btn" data-action="generate-image" data-key="${item.key}">生成</button>`;
+          }else if(status==='failed'){
+            actionBtn=`<button class="generate-btn" data-action="generate-image" data-key="${item.key}">重试</button>`;
+          }
+        }
+
+        let visualContent='';
+        if(status==='completed'&&data.url){
+          visualContent=`<img src="${safeURL(data.url)}" alt="${escapeHTML(item.label)}" style="width:100%;height:100%;object-fit:cover">`;
+        }else{
+          visualContent=`
+            <span class="preview-icon">${item.icon}</span>
+            <span class="preview-label">${escapeHTML(item.label)}</span>
+          `;
+        }
+
+        let promptHtml='';
+        if(isExpanded||item.key!=='imagePrompt'){
+          promptHtml=`<div class="preview-prompt">${escapeHTML(data.prompt||'')}</div>`;
+        }
 
         return `
-          <div class="case-preview-card">
+          <div class="case-preview-card" data-key="${item.key}">
             <div class="preview-visual preview-${item.key}">
-              <span class="preview-icon">${item.icon}</span>
-              <span class="preview-label">${item.label}</span>
+              ${visualContent}
+              ${status==='generating'?'<div class="loading-overlay"><span class="loading-dots">···</span></div>':''}
             </div>
-            <div class="preview-prompt">${data.prompt||''}</div>
+            ${promptHtml}
             <div class="preview-footer">
               <span class="case-status-tag ${statusClass}">${statusText}</span>
-              ${status==='generating'?'<span class="loading-dots">···</span>':''}
+              ${actionBtn}
             </div>
           </div>
         `;
       }).join('');
+
+      const expandBtn=`
+        <button class="case-expand-btn" data-expand="image">
+          <span>${isExpanded?'收起':'展开'}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;transition:transform .2s;${isExpanded?'transform:rotate(180deg)':''}"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      `;
+
+      document.getElementById('caseImageCards').innerHTML=cardsHtml+expandBtn;
     }
 
     function renderCaseVideoArea(video){
@@ -3112,37 +3269,60 @@
         return;
       }
 
-      // 分镜时间轴
+      const status=video.status||'demo';
+      const statusText=status==='demo'?'演示数据':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
+      const statusClass=status==='demo'?'demo':status==='completed'?'done':status==='generating'?'loading':status==='failed'?'failed':'idle';
+
+      let statusBar='';
+      let actionBtn='';
+      if(ApiClient.BASE_URL){
+        if(status==='demo'){
+          actionBtn=`<button class="generate-btn" data-action="generate-video">生成视频</button>`;
+        }else if(status==='failed'){
+          actionBtn=`<button class="generate-btn" data-action="generate-video">重试</button>`;
+        }
+      }
+      statusBar=`
+        <div class="case-video-status">
+          <span class="case-status-tag ${statusClass}">${statusText}</span>
+          ${status==='generating'?'<span class="loading-dots">···</span>':''}
+          ${status==='failed'&&video.error?`<span class="error-text">${escapeHTML(video.error)}</span>`:''}
+          ${actionBtn}
+        </div>
+      `;
+
+      const isExpanded=caseExpandState.video;
       const shots=video.storyboard||[];
-      const timelineHtml=shots.length>0?`
+      const visibleShots=isExpanded?shots:shots.slice(0,3);
+
+      const timelineHtml=visibleShots.length>0?`
         <div class="case-storyboard-timeline">
-          ${shots.map(s=>`
+          ${visibleShots.map(s=>`
             <div class="timeline-shot">
-              <div class="timeline-shot-time">${s.time}</div>
-              <div class="timeline-shot-title">${s.title}</div>
-              <div class="timeline-shot-desc">${s.desc}</div>
-              <div class="timeline-shot-basis">原文：${s.basis}</div>
+              <div class="timeline-shot-time">${escapeHTML(s.time)}</div>
+              <div class="timeline-shot-title">${escapeHTML(s.title)}</div>
+              <div class="timeline-shot-desc">${escapeHTML(s.desc)}</div>
+              <div class="timeline-shot-basis">原文：${escapeHTML(s.basis)}</div>
             </div>
           `).join('')}
         </div>
       `:'<div class="case-status-tag">无分镜数据</div>';
 
-      // 旁白稿 + 视频prompt + 标题标签
-      const extraCards=`
+      const extraCards=isExpanded?`
         <div class="case-cards" style="margin-top:12px">
           <div class="case-card">
             <div class="case-card-header">
               <span class="case-card-title">旁白稿</span>
               <span class="case-badge yanyi">演绎</span>
             </div>
-            <div class="case-card-body">${video.narration||''}</div>
+            <div class="case-card-body">${escapeHTML(video.narration||'')}</div>
           </div>
           <div class="case-card">
             <div class="case-card-header">
               <span class="case-card-title">视频 Prompt</span>
               <span class="case-badge yanyi">演绎</span>
             </div>
-            <div class="case-card-body" style="font-family:monospace;font-size:12px">${video.videoPrompt||''}</div>
+            <div class="case-card-body" style="font-family:monospace;font-size:12px">${escapeHTML(video.videoPrompt||'')}</div>
           </div>
           <div class="case-card">
             <div class="case-card-header">
@@ -3150,14 +3330,21 @@
               <span class="case-badge yanyi">演绎</span>
             </div>
             <div class="case-card-body">
-              ${(video.titles||[]).map(t=>`<div>${t}</div>`).join('')}
-              <div style="margin-top:6px;color:var(--cinnabar)">${(video.tags||[]).join(' ')}</div>
+              ${(video.titles||[]).map(t=>`<div>${escapeHTML(t)}</div>`).join('')}
+              <div style="margin-top:6px;color:var(--cinnabar)">${escapeHTML((video.tags||[]).join(' '))}</div>
             </div>
           </div>
         </div>
+      `:'';
+
+      const expandBtn=`
+        <button class="case-expand-btn" data-expand="video" style="margin-top:10px">
+          <span>${isExpanded?'收起':'展开'}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;transition:transform .2s;${isExpanded?'transform:rotate(180deg)':''}"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
       `;
 
-      document.getElementById('caseVideoArea').innerHTML=timelineHtml+extraCards;
+      document.getElementById('caseVideoArea').innerHTML=statusBar+timelineHtml+extraCards+expandBtn;
     }
 
     // 生成案例（主题输入触发）
@@ -3197,10 +3384,77 @@
         }
       }catch(e){
         console.error('[case] 生成失败',e);
-        caseState.status='failed';
-        updateApiStatus('生成失败 · 点击重试');
-        document.getElementById('caseCategories').innerHTML=`<div class="case-status-tag failed">生成失败：${e.message} <button onclick="generateCaseWithTheme('${theme}')">重试</button></div>`;
+        if(!ApiClient.BASE_URL){
+          // 无后端时永远不会失败，直接用 demo
+          const fallback=ApiClient._fallbackCase({bookId:currentBook.id,theme:theme,text:currentBook.text,sourceInfo:currentBook.sourceInfo});
+          caseState.data=fallback;
+          caseState.status='completed';
+          renderCaseShowcase(fallback);
+          updateApiStatus('演示模式 · 数据为预设模板');
+        }else{
+          // 有后端失败时显示错误+重试按钮
+          caseState.status='failed';
+          updateApiStatus('生成失败 · 点击重试');
+          const errorHtml=`
+            <div style="grid-column:1/-1;padding:20px;text-align:center">
+              <div class="case-status-tag failed" style="margin-bottom:10px">生成失败：${escapeHTML(e.message)}</div>
+              <button class="generate-btn" onclick="generateCaseWithTheme('${escapeHTML(theme.replace(/'/g,"\\'"))}')">重试</button>
+            </div>
+          `;
+          document.getElementById('caseCategories').innerHTML=errorHtml;
+        }
       }
+    }
+
+    async function generateImageItem(key){
+      if(!caseState.data||!caseState.data.image||!caseState.data.image[key])return;
+      const imageData=caseState.data.image[key];
+      imageData.status='generating';
+      renderCaseImageCards(caseState.data.image);
+
+      try{
+        const payload={
+          key:key,
+          prompt:imageData.prompt,
+          theme:caseState.theme,
+          bookId:currentBook?.id
+        };
+        const result=await ApiClient.generateImage(payload);
+        imageData.status=result.status||'completed';
+        imageData.url=result.url||null;
+        imageData.prompt=result.prompt||imageData.prompt;
+        if(result.error)imageData.error=result.error;
+      }catch(e){
+        console.error('[image] 生成失败',e);
+        imageData.status='failed';
+        imageData.error=e.message;
+      }
+      renderCaseImageCards(caseState.data.image);
+    }
+
+    async function generateVideo(){
+      if(!caseState.data||!caseState.data.video)return;
+      const videoData=caseState.data.video;
+      videoData.status='generating';
+      renderCaseVideoArea(videoData);
+
+      try{
+        const payload={
+          prompt:videoData.videoPrompt,
+          storyboard:videoData.storyboard,
+          theme:caseState.theme,
+          bookId:currentBook?.id
+        };
+        const result=await ApiClient.generateVideo(payload);
+        videoData.status=result.status||'completed';
+        videoData.url=result.url||null;
+        if(result.error)videoData.error=result.error;
+      }catch(e){
+        console.error('[video] 生成失败',e);
+        videoData.status='failed';
+        videoData.error=e.message;
+      }
+      renderCaseVideoArea(videoData);
     }
 
     function updateApiStatus(text){
@@ -3218,6 +3472,39 @@
       });
       caseState.data=defaultCase;
       renderCaseShowcase(defaultCase);
+
+      // 事件委托：展开/收起按钮
+      document.getElementById('caseCategories').addEventListener('click',(e)=>{
+        const btn=e.target.closest('[data-expand]');
+        if(btn){
+          const type=btn.dataset.expand;
+          if(type&&caseExpandState.hasOwnProperty(type)){
+            caseExpandState[type]=!caseExpandState[type];
+            if(caseState.data){
+              if(type==='text')renderCaseTextCards(caseState.data.text);
+              if(type==='image')renderCaseImageCards(caseState.data.image);
+              if(type==='video')renderCaseVideoArea(caseState.data.video);
+            }
+          }
+        }
+      });
+
+      // 事件委托：图片生成按钮
+      document.getElementById('caseImageCards').addEventListener('click',(e)=>{
+        const btn=e.target.closest('[data-action="generate-image"]');
+        if(btn){
+          const key=btn.dataset.key;
+          if(key)generateImageItem(key);
+        }
+      });
+
+      // 事件委托：视频生成按钮
+      document.getElementById('caseVideoArea').addEventListener('click',(e)=>{
+        const btn=e.target.closest('[data-action="generate-video"]');
+        if(btn){
+          generateVideo();
+        }
+      });
 
       // 主题输入按钮
       document.getElementById('themeSubmit').addEventListener('click',()=>{
