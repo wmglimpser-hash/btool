@@ -57,9 +57,9 @@
 - 平台：GitHub Pages（Static HTML workflow）
 - 地址：https://wmglimpser-hash.github.io/btool/
 - 分支：main
-- 线上已验证版本：**1.5.0**（1.7.0 待推送验证）
-- 线上已验证 commit：`34096ab`（feat: D9 场景化产品叙事首页）
-- GitHub Pages run：https://github.com/wmglimpser-hash/btool/actions/runs/28704392960（completed · success）
+- 线上已验证版本：**1.7.0**
+- 线上已验证 commit：`a13db2d`（feat: D10 案卷视觉收敛 - 水墨册页）
+- GitHub Pages run：https://github.com/wmglimpser-hash/btool/actions/runs/28708956199（completed · success）
 - 验证时间：2026-07-04
 
 ---
