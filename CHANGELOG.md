@@ -4,6 +4,93 @@
 
 ---
 
+## [1.7.0] 2026-07-04 · D10 案卷视觉收敛（水墨册页）
+
+> 本次为**视觉系统收敛**，不新增业务功能。把 D1 工作台 / D8 案例区 / D9 场景叙事三块叠加的碎裂首页，重构成一个统一的"可信传播案卷"。
+
+### 重构
+- **首页四区块 → 单一案卷**：移除 `hero-narrative` / `scenario-entry` / `metrics-strip` / `case-showcase` 主题横幅 四个独立 section，合并为 `<section class="case-file">` 案卷容器
+- **案卷结构**（桌面左右两栏 / 移动单列）：
+  - 顶栏：案卷名 + 4 个场景 tab（轻量切换控件）+ 设置齿轮（API 配置入口）
+  - 左栏 `.case-source`：古籍原文（滚动）+ 来源 + 版本 + 原文链接，册页边框 + "原"印章
+  - 右栏 `.case-products`：5 类产物纵向堆叠（口播稿/封面/分镜/发布标题/引用说明）
+  - 底栏 `.case-declaration`：来源声明文字（合并原 metrics 信息），"信"印章，非 dashboard 指标条
+- **四类场景入口轻量化**：4 张大场景卡（带 emoji）→ 案卷顶栏 4 个纯文字 tab（短视频/教学/文博/文创），切换时更新同一个案卷，不再新增大面积卡片区
+- **移除全部 emoji**：🎬📚🏛️🎨 全部移除，产物标题改用印章式文字标识（方框"原/句/画/引/信"等，朱砂色）
+- **标签收敛为 2 类**：只保留"考据"（绿）/ "演绎"（朱砂），移除"可追溯"/"演示"等其他标签
+- **API 配置降级**：默认隐藏，改为案卷顶栏齿轮按钮触发展开，不打断首页主案例
+
+### 统一视觉语言（水墨册页·层次晕染）
+- 背景：保留 `--paper`，加 SVG 噪点水墨纹理
+- 案卷：册页双线边框（border + outline-offset）+ 内框线 + 四角装饰
+- 卡片：所有 border-radius 统一为 **2px**（册页风不圆），统一 border/padding
+- 字体层级：案卷名 ZCOOL XiaoWei，产物标题 Noto Serif SC 600，正文 400
+- 标签：考据=绿实色白字，演绎=朱砂实色白字，统一尺寸
+- 章节分隔：左右栏细竖线，产物间细横线
+- workspace-section-header：移除大色块装饰，改为细线 + 小标题
+
+### GSAP 迁移（保留并适配新结构）
+- 入场时间线选择器：`.hero-claim/.hero-scene/.hero-source-strip/.hero-preview/.hero-cta/.scenario-entry/.metrics-strip/.broadcast-pack` → `.case-file-header/.case-source/.case-products/.case-declaration` + `.case-products > *` stagger
+- 场景切换过渡：`.pack-section` → `.case-products > *` stagger
+- 保留 gsap.matchMedia 三条件（isDesktop/isMobile/reduceMotion）和 transform/opacity only 约束
+
+### 保留（不回退）
+- ApiClient（generateCase/generateImage/generateVideo/pollJob/loadConfig/saveConfig）· Bearer Token · localStorage
+- escapeHTML / safeURL · 阅读器工作台 · 移动端 peek 抽屉 · 分享卡下载（html2canvas 三重保障）
+- 主题输入 · 四类场景产物组合差异（scenarioData）· generateCaseWithTheme 全链路
+
+### 验证（子代理 Playwright 真实驱动，16/16 通过）
+- pageerror = 0 条
+- 首屏单一案卷 `.case-file`，旧区块 `.hero-narrative/.scenario-entry/.metrics-strip` 全部移除
+- 案卷顶栏 4 个场景 tab（纯文字，无 emoji）
+- 左栏含古籍原文+来源+版本+原文链接；右栏含 5 类产物
+- 只有 2 类标签（考据/演绎），无"可追溯"/"演示"等其他标签
+- 页面 emoji = 0 处
+- 场景 tab 切换：短视频→口播稿 / 教学→课堂讲解 / 文博→导览文案 / 文创→商品文案
+- 案卷底栏含"可追溯/出处标注"字样，非 dashboard 指标条
+- API 配置默认隐藏，齿轮按钮可展开
+- `typeof gsap.to` = `"function"`，`typeof html2canvas` = `"function"`
+- 阅读器 .workspace 稳定，选中文字后工具条可用
+- 移动端 390px：无横向滚动，案卷单列堆叠
+- 后端能力全部保留（ApiClient/escapeHTML/safeURL/pollJob/renderShelf/renderReader）
+
+---
+
+## [1.6.0] 2026-07-04 · GSAP 产品叙事动画（仅服务叙事，不碰阅读器）
+
+### 新增
+- **GSAP 引入**：`<head>` 加入 `gsap@3.12.5` CDN（jsdelivr 主源 + unpkg 兜底），双源保障；加载失败时降级为无动画，页面不坏
+- **首屏入场时间线**：`gsap.timeline()` 编排"原文→来源→传播包"叙事节奏
+  - 产品主张 → 真实用户任务 → 可信来源条 → 4 格生成预览 → 双 CTA → 场景入口 → 指标条 → 传播包
+  - 仅用 `autoAlpha` / `y` / `scale`（transform+opacity），不动画 width/height/top/left
+- **可信链路节点点亮**：`.hero-source-strip > *` 按 stagger 0.12s 顺序点亮（原文→来源→链接→可追溯），`back.out(1.6)` 微弹
+- **场景切换传播包 stagger 过渡**：`switchScenario()` 和 `generateCaseWithTheme()` 末尾触发 `animatePackTransition()`，5 段 `.pack-section` 按 0.07s stagger 淡入
+
+### 可访问性
+- **prefers-reduced-motion 全程支持**：`gsap.matchMedia()` 三条件（isDesktop/isMobile/reduceMotion），reduce 模式下用 `gsap.set` 直接显示，无任何过渡
+- **移动端轻量**：移动端位移和持续时间均减半（dy 12px / duration 0.45s）
+
+### 边界
+- **阅读器区域零干扰**：`.workspace` / `.shelf` / `.reader` 完全不动画，选中文字→工具条→生成产物链路不受影响
+- **不装饰性炫技**：仅服务产品叙事三段（首屏入场/节点点亮/场景切换），其他区域无动效
+
+### 修复
+- **GSAP 守卫写法**：`typeof gsap!=='function'` 误判（GSAP 3 中 gsap 是对象），改为 `typeof gsap==='undefined'||typeof gsap.to!=='function'`
+
+### 验证（子代理 Playwright 真实驱动，14/14 通过）
+- pageerror = 0 条；无 `[gsap] 未加载` 警告
+- `typeof gsap.to` = `"function"`；`typeof gsap.matchMedia` = `"function"`
+- **首屏入场真的执行**：rAF 记录 `.hero-claim` opacity 完整轨迹 1→0→1（t=768ms 时 op=0，t=1153ms 时 op≥0.95，过渡 ~385ms）
+- **场景切换 fromTo 起效**：点击 teacher 后 100ms 内首个 `.pack-section` opacity=0.1428（<0.5），1s 后全恢复为 1
+- 8 个首屏元素 + 8 个来源条子元素 + 4 个预览格 + 5 段传播包 opacity 全为 1
+- inline style 仅含 transform/opacity/visibility，**无 width/height/top/left 残留**
+- 阅读器 `.workspace/.shelf/.reader` 无 inline transform/opacity；选中文字后 6 个工具条按钮全部启用
+- `typeof window.html2canvas` = `"function"`
+- 移动端 390px：scrollWidth=clientWidth=390，无横向滚动
+- prefers-reduced-motion: reduce：首屏元素直接 opacity=1，点 teacher 后无 stagger，标签正确切换为"课堂讲解"
+
+---
+
 ## [1.5.0] 2026-07-04 · D9 场景化产品叙事首页
 
 ### 重构

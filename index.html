@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
   <script src="html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" onerror="var s=document.createElement('script');s.src='https://unpkg.com/gsap@3.12.5/dist/gsap.min.js';s.onerror=function(){console.warn('[gsap] 加载失败，跳过产品叙事动画');};document.head.appendChild(s);"></script>
   <style>
     :root{
       --paper:#f7f3e9;
@@ -1259,123 +1260,265 @@
       .workspace{gap:14px}
     }
 
-    /* ============ 案例展示区 ============ */
-    .case-showcase{
-      background:rgba(255,255,255,.65);
-      border:1px solid var(--border);
-      border-radius:10px;
-      padding:24px 26px 22px;
-      margin-bottom:20px;
+    /* ============ 1.7.0 案卷 case-file（水墨册页） ============ */
+    .case-file{
+      background:var(--paper);
+      border:1px solid var(--border-strong);
+      outline:1px solid var(--border);
+      outline-offset:4px;
+      border-radius:2px;
+      margin-bottom:24px;
       position:relative;
       overflow:hidden;
-      backdrop-filter:blur(2px);
+      box-shadow:0 2px 0 rgba(26,20,16,.04);
     }
-    .case-showcase::before{
+    .case-file::before{
       content:"";
       position:absolute;
       inset:0;
       pointer-events:none;
-      opacity:.4;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise2)' opacity='0.25'/%3E%3C/svg%3E");
+      opacity:.5;
+      z-index:0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='inknoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23inknoise)' opacity='0.18'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 10% 12%, rgba(139,69,19,.05) 0%, transparent 55%),
+        radial-gradient(ellipse at 92% 88%, rgba(139,69,19,.045) 0%, transparent 50%);
     }
-    .case-showcase>*{position:relative;z-index:1}
+    .case-file::after{
+      content:"";
+      position:absolute;
+      top:8px;left:8px;right:8px;bottom:8px;
+      border:1px solid var(--border);
+      pointer-events:none;
+      z-index:0;
+      border-radius:1px;
+    }
+    .case-file>*{position:relative;z-index:1}
 
-    /* 主题横幅 */
-    .case-theme-banner{
-      margin-bottom:16px;
-      padding-bottom:14px;
+    /* 案卷顶栏 */
+    .case-file-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      padding:22px 28px 16px;
       border-bottom:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.35) 0%, transparent 100%);
     }
-    .case-theme-label{
+    .case-file-title-wrap{min-width:0;flex:1}
+    .case-file-label{
       display:inline-block;
       font-size:11px;
-      letter-spacing:2px;
+      letter-spacing:4px;
       color:var(--cinnabar);
-      background:var(--cinnabar-light);
-      padding:3px 10px;
-      border-radius:10px;
+      border:1px solid var(--cinnabar);
+      padding:1px 9px;
       margin-bottom:8px;
-    }
-    .case-theme-title{
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:26px;
-      letter-spacing:3px;
-      color:var(--ink);
-      margin-bottom:6px;
-      line-height:1.4;
     }
-    .case-theme-meta{
+    .case-file-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:28px;
+      letter-spacing:4px;
+      color:var(--ink);
+      line-height:1.3;
+      margin-bottom:5px;
+    }
+    .case-file-meta{
       font-size:12px;
       color:var(--ink-muted);
       letter-spacing:1px;
     }
-
-    /* 来源条 */
-    .case-source-bar{
+    .case-file-controls{
       display:flex;
-      flex-wrap:wrap;
       align-items:center;
-      gap:8px 12px;
-      padding:10px 12px;
+      gap:12px;
+      flex-shrink:0;
+    }
+    .scenario-tabs{
+      display:flex;
+      gap:2px;
       background:rgba(26,20,16,.04);
       border:1px solid var(--border);
-      border-radius:6px;
+      border-radius:2px;
+      padding:3px;
+    }
+    .scenario-tab{
+      background:transparent;
+      border:none;
+      padding:7px 15px;
+      font-family:"Noto Serif SC",serif;
+      font-size:13px;
+      color:var(--ink-light);
+      cursor:pointer;
+      letter-spacing:2px;
+      border-radius:2px;
+      transition:color .2s, background .2s;
+      white-space:nowrap;
+    }
+    .scenario-tab:hover{color:var(--ink)}
+    .scenario-tab.active{
+      color:#fff;
+      background:var(--cinnabar);
+    }
+    .case-file-settings{
+      display:flex;
+      align-items:center;
+      gap:5px;
+      background:transparent;
+      border:1px solid var(--border);
+      padding:6px 12px;
+      font-family:inherit;
       font-size:12px;
       color:var(--ink-light);
-      margin-bottom:18px;
+      cursor:pointer;
+      border-radius:2px;
+      letter-spacing:1px;
+      transition:color .2s, border-color .2s;
     }
-    .case-source-bar .source-status{
-      font-size:11px;
-      padding:3px 9px;
+    .case-file-settings:hover{border-color:var(--cinnabar);color:var(--cinnabar)}
+    .case-file-settings svg{width:14px;height:14px}
+    .case-file-config{margin:0;position:relative}
+    .case-file-config .api-config-panel{
+      position:absolute;
+      top:calc(100% + 8px);
+      right:0;
+      min-width:300px;
+      z-index:60;
+      box-shadow:var(--shadow);
     }
-    .case-source-item{color:var(--ink-light)}
-    .case-source-bar a{
+
+    /* 案卷主体：左右双栏 */
+    .case-file-body{
+      display:grid;
+      grid-template-columns:minmax(280px,0.82fr) 1.18fr;
+      border-bottom:1px solid var(--border);
+    }
+    .case-source{
+      padding:22px 24px;
+      border-right:1px solid var(--border);
+      background:rgba(255,255,255,.22);
+    }
+    .case-source-heading{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:14px;
+      padding-bottom:10px;
+      border-bottom:1px solid var(--border);
+    }
+    .seal-mark{
+      width:26px;height:26px;
+      background:var(--cinnabar);
+      color:#fff;
+      display:grid;place-items:center;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:14px;
+      font-weight:700;
+      border-radius:2px;
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.22);
+      flex-shrink:0;
+    }
+    .case-source-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:16px;
+      letter-spacing:3px;
+      color:var(--ink);
+    }
+    .case-source-text{
+      max-height:260px;
+      overflow-y:auto;
+      font-size:14px;
+      line-height:2.1;
+      color:var(--ink);
+      letter-spacing:1px;
+      padding:2px 8px 2px 0;
+      margin-bottom:16px;
+      font-family:"Noto Serif SC",serif;
+    }
+    .case-source-text p{margin-bottom:2px}
+    .case-source-info{
+      font-size:12px;
+      color:var(--ink-light);
+      border-top:1px dashed var(--border);
+      padding-top:12px;
+    }
+    .case-source-row{
+      display:flex;
+      gap:8px;
+      padding:4px 0;
+      line-height:1.7;
+    }
+    .case-source-key{
+      flex:0 0 34px;
+      color:var(--ink-muted);
+      letter-spacing:1px;
+    }
+    .case-source-val{color:var(--ink-light);flex:1;min-width:0;word-break:break-word}
+    .case-source-val a{
       color:var(--cinnabar);
       text-decoration:none;
+      border-bottom:1px dashed var(--cinnabar);
     }
-    .case-source-bar a:hover{text-decoration:underline}
+    .case-source-val a:hover{text-decoration:underline}
     .case-source-ref{
       width:100%;
       font-size:11px;
       color:var(--ink-muted);
       padding-top:6px;
+      margin-top:4px;
       border-top:1px dashed var(--border);
     }
 
-    /* 三类产物网格 */
-    .case-categories{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:16px;
-      margin-bottom:18px;
+    /* 右·产物 */
+    .case-products{
+      padding:20px 26px 22px;
+      display:flex;
+      flex-direction:column;
     }
-    .case-category{
-      background:rgba(255,255,255,.45);
-      border:1px solid var(--border);
-      border-radius:8px;
-      padding:14px;
-      min-width:0;
+    .case-products > *{
+      padding:16px 0;
+      border-bottom:1px solid var(--border);
     }
-    .case-category-title{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:15px;
-      letter-spacing:3px;
-      margin-bottom:12px;
-      padding-bottom:8px;
-      border-bottom:2px solid var(--border);
+    .case-products > *:first-child{padding-top:4px}
+    .case-products > *:last-child{border-bottom:none;padding-bottom:4px}
+
+    /* 案卷底栏·来源声明 */
+    .case-declaration{
       display:flex;
       align-items:center;
-      gap:8px;
+      gap:12px;
+      padding:14px 28px;
+      background:rgba(163,50,31,.05);
+      border-top:1px solid var(--border);
     }
-    /* 文字类 = 墨色 */
-    .case-category:nth-child(1) .case-category-title{border-bottom-color:var(--ink);color:var(--ink)}
-    .case-category:nth-child(1) .case-category-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink)}
-    /* 图片类 = 金色 */
-    .case-category:nth-child(2) .case-category-title{border-bottom-color:var(--gold);color:var(--gold)}
-    .case-category:nth-child(2) .case-category-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
-    /* 视频类 = 朱砂 */
-    .case-category:nth-child(3) .case-category-title{border-bottom-color:var(--cinnabar);color:var(--cinnabar)}
-    .case-category:nth-child(3) .case-category-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cinnabar)}
+    .case-declaration-seal{
+      width:28px;height:28px;
+      background:var(--cinnabar);
+      color:#fff;
+      display:grid;place-items:center;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:15px;
+      border-radius:2px;
+      flex-shrink:0;
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.22);
+    }
+    .case-declaration-text{
+      font-size:12px;
+      color:var(--ink-light);
+      letter-spacing:1px;
+      line-height:1.7;
+    }
+
+    /* 案卷下方主题输入 */
+    .case-file-theme{
+      padding:16px 28px 20px;
+      border-top:1px solid var(--border);
+      background:rgba(255,255,255,.2);
+      margin-top:0;
+      padding-top:16px;
+      border-top:1px solid var(--border);
+    }
 
     .case-cards{
       display:flex;
@@ -1385,11 +1528,11 @@
 
     /* 文字类卡片 */
     .case-card{
-      background:rgba(255,255,255,.7);
+      background:rgba(255,255,255,.55);
       border:1px solid var(--border);
       border-left:3px solid var(--ink);
-      border-radius:4px;
-      padding:10px 12px;
+      border-radius:2px;
+      padding:11px 13px;
       font-size:12px;
       line-height:1.7;
       color:var(--ink-light);
@@ -1401,6 +1544,7 @@
       margin-bottom:6px;
     }
     .case-card-title{
+      font-family:"Noto Serif SC",serif;
       font-size:13px;
       font-weight:600;
       color:var(--ink);
@@ -1425,23 +1569,24 @@
     }
     .case-source-tag{color:var(--ink-muted)}
 
-    /* 考据/演绎 badge */
+    /* 考据/演绎 badge（统一实色印章风） */
     .case-badge{
       display:inline-block;
-      padding:2px 8px;
+      padding:2px 9px;
       font-size:10px;
-      border-radius:10px;
-      letter-spacing:1px;
+      border-radius:2px;
+      letter-spacing:2px;
       font-weight:600;
+      font-family:"Noto Serif SC",serif;
     }
     .case-badge.kaoju{
-      background:var(--green-light);
-      color:var(--green);
+      background:var(--green);
+      color:#fff;
       border:1px solid var(--green);
     }
     .case-badge.yanyi{
-      background:var(--cinnabar-light);
-      color:var(--cinnabar);
+      background:var(--cinnabar);
+      color:#fff;
       border:1px solid var(--cinnabar);
     }
 
@@ -1507,6 +1652,7 @@
       overflow:hidden;
     }
     .preview-icon{font-size:22px;line-height:1;position:relative;z-index:2}
+    .preview-seal{width:24px;height:24px;font-size:12px;position:relative;z-index:2}
     .preview-label{font-size:11px;letter-spacing:2px;text-shadow:0 1px 3px rgba(0,0,0,.4);position:relative;z-index:2}
     /* 金句卡：竖排书法风 */
     .preview-quoteCard{
@@ -1880,462 +2026,73 @@
     .api-config-status.info{background:rgba(26,20,16,.04);color:var(--ink-light)}
     .progress-text{color:var(--green);font-weight:500}
 
-    /* 工作台区域标题 */
+    /* 工作台区域标题（克制的细线分隔） */
     .workspace-section-header{
-      margin:8px 0 14px;
-      padding:10px 0;
+      margin:10px 0 14px;
+      padding:8px 0;
       text-align:center;
       position:relative;
+      border-top:1px solid var(--border);
     }
-    .workspace-section-header::before,
-    .workspace-section-header::after{
-      content:"";
-      position:absolute;
-      top:50%;
-      width:80px;
-      height:1px;
-      background:var(--border);
-    }
-    .workspace-section-header::before{left:50%;transform:translateX(-180px)}
-    .workspace-section-header::after{right:50%;transform:translateX(180px)}
     .workspace-section-header h2{
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:20px;
-      letter-spacing:4px;
-      color:var(--ink);
-      margin-bottom:4px;
+      font-size:16px;
+      letter-spacing:5px;
+      color:var(--ink-light);
+      margin:6px 0 2px;
+      font-weight:400;
     }
     .workspace-section-header p{
-      font-size:12px;
+      font-size:11px;
       color:var(--ink-muted);
       letter-spacing:1px;
     }
 
-    /* 案例区响应式 */
+    /* 案卷响应式 */
     @media(max-width:900px){
-      .case-showcase{padding:18px 14px}
-      .case-theme-title{font-size:20px;letter-spacing:2px}
-      .case-categories{grid-template-columns:1fr;gap:12px}
-      .case-source-bar{font-size:11px;gap:6px 8px;padding:8px 10px}
-      .workspace-section-header::before,
-      .workspace-section-header::after{display:none}
+      .case-file-header{flex-direction:column;align-items:flex-start;gap:14px;padding:18px 18px 14px}
+      .case-file-title{font-size:22px;letter-spacing:3px}
+      .case-file-controls{width:100%;justify-content:space-between;gap:10px}
+      .scenario-tabs{flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch}
+      .case-file-body{grid-template-columns:1fr}
+      .case-source{border-right:none;border-bottom:1px solid var(--border);padding:18px}
+      .case-source-text{max-height:200px}
+      .case-products{padding:18px}
+      .case-declaration{padding:12px 18px}
+      .case-file-theme{padding:14px 18px 18px}
+      .case-file-config .api-config-panel{position:static;min-width:0;box-shadow:none;margin-top:8px}
       .theme-input-row input{font-size:14px}
     }
     @media(max-width:390px){
-      .case-showcase{padding:14px 10px}
-      .case-theme-title{font-size:18px}
-      .case-source-bar{flex-direction:column;align-items:flex-start;gap:4px}
+      .case-file-title{font-size:19px;letter-spacing:2px}
+      .case-source{padding:14px}
+      .case-products{padding:14px}
+      .case-declaration{padding:10px 14px;flex-wrap:wrap}
+      .case-declaration-text{font-size:11px}
       .timeline-shot{flex:0 0 130px}
       .preview-visual{height:72px}
+      .scenario-tab{padding:6px 11px;font-size:12px;letter-spacing:1px}
+      .case-file-settings span{display:none}
+      .case-file-settings{padding:7px 10px}
     }
 
-    /* ============ 1.5.0 场景化首屏叙事 ============ */
-    .hero-narrative{
-      background:linear-gradient(180deg, #1a1410 0%, #2b2118 60%, #3a2d20 100%);
-      color:#f7f3e9;
-      border-radius:12px;
-      padding:36px 32px 30px;
-      margin-bottom:20px;
-      position:relative;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-    }
-    .hero-narrative::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      opacity:.18;
-      background-image:
-        radial-gradient(ellipse at 15% 25%, rgba(163,50,31,.35) 0%, transparent 55%),
-        radial-gradient(ellipse at 85% 75%, rgba(184,148,31,.25) 0%, transparent 55%);
-    }
-    .hero-narrative::after{
-      content:"";
-      position:absolute;
-      right:-50px;top:-50px;
-      width:240px;height:240px;
-      border:1px solid rgba(247,243,233,.08);
-      border-radius:50%;
-      pointer-events:none;
-    }
-    .hero-narrative>*{position:relative;z-index:1}
+    /* 1.7.0：原 hero-narrative / scenario-entry / metrics-strip 已收敛进 .case-file，样式见上 */
 
-    .hero-claim{
-      text-align:center;
-      margin-bottom:22px;
-      padding-bottom:18px;
-      border-bottom:1px solid rgba(247,243,233,.12);
-    }
-    .hero-claim h1{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:36px;
-      letter-spacing:8px;
-      color:#f7f3e9;
-      margin-bottom:8px;
-      text-shadow:0 2px 12px rgba(0,0,0,.5);
-    }
-    .hero-claim-sub{
-      font-size:14px;
-      color:rgba(247,243,233,.7);
-      letter-spacing:3px;
-      font-weight:300;
-    }
 
-    .hero-scene{
-      background:rgba(247,243,233,.06);
-      border:1px solid rgba(247,243,233,.15);
-      border-radius:8px;
-      padding:16px 20px;
-      margin-bottom:14px;
-      backdrop-filter:blur(2px);
-    }
-    .hero-scene-label{
-      display:inline-block;
-      font-size:11px;
-      letter-spacing:3px;
-      color:#b8941f;
-      background:rgba(184,148,31,.15);
-      padding:3px 10px;
-      border-radius:10px;
-      margin-bottom:10px;
-      border:1px solid rgba(184,148,31,.4);
-    }
-    .hero-scene-text{
-      font-size:15px;
-      color:#f7f3e9;
-      line-height:1.9;
-      margin-bottom:10px;
-      letter-spacing:1px;
-    }
-    .hero-scene-solution{
-      font-size:13px;
-      color:rgba(247,243,233,.78);
-      line-height:1.85;
-      padding-top:10px;
-      border-top:1px dashed rgba(247,243,233,.15);
-    }
-
-    .hero-source-strip{
-      display:flex;
-      align-items:center;
-      flex-wrap:wrap;
-      gap:8px 12px;
-      padding:10px 14px;
-      background:rgba(58,107,74,.18);
-      border:1px solid rgba(58,107,74,.45);
-      border-radius:6px;
-      font-size:12px;
-      color:rgba(247,243,233,.85);
-      margin-bottom:18px;
-      letter-spacing:1px;
-    }
-    .hero-source-strip .source-dot{
-      width:8px;height:8px;
-      border-radius:50%;
-      background:#3a6b4a;
-      box-shadow:0 0 0 3px rgba(58,107,74,.3);
-    }
-    .hero-source-strip .source-dot.traceable{background:#3a6b4a}
-    .hero-source-strip a{
-      color:#b8941f;
-      text-decoration:none;
-      border-bottom:1px dashed rgba(184,148,31,.5);
-      transition:color .2s;
-    }
-    .hero-source-strip a:hover{color:#d4a82f}
-    .hero-source-strip .source-badge{
-      display:inline-block;
-      padding:2px 9px;
-      font-size:10px;
-      letter-spacing:2px;
-      color:#3a6b4a;
-      background:rgba(58,107,74,.2);
-      border:1px solid #3a6b4a;
-      border-radius:10px;
-      font-weight:600;
-    }
-
-    .hero-preview{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:10px;
-      margin-bottom:20px;
-    }
-    .hero-preview-item{
-      background:rgba(247,243,233,.05);
-      border:1px solid rgba(247,243,233,.15);
-      border-radius:6px;
-      padding:14px 8px;
-      text-align:center;
-      transition:all .2s;
-      cursor:default;
-    }
-    .hero-preview-item:hover{
-      background:rgba(247,243,233,.1);
-      border-color:rgba(184,148,31,.5);
-      transform:translateY(-2px);
-    }
-    .hero-preview-icon{
-      width:34px;height:34px;
-      margin:0 auto 8px;
-      background:rgba(163,50,31,.25);
-      border:1px solid rgba(163,50,31,.55);
-      color:#f7f3e9;
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:16px;
-      font-weight:700;
-      display:grid;place-items:center;
-      border-radius:50%;
-    }
-    .hero-preview-label{
-      font-size:12px;
-      color:rgba(247,243,233,.9);
-      letter-spacing:1px;
-      margin-bottom:5px;
-    }
-    .hero-preview-tag{
-      display:inline-block;
-      font-size:10px;
-      padding:1px 7px;
-      border-radius:8px;
-      letter-spacing:1px;
-    }
-    .hero-preview-tag.kaoju{
-      background:rgba(58,107,74,.25);
-      color:#7ec896;
-      border:1px solid rgba(58,107,74,.6);
-    }
-    .hero-preview-tag.yanyi{
-      background:rgba(163,50,31,.25);
-      color:#e8a89a;
-      border:1px solid rgba(163,50,31,.6);
-    }
-
-    .hero-cta{
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
-    .hero-cta-primary,
-    .hero-cta-secondary{
-      padding:11px 26px;
-      border-radius:6px;
-      font-family:inherit;
-      font-size:14px;
-      cursor:pointer;
-      letter-spacing:2px;
-      transition:all .2s;
-    }
-    .hero-cta-primary{
-      background:var(--cinnabar);
-      color:#fff;
-      border:1px solid var(--cinnabar);
-      box-shadow:0 4px 14px rgba(163,50,31,.4);
-    }
-    .hero-cta-primary:hover{
-      background:var(--cinnabar-dark);
-      transform:translateY(-1px);
-      box-shadow:0 6px 18px rgba(163,50,31,.55);
-    }
-    .hero-cta-primary:focus-visible{
-      outline:2px solid #b8941f;
-      outline-offset:3px;
-    }
-    .hero-cta-secondary{
-      background:transparent;
-      color:#f7f3e9;
-      border:1px solid rgba(247,243,233,.4);
-    }
-    .hero-cta-secondary:hover{
-      background:rgba(247,243,233,.08);
-      border-color:#f7f3e9;
-    }
-    .hero-cta-secondary:focus-visible{
-      outline:2px solid #b8941f;
-      outline-offset:3px;
-    }
-
-    /* ============ 2. 场景入口 ============ */
-    .scenario-entry{
-      margin-bottom:20px;
-      padding:18px 22px;
-      background:rgba(255,255,255,.55);
-      border:1px solid var(--border);
-      border-radius:10px;
-      backdrop-filter:blur(2px);
-    }
-    .scenario-entry-title{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:18px;
-      letter-spacing:4px;
-      color:var(--ink);
-      text-align:center;
-      margin-bottom:14px;
-      position:relative;
-    }
-    .scenario-entry-title::before,
-    .scenario-entry-title::after{
-      content:"·";
-      color:var(--cinnabar);
-      margin:0 10px;
-      font-weight:bold;
-    }
-    .scenario-cards{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
-    }
-    .scenario-card{
-      background:rgba(255,255,255,.7);
-      border:1px solid var(--border);
-      border-radius:8px;
-      padding:14px 12px;
-      cursor:pointer;
-      transition:all .2s;
-      text-align:center;
-      font-family:inherit;
-      color:var(--ink);
-      position:relative;
-      overflow:hidden;
-    }
-    .scenario-card::before{
-      content:"";
-      position:absolute;
-      left:0;top:0;bottom:0;
-      width:3px;
-      background:transparent;
-      transition:background .2s;
-    }
-    .scenario-card:hover{
-      background:rgba(255,255,255,.9);
-      border-color:var(--cinnabar);
-      transform:translateY(-2px);
-      box-shadow:var(--shadow-sm);
-    }
-    .scenario-card:focus-visible{
-      outline:2px solid var(--cinnabar);
-      outline-offset:2px;
-    }
-    .scenario-card.active{
-      background:var(--cinnabar-light);
-      border-color:var(--cinnabar);
-      box-shadow:0 4px 14px rgba(163,50,31,.18);
-    }
-    .scenario-card.active::before{
-      background:var(--cinnabar);
-    }
-    .scenario-icon{
-      font-size:26px;
-      margin-bottom:6px;
-      line-height:1;
-    }
-    .scenario-name{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:14px;
-      letter-spacing:2px;
-      margin-bottom:4px;
-      color:var(--ink);
-    }
-    .scenario-card.active .scenario-name{color:var(--cinnabar)}
-    .scenario-desc{
-      font-size:11px;
-      color:var(--ink-muted);
-      letter-spacing:1px;
-      line-height:1.6;
-    }
-
-    /* ============ 5. 指标条 ============ */
-    .metrics-strip{
-      display:grid;
-      grid-template-columns:repeat(6,1fr);
-      gap:0;
-      background:rgba(26,20,16,.04);
-      border:1px solid var(--border);
-      border-radius:10px;
-      padding:18px 14px;
-      margin-bottom:22px;
-      backdrop-filter:blur(2px);
-    }
-    .metric-item{
-      text-align:center;
-      padding:4px 8px;
-      border-right:1px dashed var(--border);
-    }
-    .metric-item:last-child{border-right:none}
-    .metric-value{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:24px;
-      letter-spacing:2px;
-      color:var(--cinnabar);
-      margin-bottom:4px;
-      line-height:1.2;
-    }
-    .metric-label{
-      font-size:11px;
-      color:var(--ink-light);
-      letter-spacing:1px;
-      line-height:1.5;
-    }
-
-    /* ============ 3. 传播包结构 ============ */
-    .broadcast-pack{
-      margin-top:18px;
-      padding-top:18px;
-      border-top:2px solid var(--border);
-    }
-    .pack-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:8px 14px;
-      margin-bottom:14px;
-      padding:10px 14px;
-      background:linear-gradient(90deg, rgba(163,50,31,.08) 0%, rgba(184,148,31,.06) 100%);
-      border:1px solid var(--border);
-      border-radius:6px;
-    }
-    .pack-title{
-      font-family:"ZCOOL XiaoWei",serif;
-      font-size:17px;
-      letter-spacing:4px;
-      color:var(--cinnabar);
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .pack-title::before{
-      content:"";
-      width:8px;height:8px;
-      border-radius:50%;
-      background:var(--cinnabar);
-      box-shadow:0 0 0 3px rgba(163,50,31,.18);
-    }
-    .pack-meta{
-      font-size:12px;
-      color:var(--ink-light);
-      letter-spacing:1px;
-    }
-    .pack-sections{
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
+    /* ============ 3. 传播包结构（1.7.0：已收敛进 .case-products > .pack-section） ============ */
     .pack-section{
-      background:rgba(255,255,255,.45);
-      border:1px solid var(--border);
-      border-radius:8px;
-      padding:14px;
+      padding:0;
+      background:transparent;
+      border:none;
+      border-radius:0;
     }
     .pack-section-title{
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:15px;
+      font-size:14px;
       letter-spacing:3px;
-      margin-bottom:12px;
-      padding-bottom:8px;
-      border-bottom:2px solid var(--border);
+      margin:0 0 10px;
+      padding-bottom:6px;
+      border-bottom:1px solid var(--border);
       display:flex;
       align-items:center;
       gap:8px;
@@ -2343,33 +2100,23 @@
     }
     .pack-section-title::before{
       content:"";
-      width:6px;height:6px;
+      width:5px;height:5px;
       border-radius:50%;
-      background:var(--ink);
+      background:var(--cinnabar);
+      opacity:.7;
     }
-    /* 各 pack-section 标题色 */
-    .pack-section:nth-child(1) .pack-section-title{border-bottom-color:var(--ink);color:var(--ink)}
-    .pack-section:nth-child(1) .pack-section-title::before{background:var(--ink)}
-    .pack-section:nth-child(2) .pack-section-title{border-bottom-color:var(--gold);color:var(--gold)}
-    .pack-section:nth-child(2) .pack-section-title::before{background:var(--gold)}
-    .pack-section:nth-child(3) .pack-section-title{border-bottom-color:var(--cinnabar);color:var(--cinnabar)}
-    .pack-section:nth-child(3) .pack-section-title::before{background:var(--cinnabar)}
-    .pack-section:nth-child(4) .pack-section-title{border-bottom-color:var(--green);color:var(--green)}
-    .pack-section:nth-child(4) .pack-section-title::before{background:var(--green)}
-    .pack-section:nth-child(5) .pack-section-title{border-bottom-color:var(--cinnabar-dark);color:var(--cinnabar-dark)}
-    .pack-section:nth-child(5) .pack-section-title::before{background:var(--cinnabar-dark)}
 
     /* 发布包 */
     .publish-pack{
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:10px;
     }
     .publish-section{
       padding:10px 12px;
       background:rgba(58,107,74,.06);
       border-left:3px solid var(--green);
-      border-radius:0 4px 4px 0;
+      border-radius:0 2px 2px 0;
     }
     .publish-section-label{
       font-size:11px;
@@ -2398,7 +2145,7 @@
       background:rgba(184,148,31,.12);
       color:var(--gold);
       border:1px solid rgba(184,148,31,.4);
-      border-radius:10px;
+      border-radius:2px;
       letter-spacing:1px;
     }
 
@@ -2406,13 +2153,13 @@
     .citation-pack{
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:10px;
     }
     .citation-format{
       padding:10px 12px;
       background:rgba(163,50,31,.06);
       border-left:3px solid var(--cinnabar);
-      border-radius:0 4px 4px 0;
+      border-radius:0 2px 2px 0;
     }
     .citation-label{
       font-size:11px;
@@ -2432,7 +2179,7 @@
       padding:10px 12px;
       background:rgba(26,20,16,.03);
       border:1px solid var(--border);
-      border-radius:4px;
+      border-radius:2px;
     }
     .citation-rule-label{
       font-size:11px;
@@ -2461,75 +2208,13 @@
       font-weight:bold;
     }
 
-    /* ============ 新增元素响应式 ============ */
+    /* ============ 传播包响应式（1.7.0：仅保留 pack-section / publish / citation 相关） ============ */
     @media(max-width:900px){
-      .hero-narrative{padding:26px 18px 22px}
-      .hero-claim h1{font-size:28px;letter-spacing:5px}
-      .hero-claim-sub{font-size:12px;letter-spacing:2px}
-      .hero-scene{padding:14px 14px}
-      .hero-scene-text{font-size:14px;line-height:1.85}
-      .hero-scene-solution{font-size:12px;line-height:1.8}
-      .hero-preview{grid-template-columns:repeat(2,1fr);gap:8px}
-      .hero-preview-item{padding:12px 6px}
-      .hero-cta-primary,.hero-cta-secondary{padding:10px 20px;font-size:13px;letter-spacing:1px}
-
-      .scenario-entry{padding:14px 12px}
-      .scenario-entry-title{font-size:16px;letter-spacing:3px}
-      .scenario-cards{
-        grid-template-columns:repeat(2,1fr);
-        gap:10px;
-      }
-      .scenario-card{padding:12px 8px}
-      .scenario-icon{font-size:22px}
-      .scenario-name{font-size:13px;letter-spacing:1px}
-
-      .metrics-strip{
-        grid-template-columns:repeat(2,1fr);
-        gap:10px 0;
-        padding:14px 10px;
-      }
-      .metric-item{
-        border-right:none;
-        border-bottom:1px dashed var(--border);
-        padding:6px 4px;
-      }
-      .metric-item:nth-child(2n){border-right:none}
-      .metric-item:nth-last-child(-n+2){border-bottom:none}
-      .metric-value{font-size:20px}
-      .metric-label{font-size:10px}
-
-      .pack-header{padding:8px 12px}
-      .pack-title{font-size:15px;letter-spacing:3px}
-      .pack-meta{font-size:11px}
-      .pack-section{padding:12px}
-      .pack-section-title{font-size:14px;letter-spacing:2px}
+      .pack-section-title{font-size:13px;letter-spacing:2px}
     }
     @media(max-width:390px){
-      .hero-narrative{padding:20px 14px 18px;border-radius:10px}
-      .hero-claim h1{font-size:22px;letter-spacing:3px}
-      .hero-claim-sub{font-size:11px;letter-spacing:1px}
-      .hero-scene{padding:12px}
-      .hero-scene-text{font-size:13px}
-      .hero-source-strip{font-size:11px;gap:6px 8px;padding:8px 10px}
-      .hero-preview{grid-template-columns:repeat(2,1fr);gap:6px}
-      .hero-preview-item{padding:10px 4px}
-      .hero-preview-icon{width:28px;height:28px;font-size:13px}
-      .hero-preview-label{font-size:11px}
-      .hero-cta-primary,.hero-cta-secondary{padding:9px 16px;font-size:12px;letter-spacing:1px}
-
-      .scenario-cards{grid-template-columns:1fr;gap:8px}
-      .scenario-card{padding:10px}
-      .scenario-icon{font-size:20px}
-      .scenario-name{font-size:13px}
-
-      .metrics-strip{grid-template-columns:repeat(2,1fr);padding:10px 6px}
-      .metric-value{font-size:18px}
-      .metric-label{font-size:10px;letter-spacing:0}
-
-      .broadcast-pack{margin-top:14px;padding-top:14px}
-      .pack-header{flex-direction:column;align-items:flex-start;gap:4px;padding:8px 10px}
-      .pack-section{padding:10px}
-      .pack-section-title{font-size:13px;letter-spacing:2px}
+      .pack-section-title{font-size:12px;letter-spacing:2px}
+      .publish-section,.citation-format,.citation-rule{padding:8px 10px}
     }
   </style>
 </head>
@@ -2553,183 +2238,66 @@
       </nav>
     </header>
 
-    <!-- 1.5.0 场景化首屏叙事 -->
-    <section class="hero-narrative">
-      <!-- 产品主张 -->
-      <div class="hero-claim">
-        <h1>古籍可信传播工作流</h1>
-        <p class="hero-claim-sub">从原文、来源、解读，到图文视频发布，一次完成</p>
-      </div>
-
-      <!-- 真实用户任务 -->
-      <div class="hero-scene">
-        <div class="hero-scene-label">真实场景</div>
-        <div class="hero-scene-text" id="heroSceneText">
-          短视频创作者想把《关雎》做成一条 60 秒传统文化短片，但担心讲错、没出处、画面不好看。
+    <!-- 1.7.0 单一案卷 · 可信传播案卷 -->
+    <section class="case-file" id="caseFile">
+      <!-- 案卷顶栏 -->
+      <div class="case-file-header">
+        <div class="case-file-title-wrap">
+          <div class="case-file-label">案 卷</div>
+          <h2 class="case-file-title" id="caseThemeTitle">《关雎》如何表达理想关系？</h2>
+          <div class="case-file-meta" id="caseThemeMeta">基于《诗经·周南》· 原文可查证</div>
         </div>
-        <div class="hero-scene-solution" id="heroSceneSolution">
-          btool 基于可追溯古籍原文，一次性生成口播稿、分镜、封面、标签，每个产物都标注"基于原文"或"演绎生成"。
-        </div>
-      </div>
-
-      <!-- 可信来源条 -->
-      <div class="hero-source-strip" id="heroSourceStrip">
-        <span class="source-dot traceable"></span>
-        <span>来源：《诗经·周南》</span>
-        <span>·</span>
-        <span>版本：毛诗正义通行本</span>
-        <span>·</span>
-        <a href="https://ctext.org/book-of-poetry/zhounan/zh" target="_blank" rel="noopener">原文链接</a>
-        <span>·</span>
-        <span class="source-badge">可追溯</span>
-      </div>
-
-      <!-- 生成结果预览（紧凑缩略） -->
-      <div class="hero-preview" id="heroPreview">
-        <div class="hero-preview-item">
-          <div class="hero-preview-icon">文</div>
-          <div class="hero-preview-label" id="heroPreviewTextLabel">口播稿</div>
-          <div class="hero-preview-tag kaoju">考据</div>
-        </div>
-        <div class="hero-preview-item">
-          <div class="hero-preview-icon">图</div>
-          <div class="hero-preview-label" id="heroPreviewImageLabel">金句封面</div>
-          <div class="hero-preview-tag yanyi">演绎</div>
-        </div>
-        <div class="hero-preview-item">
-          <div class="hero-preview-icon">视</div>
-          <div class="hero-preview-label" id="heroPreviewVideoLabel">60秒分镜</div>
-          <div class="hero-preview-tag kaoju">考据</div>
-        </div>
-        <div class="hero-preview-item">
-          <div class="hero-preview-icon">引</div>
-          <div class="hero-preview-label">引用说明</div>
-          <div class="hero-preview-tag kaoju">考据</div>
-        </div>
-      </div>
-
-      <!-- CTA -->
-      <div class="hero-cta">
-        <button class="hero-cta-primary" id="heroCtaPrimary" type="button">生成我的传播包</button>
-        <button class="hero-cta-secondary" id="heroCtaSecondary" type="button">进入创作</button>
-      </div>
-    </section>
-
-    <!-- 2. 场景入口 -->
-    <section class="scenario-entry">
-      <h3 class="scenario-entry-title">你在为谁做传播？</h3>
-      <div class="scenario-cards" id="scenarioCards">
-        <button class="scenario-card active" data-scenario="video" type="button">
-          <div class="scenario-icon">🎬</div>
-          <div class="scenario-name">短视频创作者</div>
-          <div class="scenario-desc">口播稿、分镜、封面、标签</div>
-        </button>
-        <button class="scenario-card" data-scenario="teacher" type="button">
-          <div class="scenario-icon">📚</div>
-          <div class="scenario-name">语文/通识老师</div>
-          <div class="scenario-desc">课堂讲解、板书要点、导入问题</div>
-        </button>
-        <button class="scenario-card" data-scenario="museum" type="button">
-          <div class="scenario-icon">🏛️</div>
-          <div class="scenario-name">文博/展陈人员</div>
-          <div class="scenario-desc">导览文案、展签说明、互动问答</div>
-        </button>
-        <button class="scenario-card" data-scenario="design" type="button">
-          <div class="scenario-icon">🎨</div>
-          <div class="scenario-name">国风文创设计师</div>
-          <div class="scenario-desc">金句卡、海报 prompt、商品文案</div>
-        </button>
-      </div>
-    </section>
-
-    <!-- 5. 产品指标条 -->
-    <section class="metrics-strip">
-      <div class="metric-item">
-        <div class="metric-value">100%</div>
-        <div class="metric-label">内置古籍来源可追溯率</div>
-      </div>
-      <div class="metric-item">
-        <div class="metric-value">100%</div>
-        <div class="metric-label">生成内容出处标注率</div>
-      </div>
-      <div class="metric-item">
-        <div class="metric-value">100%</div>
-        <div class="metric-label">演绎内容显性标注率</div>
-      </div>
-      <div class="metric-item">
-        <div class="metric-value">4类</div>
-        <div class="metric-label">一次覆盖文字/图片/视频/引用</div>
-      </div>
-      <div class="metric-item">
-        <div class="metric-value">10s</div>
-        <div class="metric-label">文字生成目标时长</div>
-      </div>
-      <div class="metric-item">
-        <div class="metric-value">异步</div>
-        <div class="metric-label">图片/视频任务可追踪</div>
-      </div>
-    </section>
-
-    <!-- 案例驱动首屏（已改造为传播包） -->
-    <section class="case-showcase" id="caseShowcase">
-      <div class="case-theme-banner">
-        <div class="case-theme-label">当前案例主题</div>
-        <h2 class="case-theme-title" id="caseThemeTitle">《关雎》如何表达理想关系？</h2>
-        <div class="case-theme-meta" id="caseThemeMeta">基于《诗经·周南》· 来源可追溯</div>
-      </div>
-
-      <div class="case-source-bar" id="caseSourceBar"></div>
-
-      <!-- 主题输入 -->
-      <div class="theme-input-section" style="margin-top:0;margin-bottom:18px;padding-top:0;padding-bottom:16px;border-top:none;border-bottom:1px solid var(--border)">
-        <div class="theme-input-row">
-          <input type="text" id="themeInput" placeholder="输入一个传播主题，生成文字/图片/视频全场景案例" autocomplete="off">
-          <button id="themeSubmit" class="theme-submit-btn">生成案例</button>
-        </div>
-        <div class="theme-presets" id="themePresets">
-          <button class="theme-preset" data-theme="关雎里的理想关系">关雎里的理想关系</button>
-          <button class="theme-preset" data-theme="庄子如何看待自由">庄子如何看待自由</button>
-          <button class="theme-preset" data-theme="论语中的学习方法">论语中的学习方法</button>
-        </div>
-        <div class="api-status-indicator" id="apiStatus">演示模式 · 数据为预设模板</div>
-      </div>
-
-      <!-- API 配置面板 -->
-      <div class="api-config-section">
-        <button id="apiConfigToggle" class="api-config-toggle">API 配置</button>
-        <div id="apiConfigPanel" class="api-config-panel hidden">
-          <div class="api-config-header">
-            <h4>后端 API 配置</h4>
-            <button id="apiConfigClose" class="api-config-close">×</button>
+        <div class="case-file-controls">
+          <div class="scenario-tabs" id="scenarioTabs" role="tablist" aria-label="场景切换">
+            <button class="scenario-tab active" data-scenario="video" type="button" role="tab">短视频</button>
+            <button class="scenario-tab" data-scenario="teacher" type="button" role="tab">教学</button>
+            <button class="scenario-tab" data-scenario="museum" type="button" role="tab">文博</button>
+            <button class="scenario-tab" data-scenario="design" type="button" role="tab">文创</button>
           </div>
-          <div class="api-config-body">
-            <div class="api-config-row">
-              <label for="apiBaseUrl">API 基础地址</label>
-              <input type="text" id="apiBaseUrl" placeholder="如 https://api.example.com" autocomplete="off">
+          <div class="api-config-section case-file-config">
+            <button class="case-file-settings" id="apiConfigToggle" type="button" aria-label="API 配置">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>设置</span>
+            </button>
+            <div id="apiConfigPanel" class="api-config-panel hidden">
+              <div class="api-config-header">
+                <h4>后端 API 配置</h4>
+                <button id="apiConfigClose" class="api-config-close" type="button" aria-label="关闭">×</button>
+              </div>
+              <div class="api-config-body">
+                <div class="api-config-row">
+                  <label for="apiBaseUrl">API 基础地址</label>
+                  <input type="text" id="apiBaseUrl" placeholder="如 https://api.example.com" autocomplete="off">
+                </div>
+                <div class="api-config-row">
+                  <label for="apiKey">API Key</label>
+                  <input type="password" id="apiKey" placeholder="留空则无需认证" autocomplete="off">
+                </div>
+                <div class="api-config-actions">
+                  <button id="apiConfigSave" class="api-config-save" type="button">保存配置</button>
+                  <button id="apiConfigReset" class="api-config-reset" type="button">重置为示例模式</button>
+                </div>
+                <div id="apiConfigStatus" class="api-config-status"></div>
+              </div>
             </div>
-            <div class="api-config-row">
-              <label for="apiKey">API Key</label>
-              <input type="password" id="apiKey" placeholder="留空则无需认证" autocomplete="off">
-            </div>
-            <div class="api-config-actions">
-              <button id="apiConfigSave" class="api-config-save">保存配置</button>
-              <button id="apiConfigReset" class="api-config-reset">重置为演示模式</button>
-            </div>
-            <div id="apiConfigStatus" class="api-config-status"></div>
           </div>
         </div>
       </div>
 
-      <!-- 3. 传播包结构（原 case-categories 改造） -->
-      <div class="broadcast-pack" id="broadcastPack">
-        <div class="pack-header">
-          <div class="pack-title">完整传播包</div>
-          <div class="pack-meta" id="packMeta">基于《诗经·周南》· 关雎里的理想关系</div>
-        </div>
+      <!-- 案卷主体：左卷宗 + 右产物 -->
+      <div class="case-file-body">
+        <!-- 左·卷宗 -->
+        <aside class="case-source">
+          <div class="case-source-heading">
+            <span class="seal-mark" aria-hidden="true">原</span>
+            <span class="case-source-title">古籍原文</span>
+          </div>
+          <div class="case-source-text" id="caseSourceText"></div>
+          <div class="case-source-info" id="caseSourceBar"></div>
+        </aside>
 
-        <!-- 原文依据 + 可信来源 已在 case-source-bar 中 -->
-
-        <div class="pack-sections" id="caseCategories">
+        <!-- 右·产物 -->
+        <div class="case-products" id="caseCategories">
           <!-- 文字包 -->
           <div class="pack-section">
             <h4 class="pack-section-title" id="packSectionTitleText">文字包</h4>
@@ -2748,19 +2316,38 @@
           <!-- 发布包 -->
           <div class="pack-section">
             <h4 class="pack-section-title" id="packSectionTitlePublish">发布包</h4>
-            <div class="publish-pack" id="publishPack">
-              <!-- 发布标题、标签、发布建议 -->
-            </div>
+            <div class="publish-pack" id="publishPack"></div>
           </div>
           <!-- 引用说明 -->
           <div class="pack-section">
             <h4 class="pack-section-title">引用说明</h4>
-            <div class="citation-pack" id="citationPack">
-              <!-- 标准引用格式、出处标注规则 -->
-            </div>
+            <div class="citation-pack" id="citationPack"></div>
           </div>
         </div>
       </div>
+
+      <!-- 案卷底栏·来源声明 -->
+      <div class="case-declaration">
+        <span class="case-declaration-seal" aria-hidden="true">信</span>
+        <span class="case-declaration-text">内置古籍来源可追溯 · 生成内容出处标注 · 演绎内容显性标注</span>
+      </div>
+
+      <!-- 主题输入（换一个案例主题，不抢首屏焦点） -->
+      <div class="theme-input-section case-file-theme">
+        <div class="theme-input-row">
+          <input type="text" id="themeInput" placeholder="输入一个传播主题，生成文字/图片/视频全场景案例" autocomplete="off">
+          <button id="themeSubmit" class="theme-submit-btn" type="button">生成案例</button>
+        </div>
+        <div class="theme-presets" id="themePresets">
+          <button class="theme-preset" data-theme="关雎里的理想关系" type="button">关雎里的理想关系</button>
+          <button class="theme-preset" data-theme="庄子如何看待自由" type="button">庄子如何看待自由</button>
+          <button class="theme-preset" data-theme="论语中的学习方法" type="button">论语中的学习方法</button>
+        </div>
+        <div class="api-status-indicator" id="apiStatus">示例模式 · 数据为预设模板</div>
+      </div>
+
+      <!-- 隐藏的 packMeta，保留 JS 引用兼容 -->
+      <div id="packMeta" hidden></div>
     </section>
 
     <!-- 移动端书签 tabs -->
@@ -3237,7 +2824,7 @@
       if(caseState.data){
         caseState.data.book=currentBook;
         renderCaseSourceBar(currentBook);
-        document.getElementById('caseThemeMeta').textContent=`基于《${currentBook.title}》· ${(currentBook.sourceInfo?.textSourceUrl?'来源可追溯':'用户输入待核验')}`;
+        document.getElementById('caseThemeMeta').textContent=`基于《${currentBook.title}》· ${(currentBook.sourceInfo?.textSourceUrl?'原文可查证':'用户输入')}`;
       }
     }
     
@@ -3950,9 +3537,9 @@
           theme:payload.theme,
           book:book,
           text:{
-            vernacular:{content:o.vernacular||'（演示）白话解读内容',badge:'考据',source:'基于原文'},
+            vernacular:{content:o.vernacular||'（示例）白话解读内容',badge:'考据',source:'基于原文'},
             highlights:{content:(o.highlights||[]).join('\n'),badge:'考据',source:'基于原文'},
-            xiaohongshu:{content:demoData.xiaohongshu||'（演示）小红书文案',badge:'演绎',source:'演绎生成'}
+            xiaohongshu:{content:demoData.xiaohongshu||'（示例）小红书文案',badge:'演绎',source:'演绎生成'}
           },
           image:{
             quoteCard:{prompt:'金句卡片：窈窕淑女，君子好逑。竖排书法，朱砂印章，宣纸纹理',status:'demo-preview'},
@@ -4028,38 +3615,26 @@
         solution:'btool 基于可追溯原文生成金句卡、海报 prompt、商品文案，所有文字可追溯到权威版本。',
         textLabel:'商品文案',
         imageLabel:'金句卡/海报',
-        videoLabel:'产品演示分镜',
+        videoLabel:'产品示例分镜',
         publishLabel:'商品标题/标签',
         packSectionText:'文案包',
         packSectionImage:'设计素材包',
-        packSectionVideo:'演示分镜包',
+        packSectionVideo:'示例分镜包',
         packSectionPublish:'上架包'
       }
     };
 
     let currentScenario='video';
 
-    // 切换场景：更新首屏文案、传播包标签、产物组合
+    // 切换场景：更新传播包标签、产物组合（1.7.0：移除 hero 引用，改用 .scenario-tab）
     function switchScenario(scenario){
       if(!scenarioData[scenario])return;
       currentScenario=scenario;
       // 切换 active 状态
-      document.querySelectorAll('.scenario-card').forEach(c=>{
+      document.querySelectorAll('.scenario-tab').forEach(c=>{
         c.classList.toggle('active',c.dataset.scenario===scenario);
       });
       const data=scenarioData[scenario];
-      // 更新首屏用户任务
-      const sceneTextEl=document.getElementById('heroSceneText');
-      const sceneSolEl=document.getElementById('heroSceneSolution');
-      if(sceneTextEl)sceneTextEl.textContent=data.scene;
-      if(sceneSolEl)sceneSolEl.textContent=data.solution;
-      // 更新首屏预览标签
-      const tl=document.getElementById('heroPreviewTextLabel');
-      const il=document.getElementById('heroPreviewImageLabel');
-      const vl=document.getElementById('heroPreviewVideoLabel');
-      if(tl)tl.textContent=data.textLabel;
-      if(il)il.textContent=data.imageLabel;
-      if(vl)vl.textContent=data.videoLabel;
       // 更新传播包 section 标题
       const pst=document.getElementById('packSectionTitleText');
       const psi=document.getElementById('packSectionTitleImage');
@@ -4078,6 +3653,8 @@
       if(caseState.data){
         renderCaseShowcase(caseState.data);
       }
+      // 1.7.0 场景切换时产物卡 stagger 过渡
+      animatePackTransition();
     }
 
     // 预设主题与书籍绑定
@@ -4087,14 +3664,14 @@
       {theme:'论语中的学习方法',bookId:'xueer',displayTheme:'论语中的学习方法'}
     ];
 
-    // 渲染案例展示区
+    // 渲染案例展示区（1.7.0：移除 hero 同步，新增左栏原文渲染）
     function renderCaseShowcase(caseData){
       const book=caseData.book||books[0];
       const theme=caseData.theme||caseState.theme;
 
       // 主题横幅
       document.getElementById('caseThemeTitle').textContent=theme;
-      document.getElementById('caseThemeMeta').textContent=`基于《${book.title}》· ${(book.sourceInfo?.textSourceUrl?'来源可追溯':'用户输入待核验')}`;
+      document.getElementById('caseThemeMeta').textContent=`基于《${book.title}》· ${(book.sourceInfo?.textSourceUrl?'原文可查证':'用户输入')}`;
 
       // 传播包 meta
       const packMetaEl=document.getElementById('packMeta');
@@ -4102,10 +3679,14 @@
         packMetaEl.textContent=`基于《${book.title}》· ${theme||''}`;
       }
 
-      // 同步首屏可信来源条
-      updateHeroSourceStrip(book);
+      // 左栏：古籍原文
+      const sourceTextEl=document.getElementById('caseSourceText');
+      if(sourceTextEl){
+        const rawText=(book.text||'').replace(/\n/g,'<br>');
+        sourceTextEl.innerHTML=rawText;
+      }
 
-      // 来源条
+      // 来源信息条
       renderCaseSourceBar(book);
 
       // 文字类产物
@@ -4207,20 +3788,16 @@
 
     function renderCaseSourceBar(book){
       const si=book.sourceInfo||{};
-      const isTraceable=si.textSourceUrl&&si.textSourceUrl.includes('ctext.org');
-      const statusClass=isTraceable?'traceable':'pending';
-      const statusText=isTraceable?'可追溯':'待核验';
       const sourceLink=si.textSourceUrl
         ?`<a href="${safeURL(si.textSourceUrl)}" target="_blank">${escapeHTML(si.textSourceName||'原文链接')}</a>`
         :escapeHTML(si.textSourceName||'用户输入');
 
       document.getElementById('caseSourceBar').innerHTML=`
-        <span class="source-status ${statusClass}"><span class="source-status-icon"></span>${statusText}</span>
-        <span class="case-source-item">${escapeHTML(si.canon||book.title)}</span>
-        <span class="case-source-item">${escapeHTML(si.version||'版本待确认')}</span>
-        <span class="case-source-item">${escapeHTML(si.chapter||book.source||'')}</span>
-        <span class="case-source-item">${sourceLink}</span>
-        ${si.referenceWorks&&si.referenceWorks.length>0?`<span class="case-source-ref">参考注本：${escapeHTML(si.referenceWorks.join('、'))}</span>`:''}
+        <div class="case-source-row"><span class="case-source-key">典籍</span><span class="case-source-val">${escapeHTML(si.canon||book.title)}</span></div>
+        <div class="case-source-row"><span class="case-source-key">章节</span><span class="case-source-val">${escapeHTML(si.chapter||book.source||'—')}</span></div>
+        <div class="case-source-row"><span class="case-source-key">版本</span><span class="case-source-val">${escapeHTML(si.version||'版本待确认')}</span></div>
+        <div class="case-source-row"><span class="case-source-key">来源</span><span class="case-source-val">${sourceLink}</span></div>
+        ${si.referenceWorks&&si.referenceWorks.length>0?`<div class="case-source-row"><span class="case-source-key">参考注本</span><span class="case-source-val">${escapeHTML(si.referenceWorks.join('、'))}</span></div>`:''}
       `;
     }
 
@@ -4255,7 +3832,7 @@
             <div class="case-card-body">${escapeHTML(content).replace(/\n/g,'<br>')}</div>
             <div class="case-card-footer">
               <span class="case-source-tag">${escapeHTML(item.source)}</span>
-              ${isDemo?'<span class="case-status-tag demo">演示数据</span>':''}
+              ${isDemo?'<span class="case-status-tag demo">示例数据</span>':''}
             </div>
           </div>
         `;
@@ -4277,9 +3854,9 @@
         return;
       }
       const allItems=[
-        {key:'quoteCard',label:'金句卡片',icon:'📝'},
-        {key:'poster',label:'竖版海报',icon:'🖼'},
-        {key:'imagePrompt',label:'图片 Prompt',icon:'💡'}
+        {key:'quoteCard',label:'金句卡片',seal:'句'},
+        {key:'poster',label:'竖版海报',seal:'画'},
+        {key:'imagePrompt',label:'图片 Prompt',seal:'引'}
       ];
 
       const isExpanded=caseExpandState.image;
@@ -4288,7 +3865,7 @@
       const cardsHtml=visibleItems.map(item=>{
         const data=image[item.key]||{};
         const status=data.status||'demo';
-        const statusText=status==='demo'?'演示数据':status==='demo-preview'?'预览占位':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
+        const statusText=status==='demo'?'示例数据':status==='demo-preview'?'预览占位':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
         const statusClass=status==='demo'||status==='demo-preview'?'demo':status==='completed'?'done':status==='generating'?'loading':status==='failed'?'failed':'idle';
 
         let actionBtn='';
@@ -4305,7 +3882,7 @@
           visualContent=`<img src="${safeURL(data.url)}" alt="${escapeHTML(item.label)}" style="width:100%;height:100%;object-fit:cover">`;
         }else{
           visualContent=`
-            <span class="preview-icon">${item.icon}</span>
+            <span class="seal-mark preview-seal" aria-hidden="true">${item.seal}</span>
             <span class="preview-label">${escapeHTML(item.label)}</span>
           `;
         }
@@ -4347,7 +3924,7 @@
       }
 
       const status=video.status||'demo';
-      const statusText=status==='demo'?'演示数据':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
+      const statusText=status==='demo'?'示例数据':status==='completed'?'已生成':status==='generating'?'生成中':status==='failed'?'生成失败':'未生成';
       const statusClass=status==='demo'?'demo':status==='completed'?'done':status==='generating'?'loading':status==='failed'?'failed':'idle';
 
       let statusBar='';
@@ -4454,9 +4031,11 @@
         caseState.status='completed';
 
         renderCaseShowcase(result);
+        // 1.6.0 新案例生成完成后，传播包 stagger 过渡
+        animatePackTransition();
 
         if(result.status==='demo'){
-          updateApiStatus('演示模式 · 数据为预设模板');
+          updateApiStatus('示例模式 · 数据为预设模板');
         }else{
           updateApiStatus('已生成 · 基于API返回');
         }
@@ -4468,7 +4047,7 @@
           caseState.data=fallback;
           caseState.status='completed';
           renderCaseShowcase(fallback);
-          updateApiStatus('演示模式 · 数据为预设模板');
+          updateApiStatus('示例模式 · 数据为预设模板');
         }else{
           // 有后端失败时显示错误+重试按钮
           caseState.status='failed';
@@ -4595,9 +4174,9 @@
           statusEl.className='api-config-status success';
           updateApiStatus('API 已配置 · 可调用真实生成接口');
         }else{
-          statusEl.textContent='配置已保存，使用演示模式';
+          statusEl.textContent='配置已保存，使用示例模式';
           statusEl.className='api-config-status info';
-          updateApiStatus('演示模式 · 数据为预设模板');
+          updateApiStatus('示例模式 · 数据为预设模板');
         }
         setTimeout(()=>{
           statusEl.textContent='';
@@ -4610,9 +4189,9 @@
         document.getElementById('apiBaseUrl').value='';
         document.getElementById('apiKey').value='';
         const statusEl=document.getElementById('apiConfigStatus');
-        statusEl.textContent='已重置为演示模式';
+        statusEl.textContent='已重置为示例模式';
         statusEl.className='api-config-status info';
-        updateApiStatus('演示模式 · 数据为预设模板');
+        updateApiStatus('示例模式 · 数据为预设模板');
         setTimeout(()=>{
           statusEl.textContent='';
           statusEl.className='api-config-status';
@@ -4628,6 +4207,90 @@
       if(ApiClient.BASE_URL){
         updateApiStatus('API 已配置 · 可调用真实生成接口');
       }
+    }
+
+    // 1.6.0 GSAP 产品叙事动画 — 仅服务叙事区，不碰阅读器
+    function initNarrativeAnimation(){
+      if(typeof gsap==='undefined'||typeof gsap.to!=='function'){
+        console.warn('[gsap] 未加载，跳过产品叙事动画');
+        return;
+      }
+      const mm=gsap.matchMedia();
+      mm.add({
+        isDesktop:"(min-width: 901px)",
+        isMobile:"(max-width: 900px)",
+        reduceMotion:"(prefers-reduced-motion: reduce)"
+      },(ctx)=>{
+        const {isDesktop,reduceMotion}=ctx.conditions;
+        // 1.7.0 选择器迁移：从 hero/scenario/metrics/broadcast-pack 改为案卷四段
+        const blockTargets=['.case-file-header','.case-source','.case-products','.case-declaration'];
+
+        if(reduceMotion){
+          // 用户偏好减少动效：直接显示，不做任何过渡
+          gsap.set(blockTargets,{autoAlpha:1,y:0});
+          gsap.set('.case-products > *',{autoAlpha:1,y:0});
+          return;
+        }
+
+        // 初始隐藏（避免 FOUC），仅用 transform + opacity
+        const dy=isDesktop?20:12;
+        gsap.set(blockTargets,{autoAlpha:0,y:dy});
+        gsap.set('.case-products > *',{autoAlpha:0,y:isDesktop?14:10});
+
+        // 主时间线：案卷顶栏 → 左卷宗 → 右产物 → 底栏声明
+        const tl=gsap.timeline({
+          defaults:{ease:'power3.out',duration:isDesktop?0.6:0.45}
+        });
+
+        // 1. 案卷顶栏（标题 + 场景 tabs + 设置）
+        tl.to('.case-file-header',{autoAlpha:1,y:0,duration:isDesktop?0.7:0.5});
+
+        // 2. 左·卷宗：古籍原文 + 来源信息
+        tl.to('.case-source',{autoAlpha:1,y:0},'-=0.3');
+
+        // 3. 右·产物 stagger（文字/图片/视频/发布/引用）
+        tl.to('.case-products',{autoAlpha:1,y:0},'-=0.25');
+        tl.to('.case-products > *',{
+          autoAlpha:1,
+          y:0,
+          duration:0.4,
+          stagger:0.08
+        },'-=0.2');
+
+        // 4. 底栏·来源声明
+        tl.to('.case-declaration',{autoAlpha:1,y:0},'-=0.15');
+
+        return ()=>{
+          // matchMedia 切换时清理 inline style，让 CSS 接管
+          gsap.set([...blockTargets,'.case-products > *'],{clearProps:'all'});
+        };
+      });
+    }
+
+    // 1.7.0 场景切换时产物卡 stagger 过渡（替代原 .pack-section）
+    function animatePackTransition(){
+      if(typeof gsap==='undefined'||typeof gsap.to!=='function')return;
+      const sections=document.querySelectorAll('.case-products > *');
+      if(!sections.length)return;
+      const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduceMotion){
+        gsap.set(sections,{autoAlpha:1,y:0,scale:1});
+        return;
+      }
+      const isMobile=window.matchMedia('(max-width: 900px)').matches;
+      gsap.killTweensOf(sections);
+      gsap.fromTo(sections,
+        {autoAlpha:0,y:isMobile?10:14,scale:0.985},
+        {
+          autoAlpha:1,
+          y:0,
+          scale:1,
+          duration:0.45,
+          stagger:0.07,
+          ease:'power3.out',
+          overwrite:'auto'
+        }
+      );
     }
 
     // 初始化案例展示
@@ -4716,41 +4379,16 @@
         });
       });
 
-      // ============ 1.5.0 场景化交互绑定 ============
-      // 场景卡切换
-      document.querySelectorAll('.scenario-card').forEach(card=>{
-        card.addEventListener('click',()=>{
-          const scenario=card.dataset.scenario;
+      // ============ 1.7.0 场景化交互绑定 ============
+      // 场景 tab 切换（替代原 .scenario-card）
+      document.querySelectorAll('.scenario-tab').forEach(tab=>{
+        tab.addEventListener('click',()=>{
+          const scenario=tab.dataset.scenario;
           if(scenario&&scenario!==currentScenario){
             switchScenario(scenario);
           }
         });
       });
-
-      // CTA: 生成我的传播包 - 滚动到传播包并触发当前主题生成
-      const heroCtaPrimary=document.getElementById('heroCtaPrimary');
-      if(heroCtaPrimary){
-        heroCtaPrimary.addEventListener('click',()=>{
-          const packEl=document.getElementById('broadcastPack');
-          if(packEl){
-            packEl.scrollIntoView({behavior:'smooth',block:'start'});
-          }
-          // 触发当前主题生成（如已有主题则重新生成；否则用默认主题）
-          const theme=caseState.theme||'《关雎》如何表达理想关系？';
-          generateCaseWithTheme(theme);
-        });
-      }
-
-      // CTA: 进入创作 - 滚动到工作台区域
-      const heroCtaSecondary=document.getElementById('heroCtaSecondary');
-      if(heroCtaSecondary){
-        heroCtaSecondary.addEventListener('click',()=>{
-          const wsHeader=document.querySelector('.workspace-section-header');
-          if(wsHeader){
-            wsHeader.scrollIntoView({behavior:'smooth',block:'start'});
-          }
-        });
-      }
     }
 
     // 初始化
@@ -4758,6 +4396,8 @@
     renderReader();
     initCaseShowcase();
     initApiConfigPanel();
+    // 1.6.0 启动产品叙事入场时间线（必须在 initCaseShowcase 之后，确保传播包已渲染）
+    initNarrativeAnimation();
     if(isMobileView()){
       document.getElementById('sidePanel').classList.add('mobile-peek');
     }
