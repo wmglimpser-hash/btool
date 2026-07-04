@@ -59,8 +59,8 @@
 - 地址：https://wmglimpser-hash.github.io/btool/
 - 分支：main
 - 线上已验证版本：**1.5.0**
-- 线上已验证 commit：待推送后补全
-- GitHub Pages run：待部署后补全
+- 线上已验证 commit：`34096ab`（feat: D9 场景化产品叙事首页）
+- GitHub Pages run：https://github.com/wmglimpser-hash/btool/actions/runs/28704392960（completed · success）
 - 验证时间：2026-07-04
 
 ---
