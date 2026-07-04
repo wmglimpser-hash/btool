@@ -1476,12 +1476,7 @@
       display:flex;
       flex-direction:column;
     }
-    .case-products > *{
-      padding:13px 0;
-      border-bottom:1px solid var(--border);
-    }
-    .case-products > *:first-child{padding-top:2px}
-    .case-products > *:last-child{border-bottom:none;padding-bottom:2px}
+    /* 1.8.0：移除原 .case-products > * 统一样式，由 hero-case-card 和 pack-collapsible 自行控制 */
 
     /* 案卷底栏·来源声明 */
     .case-declaration{
@@ -2090,7 +2085,7 @@
       .case-source{border-right:none;border-bottom:1px solid var(--border);padding:16px;min-width:0;overflow-x:hidden}
       .case-source-text{max-height:160px;font-size:13px;line-height:1.85;overflow-x:hidden}
       .case-products{padding:16px;min-width:0;overflow-x:hidden}
-      .case-products > *{padding:12px 0}
+      .case-products > *{padding:0}
       .case-declaration{padding:11px 16px}
       .case-file-theme{padding:12px 16px 16px}
       .case-file-config .api-config-panel{position:static;min-width:0;box-shadow:none;margin-top:8px}
@@ -2108,7 +2103,7 @@
       .case-source{padding:12px}
       .case-source-text{max-height:140px;font-size:12px;line-height:1.8;padding-right:4px}
       .case-products{padding:12px}
-      .case-products > *{padding:11px 0}
+      .case-products > *{padding:0}
       .case-declaration{padding:9px 12px;flex-wrap:wrap;gap:8px}
       .case-declaration-seal{width:24px;height:24px;font-size:13px}
       .case-declaration-text{font-size:10.5px;line-height:1.6;letter-spacing:0}
@@ -2119,6 +2114,281 @@
 
     /* 1.7.0：原 hero-narrative / scenario-entry / metrics-strip 已收敛进 .case-file，样式见上 */
 
+
+    /* ============ 1.8.0 主案例预览卡 hero-case-card ============ */
+    .hero-case-card{
+      display:grid;
+      grid-template-columns:140px 1fr;
+      gap:18px;
+      padding:16px 18px;
+      background:linear-gradient(135deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,.45) 100%);
+      border:1px solid var(--border-strong);
+      border-left:4px solid var(--cinnabar);
+      border-radius:4px;
+      margin-bottom:12px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-case-card::before{
+      content:"";
+      position:absolute;
+      top:0;right:0;
+      width:120px;height:120px;
+      background:radial-gradient(circle at top right, rgba(163,50,31,.08) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .hero-cover{
+      width:140px;
+      height:200px;
+      border-radius:3px;
+      position:relative;
+      overflow:hidden;
+      flex-shrink:0;
+      background:
+        linear-gradient(135deg, rgba(247,243,233,.95) 0%, rgba(232,223,202,.95) 100%),
+        repeating-linear-gradient(0deg, rgba(139,69,19,.05) 0 2px, transparent 2px 6px);
+      border:3px solid var(--cinnabar);
+      box-shadow:var(--shadow-sm);
+    }
+    .hero-cover::before{
+      content:"";
+      position:absolute;
+      inset:6px;
+      border:1px solid rgba(139,69,19,.25);
+      pointer-events:none;
+    }
+    .hero-cover-title{
+      position:absolute;
+      writing-mode:vertical-rl;
+      text-orientation:upright;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:22px;
+      letter-spacing:5px;
+      color:var(--cinnabar);
+      right:18px;
+      top:50%;
+      transform:translateY(-50%);
+      text-shadow:0 0 1px rgba(163,50,31,.3);
+      line-height:1.6;
+    }
+    .hero-cover-seal{
+      position:absolute;
+      bottom:14px;
+      left:50%;
+      transform:translateX(-50%) rotate(6deg);
+      width:34px;height:34px;
+      background:var(--cinnabar);
+      color:#fff;
+      display:grid;place-items:center;
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:14px;
+      border-radius:2px;
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.28);
+    }
+    .hero-cover-dynasty{
+      position:absolute;
+      top:14px;
+      left:12px;
+      writing-mode:vertical-rl;
+      text-orientation:upright;
+      font-size:10px;
+      letter-spacing:2px;
+      color:var(--ink-light);
+      opacity:.7;
+    }
+    .hero-content{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-width:0;
+    }
+    .hero-top{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:0;
+    }
+    .hero-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:20px;
+      letter-spacing:2px;
+      color:var(--ink);
+      line-height:1.4;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .hero-title .case-badge{
+      font-size:10px;
+      padding:2px 8px;
+      letter-spacing:1px;
+    }
+    .hero-summary{
+      font-size:13px;
+      line-height:1.8;
+      color:var(--ink-light);
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .hero-storyboard-thumbs{
+      display:flex;
+      gap:8px;
+      margin-top:4px;
+    }
+    .hero-thumb{
+      flex:1;
+      height:36px;
+      border-radius:3px;
+      position:relative;
+      overflow:hidden;
+      background:linear-gradient(135deg, rgba(139,69,19,.15) 0%, rgba(139,69,19,.08) 100%);
+      border:1px solid rgba(139,69,19,.2);
+    }
+    .hero-thumb-time{
+      position:absolute;
+      bottom:2px;
+      left:4px;
+      font-size:9px;
+      color:var(--cinnabar);
+      background:rgba(255,255,255,.85);
+      padding:1px 4px;
+      border-radius:2px;
+      letter-spacing:0.5px;
+    }
+    .hero-thumb-title{
+      position:absolute;
+      top:4px;
+      left:6px;
+      font-size:10px;
+      color:var(--ink);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      right:6px;
+    }
+    .hero-cta{
+      margin-top:auto;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding-top:8px;
+    }
+    .hero-cta-btn{
+      padding:9px 22px;
+      background:var(--cinnabar);
+      color:#fff;
+      border:none;
+      border-radius:4px;
+      font-family:inherit;
+      font-size:13px;
+      cursor:pointer;
+      transition:all .2s;
+      letter-spacing:2px;
+      box-shadow:0 2px 8px rgba(163,50,31,.3);
+    }
+    .hero-cta-btn:hover{
+      background:var(--cinnabar-dark);
+      transform:translateY(-1px);
+      box-shadow:0 4px 12px rgba(163,50,31,.35);
+    }
+    .hero-cta-btn:focus-visible{
+      outline:2px solid var(--cinnabar);
+      outline-offset:2px;
+    }
+    .hero-cta-hint{
+      font-size:11px;
+      color:var(--ink-muted);
+      letter-spacing:1px;
+    }
+
+    /* ============ 1.8.0 可折叠传播包 pack-collapsible ============ */
+    .pack-collapsible{
+      border:1px solid var(--border);
+      border-radius:4px;
+      margin-bottom:8px;
+      background:rgba(255,255,255,.4);
+      transition:background .2s, border-color .2s;
+      overflow:hidden;
+    }
+    .pack-collapsible:hover{
+      background:rgba(255,255,255,.65);
+      border-color:var(--border-strong);
+    }
+    .pack-collapsible-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 14px;
+      cursor:pointer;
+      user-select:none;
+      height:40px;
+      box-sizing:border-box;
+    }
+    .pack-collapsible-title{
+      font-family:"ZCOOL XiaoWei",serif;
+      font-size:13px;
+      letter-spacing:2px;
+      color:var(--ink);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .pack-collapsible-title::before{
+      content:"";
+      width:4px;height:4px;
+      border-radius:50%;
+      background:var(--cinnabar);
+      opacity:.6;
+    }
+    .pack-collapsible-arrow{
+      font-size:12px;
+      color:var(--ink-muted);
+      transition:transform .25s ease;
+      line-height:1;
+    }
+    .pack-collapsible.open .pack-collapsible-arrow{
+      transform:rotate(180deg);
+    }
+    .pack-collapsible-body{
+      max-height:0;
+      overflow:hidden;
+      transition:max-height .35s ease;
+    }
+    .pack-collapsible.open .pack-collapsible-body{
+      max-height:3000px;
+    }
+    .pack-collapsible-inner{
+      padding:0 14px 14px;
+    }
+
+    /* 1.8.0 响应式：900px hero 卡片保持左右布局 */
+    @media(max-width:900px){
+      .hero-case-card{grid-template-columns:120px 1fr;gap:14px;padding:14px;}
+      .hero-cover{width:120px;height:170px;}
+      .hero-cover-title{font-size:18px;letter-spacing:4px;right:14px;}
+      .hero-title{font-size:18px;letter-spacing:1px;}
+      .hero-summary{font-size:12px;-webkit-line-clamp:3;}
+      .hero-cta-btn{padding:8px 16px;font-size:12px;letter-spacing:1px;}
+    }
+    /* 1.8.0 响应式：390px hero 卡片上下布局 */
+    @media(max-width:390px){
+      .hero-case-card{grid-template-columns:1fr;gap:12px;padding:12px;}
+      .hero-cover{width:100%;height:140px;}
+      .hero-cover-title{writing-mode:horizontal-tb;text-orientation:mixed;right:auto;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;letter-spacing:6px;}
+      .hero-cover-dynasty{writing-mode:horizontal-tb;text-orientation:mixed;top:10px;left:12px;}
+      .hero-cover-seal{bottom:10px;left:auto;right:12px;transform:rotate(6deg);}
+      .hero-title{font-size:17px;letter-spacing:1px;}
+      .hero-summary{font-size:12px;-webkit-line-clamp:3;}
+      .hero-storyboard-thumbs{gap:6px;}
+      .hero-thumb{height:34px;}
+      .hero-cta-btn{padding:9px 18px;font-size:12px;letter-spacing:1px;}
+      .pack-collapsible-header{padding:9px 12px;height:38px;}
+      .pack-collapsible-title{font-size:12px;letter-spacing:1px;}
+      .pack-collapsible-inner{padding:0 12px 12px;}
+    }
 
     /* ============ 3. 传播包结构（1.7.0：已收敛进 .case-products > .pack-section） ============ */
     .pack-section{
@@ -2339,30 +2609,102 @@
 
         <!-- 右·产物 -->
         <div class="case-products" id="caseCategories">
+          <!-- 主案例预览卡 -->
+          <div class="hero-case-card" id="heroCaseCard">
+            <div class="hero-cover" id="heroCover">
+              <div class="hero-cover-dynasty" id="heroCoverDynasty">先秦</div>
+              <div class="hero-cover-title" id="heroCoverTitle">关雎</div>
+              <div class="hero-cover-seal">句</div>
+            </div>
+            <div class="hero-content">
+              <div class="hero-top">
+                <div class="hero-title">
+                  <span id="heroTextLabel">口播稿</span>
+                  <span class="case-badge kaoju" id="heroBadge">考据</span>
+                </div>
+                <div class="hero-summary" id="heroSummary"></div>
+              </div>
+              <div class="hero-storyboard-thumbs" id="heroStoryboardThumbs"></div>
+              <div class="hero-cta">
+                <button type="button" class="hero-cta-btn" id="heroCtaBtn">生成完整传播包</button>
+                <span class="hero-cta-hint">5 类产物一键展开</span>
+              </div>
+            </div>
+          </div>
           <!-- 文字包 -->
-          <div class="pack-section">
-            <h4 class="pack-section-title" id="packSectionTitleText">文字包</h4>
-            <div class="case-cards" id="caseTextCards"></div>
+          <div class="pack-collapsible" data-pack="text">
+            <div class="pack-collapsible-header" onclick="togglePackSection('text')">
+              <span class="pack-collapsible-title" id="packCollapsibleTitleText">文字包</span>
+              <span class="pack-collapsible-arrow">▾</span>
+            </div>
+            <div class="pack-collapsible-body">
+              <div class="pack-collapsible-inner">
+                <div class="pack-section">
+                  <h4 class="pack-section-title" id="packSectionTitleText">文字包</h4>
+                  <div class="case-cards" id="caseTextCards"></div>
+                </div>
+              </div>
+            </div>
           </div>
           <!-- 图片包 -->
-          <div class="pack-section">
-            <h4 class="pack-section-title" id="packSectionTitleImage">图片包</h4>
-            <div class="case-cards" id="caseImageCards"></div>
+          <div class="pack-collapsible" data-pack="image">
+            <div class="pack-collapsible-header" onclick="togglePackSection('image')">
+              <span class="pack-collapsible-title" id="packCollapsibleTitleImage">图片包</span>
+              <span class="pack-collapsible-arrow">▾</span>
+            </div>
+            <div class="pack-collapsible-body">
+              <div class="pack-collapsible-inner">
+                <div class="pack-section">
+                  <h4 class="pack-section-title" id="packSectionTitleImage">图片包</h4>
+                  <div class="case-cards" id="caseImageCards"></div>
+                </div>
+              </div>
+            </div>
           </div>
           <!-- 视频包 -->
-          <div class="pack-section">
-            <h4 class="pack-section-title" id="packSectionTitleVideo">视频包</h4>
-            <div id="caseVideoArea"></div>
+          <div class="pack-collapsible" data-pack="video">
+            <div class="pack-collapsible-header" onclick="togglePackSection('video')">
+              <span class="pack-collapsible-title" id="packCollapsibleTitleVideo">视频包</span>
+              <span class="pack-collapsible-arrow">▾</span>
+            </div>
+            <div class="pack-collapsible-body">
+              <div class="pack-collapsible-inner">
+                <div class="pack-section">
+                  <h4 class="pack-section-title" id="packSectionTitleVideo">视频包</h4>
+                  <div id="caseVideoArea"></div>
+                </div>
+              </div>
+            </div>
           </div>
           <!-- 发布包 -->
-          <div class="pack-section">
-            <h4 class="pack-section-title" id="packSectionTitlePublish">发布包</h4>
-            <div class="publish-pack" id="publishPack"></div>
+          <div class="pack-collapsible" data-pack="publish">
+            <div class="pack-collapsible-header" onclick="togglePackSection('publish')">
+              <span class="pack-collapsible-title" id="packCollapsibleTitlePublish">发布包</span>
+              <span class="pack-collapsible-arrow">▾</span>
+            </div>
+            <div class="pack-collapsible-body">
+              <div class="pack-collapsible-inner">
+                <div class="pack-section">
+                  <h4 class="pack-section-title" id="packSectionTitlePublish">发布包</h4>
+                  <div class="publish-pack" id="publishPack"></div>
+                </div>
+              </div>
+            </div>
           </div>
           <!-- 引用说明 -->
-          <div class="pack-section">
-            <h4 class="pack-section-title">引用说明</h4>
-            <div class="citation-pack" id="citationPack"></div>
+          <div class="pack-collapsible" data-pack="citation">
+            <div class="pack-collapsible-header" onclick="togglePackSection('citation')">
+              <span class="pack-collapsible-title" id="packCollapsibleTitleCitation">引用说明</span>
+              <span class="pack-collapsible-arrow">▾</span>
+            </div>
+            <div class="pack-collapsible-body">
+              <div class="pack-collapsible-inner">
+                <div class="pack-section">
+                  <h4 class="pack-section-title">引用说明</h4>
+                  <div class="citation-pack" id="citationPack"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -3667,6 +4009,18 @@
 
     let currentScenario='video';
 
+    // 1.8.0 切换折叠行
+    function togglePackSection(id){
+      const el=document.querySelector(`.pack-collapsible[data-pack="${id}"]`);
+      if(!el)return;
+      el.classList.toggle('open');
+    }
+    // 1.8.0 展开所有折叠行并滚动
+    function expandAllPacks(){
+      document.querySelectorAll('.pack-collapsible').forEach(el=>el.classList.add('open'));
+      document.getElementById('caseCategories')?.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+
     // 切换场景：更新传播包标签、产物组合（1.7.0：移除 hero 引用，改用 .scenario-tab）
     function switchScenario(scenario){
       if(!scenarioData[scenario])return;
@@ -3685,6 +4039,15 @@
       if(psi)psi.textContent=data.packSectionImage;
       if(psv)psv.textContent=data.packSectionVideo;
       if(psp)psp.textContent=data.packSectionPublish;
+      // 更新折叠行标题
+      const ctt=document.getElementById('packCollapsibleTitleText');
+      const cti=document.getElementById('packCollapsibleTitleImage');
+      const ctv=document.getElementById('packCollapsibleTitleVideo');
+      const ctp=document.getElementById('packCollapsibleTitlePublish');
+      if(ctt)ctt.textContent=data.packSectionText;
+      if(cti)cti.textContent=data.packSectionImage;
+      if(ctv)ctv.textContent=data.packSectionVideo;
+      if(ctp)ctp.textContent=data.packSectionPublish;
       // 更新传播包 meta
       const packMetaEl=document.getElementById('packMeta');
       if(packMetaEl&&caseState.data&&caseState.data.book){
@@ -3694,6 +4057,8 @@
       if(caseState.data){
         renderCaseShowcase(caseState.data);
       }
+      // 1.8.0 场景切换时 hero 卡片 fade
+      animateHeroTransition();
       // 1.7.0 场景切换时产物卡 stagger 过渡
       animatePackTransition();
     }
@@ -3705,7 +4070,60 @@
       {theme:'论语中的学习方法',bookId:'xueer',displayTheme:'论语中的学习方法'}
     ];
 
-    // 渲染案例展示区（1.7.0：移除 hero 同步，新增左栏原文渲染）
+    // 1.8.0 渲染主案例预览卡
+    function renderHeroCaseCard(caseData){
+      const book=caseData.book||books[0];
+      const text=caseData.text;
+      const video=caseData.video;
+      const sc=scenarioData[currentScenario]||scenarioData.video;
+
+      // 封面标题（取书名简称或主题关键词）
+      const bookShort=book.shortTitle||book.title.split('·').pop().trim()||'古籍';
+      const coverTitleEl=document.getElementById('heroCoverTitle');
+      if(coverTitleEl)coverTitleEl.textContent=bookShort;
+
+      // 封面朝代
+      const coverDynastyEl=document.getElementById('heroCoverDynasty');
+      if(coverDynastyEl)coverDynastyEl.textContent=book.dynasty||'待考';
+
+      // 口播稿标题
+      const labelEl=document.getElementById('heroTextLabel');
+      if(labelEl)labelEl.textContent=sc.textLabel||'口播稿';
+
+      // 摘要（vernacular.content 前80字）
+      const summaryEl=document.getElementById('heroSummary');
+      if(summaryEl){
+        const vContent=text?.vernacular?.content||'';
+        summaryEl.textContent=vContent.length>80?vContent.slice(0,80)+'…':vContent;
+      }
+
+      // 考据/演绎标签
+      const badgeEl=document.getElementById('heroBadge');
+      if(badgeEl){
+        const badge=text?.vernacular?.badge||'考据';
+        badgeEl.textContent=badge;
+        badgeEl.className='case-badge '+(badge==='考据'?'kaoju':'yanyi');
+      }
+
+      // 分镜缩略（前3个）
+      const thumbsEl=document.getElementById('heroStoryboardThumbs');
+      if(thumbsEl){
+        const shots=video?.storyboard||[];
+        const firstThree=shots.slice(0,3);
+        if(firstThree.length>0){
+          thumbsEl.innerHTML=firstThree.map((s,i)=>`
+            <div class="hero-thumb">
+              <div class="hero-thumb-title">${escapeHTML(s.title||'')}</div>
+              <div class="hero-thumb-time">${escapeHTML(s.time||'')}</div>
+            </div>
+          `).join('');
+        }else{
+          thumbsEl.innerHTML='';
+        }
+      }
+    }
+
+    // 渲染案例展示区（1.7.0：移除 hero 同步，新增左栏原文渲染；1.8.0：新增 hero 卡片）
     function renderCaseShowcase(caseData){
       const book=caseData.book||books[0];
       const theme=caseData.theme||caseState.theme;
@@ -3729,6 +4147,9 @@
 
       // 来源信息条
       renderCaseSourceBar(book);
+
+      // 1.8.0 主案例预览卡
+      renderHeroCaseCard(caseData);
 
       // 文字类产物
       renderCaseTextCards(caseData.text);
@@ -3837,7 +4258,6 @@
             content=content.slice(0,60)+'...';
           }
         }
-        const isDemo=caseState.status==='completed'&&!ApiClient.BASE_URL;
         return `
           <div class="case-card">
             <div class="case-card-header">
@@ -3847,7 +4267,6 @@
             <div class="case-card-body">${escapeHTML(content).replace(/\n/g,'<br>')}</div>
             <div class="case-card-footer">
               <span class="case-source-tag">${escapeHTML(item.source)}</span>
-              ${isDemo?'<span class="case-status-tag demo">示例数据</span>':''}
             </div>
           </div>
         `;
@@ -4237,6 +4656,23 @@
       }
     }
 
+    // 1.8.0 hero 卡片场景切换 fade
+    function animateHeroTransition(){
+      if(typeof gsap==='undefined'||typeof gsap.to!=='function')return;
+      const hero=document.getElementById('heroCaseCard');
+      if(!hero)return;
+      const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduceMotion){
+        gsap.set(hero,{autoAlpha:1,opacity:1});
+        return;
+      }
+      gsap.killTweensOf(hero);
+      gsap.fromTo(hero,
+        {opacity:0.6},
+        {opacity:1,duration:0.35,ease:'power2.out',overwrite:'auto'}
+      );
+    }
+
     // 1.6.0 GSAP 产品叙事动画 — 仅服务叙事区，不碰阅读器
     function initNarrativeAnimation(){
       if(typeof gsap==='undefined'||typeof gsap.to!=='function'){
@@ -4250,22 +4686,24 @@
         reduceMotion:"(prefers-reduced-motion: reduce)"
       },(ctx)=>{
         const {isDesktop,reduceMotion}=ctx.conditions;
-        // 1.7.0 选择器迁移：从 hero/scenario/metrics/broadcast-pack 改为案卷四段
+        // 1.8.0 选择器：案卷顶栏 → 左卷宗 → hero 卡片 → 折叠行 stagger → 底栏声明
         const blockTargets=['.case-file-header','.case-source','.case-products','.case-declaration'];
 
         if(reduceMotion){
           // 用户偏好减少动效：直接显示，不做任何过渡
-          gsap.set(blockTargets,{autoAlpha:1,y:0});
-          gsap.set('.case-products > *',{autoAlpha:1,y:0});
+          gsap.set(blockTargets,{autoAlpha:1,y:0,opacity:1});
+          gsap.set('.hero-case-card',{autoAlpha:1,y:0,opacity:1});
+          gsap.set('.pack-collapsible',{autoAlpha:1,y:0,opacity:1});
           return;
         }
 
         // 初始隐藏（避免 FOUC），仅用 transform + opacity
         const dy=isDesktop?20:12;
         gsap.set(blockTargets,{autoAlpha:0,y:dy});
-        gsap.set('.case-products > *',{autoAlpha:0,y:isDesktop?14:10});
+        gsap.set('.hero-case-card',{autoAlpha:0,y:isDesktop?16:10});
+        gsap.set('.pack-collapsible',{autoAlpha:0,y:isDesktop?12:8});
 
-        // 主时间线：案卷顶栏 → 左卷宗 → 右产物 → 底栏声明
+        // 主时间线：案卷顶栏 → 左卷宗 → hero 卡片 → 折叠行 stagger → 底栏声明
         const tl=gsap.timeline({
           defaults:{ease:'power3.out',duration:isDesktop?0.6:0.45}
         });
@@ -4276,29 +4714,34 @@
         // 2. 左·卷宗：古籍原文 + 来源信息
         tl.to('.case-source',{autoAlpha:1,y:0},'-=0.3');
 
-        // 3. 右·产物 stagger（文字/图片/视频/发布/引用）
+        // 3. 右·产物容器
         tl.to('.case-products',{autoAlpha:1,y:0},'-=0.25');
-        tl.to('.case-products > *',{
+
+        // 3.1 主案例预览卡
+        tl.to('.hero-case-card',{autoAlpha:1,y:0,duration:0.5},'-=0.15');
+
+        // 3.2 5 个折叠行 stagger
+        tl.to('.pack-collapsible',{
           autoAlpha:1,
           y:0,
-          duration:0.4,
-          stagger:0.08
-        },'-=0.2');
+          duration:0.38,
+          stagger:0.06
+        },'-=0.25');
 
         // 4. 底栏·来源声明
         tl.to('.case-declaration',{autoAlpha:1,y:0},'-=0.15');
 
         return ()=>{
           // matchMedia 切换时清理 inline style，让 CSS 接管
-          gsap.set([...blockTargets,'.case-products > *'],{clearProps:'all'});
+          gsap.set([...blockTargets,'.hero-case-card','.pack-collapsible'],{clearProps:'all'});
         };
       });
     }
 
-    // 1.7.0 场景切换时产物卡 stagger 过渡（替代原 .pack-section）
+    // 1.7.0 场景切换时产物卡 stagger 过渡（1.8.0：作用于 .pack-collapsible）
     function animatePackTransition(){
       if(typeof gsap==='undefined'||typeof gsap.to!=='function')return;
-      const sections=document.querySelectorAll('.case-products > *');
+      const sections=document.querySelectorAll('.pack-collapsible');
       if(!sections.length)return;
       const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(reduceMotion){
@@ -4332,6 +4775,14 @@
       });
       caseState.data=defaultCase;
       renderCaseShowcase(defaultCase);
+
+      // 1.8.0 CTA 按钮：展开所有折叠行并滚动
+      const heroCtaBtn=document.getElementById('heroCtaBtn');
+      if(heroCtaBtn){
+        heroCtaBtn.addEventListener('click',()=>{
+          expandAllPacks();
+        });
+      }
 
       // 事件委托：展开/收起按钮
       document.getElementById('caseCategories').addEventListener('click',(e)=>{
