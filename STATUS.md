@@ -83,11 +83,12 @@
 - 平台：GitHub Pages（Static HTML workflow）
 - 地址：https://wmglimpser-hash.github.io/btool/
 - 分支：main
-- 当前推送 HEAD：`9ad5c42`（docs: STATUS.md 更新1.8.0部署信息+里程碑）
+- 线上已验证版本：**1.8.0**
+- 线上已验证 HEAD：`a4bf43b`（fix: 1.8.0 收口 - 选择器修正+示例标签弱化+部署HEAD更新）
 - 主体功能 commit：`e2b8187`（feat: D11 主案例优先 + 折叠传播包 1.8.0）
-- 推送时间：2026-07-05
-- Pages 部署状态：待 GitHub Actions 完成后验证
-- 上一版线上验证：**1.7.0** commit `a13db2d`（run success）
+- GitHub Pages run：https://github.com/wmglimpser-hash/btool/actions/runs/28714666122（completed · success）
+- 验证时间：2026-07-05
+- 线上验证结果：hero-case-card / 5个pack-collapsible / CTA / 封面 / 分镜缩略 全部存在；无单卡示例数据标签；pageerror=0
 
 ---
 
