@@ -3854,8 +3854,8 @@
           return this._fallbackCase(payload);
         }
 
-        // 方案 A：OpenAI 兼容 LLM 直连（检测路径中含 /v1 或配置了 API Key）
-        if(this.BASE_URL.includes('/v1')||(this.API_KEY&&!this.BASE_URL.includes('/api/'))){
+        // 方案 A：OpenAI 兼容 LLM 直连（BASE_URL 含 /v1）
+        if(this.isLLMMode()){
           return this._generateWithLLM(payload);
         }
 
@@ -3872,6 +3872,20 @@
           console.error('[api] case/generate 失败',e);
           throw e;
         }
+      },
+
+      // 判断是否为 LLM 直连模式（OpenAI /v1 兼容接口）
+      // LLM 模式仅启用文字真实生成，图片/视频保留示例降级
+      // 必须含 /v1 路径才判定为 LLM 模式，避免误判后端 API 服务
+      isLLMMode(){
+        if(!this.BASE_URL)return false;
+        return this.BASE_URL.includes('/v1');
+      },
+
+      // 判断是否为后端 API 模式（/api/ 服务，支持图片/视频生成）
+      isBackendMode(){
+        if(!this.BASE_URL)return false;
+        return !this.isLLMMode();
       },
 
       async _generateWithLLM(payload){
@@ -4448,7 +4462,8 @@ ${(payload.text||book.text||'').slice(0,3000)}
         const statusClass=status==='demo'||status==='demo-preview'?'idle':status==='completed'?'done':status==='generating'?'loading':status==='failed'?'failed':'idle';
 
         let actionBtn='';
-        if(ApiClient.BASE_URL){
+        // 只有后端 API 模式才显示图片生成按钮；LLM 直连模式保留示例降级
+        if(ApiClient.isBackendMode()){
           if(status==='demo'||status==='demo-preview'){
             actionBtn=`<button class="generate-btn" data-action="generate-image" data-key="${item.key}">生成</button>`;
           }else if(status==='failed'){
@@ -4509,7 +4524,8 @@ ${(payload.text||book.text||'').slice(0,3000)}
 
       let statusBar='';
       let actionBtn='';
-      if(ApiClient.BASE_URL){
+      // 只有后端 API 模式才显示视频生成按钮；LLM 直连模式保留示例降级
+      if(ApiClient.isBackendMode()){
         if(status==='demo'){
           actionBtn=`<button class="generate-btn" data-action="generate-video">生成视频</button>`;
         }else if(status==='failed'){
@@ -4629,16 +4645,40 @@ ${(payload.text||book.text||'').slice(0,3000)}
           renderCaseShowcase(fallback);
           updateApiStatus('示例数据 · 配置 API 后可真实生成');
         }else{
-          // 有后端失败时显示错误+重试按钮
+          // 有后端失败时：保留 hero-case-card 和 5 个 pack-collapsible DOM 结构
+          // 只在文字包区域显示失败状态和重试按钮
           caseState.status='failed';
           updateApiStatus('生成失败 · 点击重试');
-          const errorHtml=`
-            <div style="grid-column:1/-1;padding:20px;text-align:center">
-              <div class="case-status-tag failed" style="margin-bottom:10px">生成失败：${escapeHTML(e.message)}</div>
-              <button class="generate-btn" onclick="generateCaseWithTheme('${escapeHTML(theme.replace(/'/g,"\\'"))}')">重试</button>
-            </div>
-          `;
-          document.getElementById('caseCategories').innerHTML=errorHtml;
+
+          // 主案例卡摘要区域显示失败提示
+          const summaryEl=document.getElementById('heroSummary');
+          if(summaryEl){
+            summaryEl.textContent='生成失败，请点击重试';
+          }
+
+          // 展开文字包折叠行，让失败状态和重试按钮可见
+          const textPack=document.querySelector('.pack-collapsible[data-pack="text"]');
+          if(textPack)textPack.classList.add('open');
+
+          // 文字包区域显示失败状态 + 重试按钮（不替换整个 caseCategories）
+          const textCardsEl=document.getElementById('caseTextCards');
+          if(textCardsEl){
+            const safeTheme=theme.replace(/'/g,"\\'");
+            textCardsEl.innerHTML=`
+              <div class="case-card" style="border-color:var(--cinnabar)">
+                <div class="case-card-header">
+                  <span class="case-card-title">生成失败</span>
+                  <span class="case-badge yanyi">失败</span>
+                </div>
+                <div class="case-card-body" style="color:var(--cinnabar)">${escapeHTML(e.message||'未知错误')}</div>
+                <div class="case-card-footer">
+                  <button class="generate-btn" onclick="generateCaseWithTheme('${escapeHTML(safeTheme)}')">重试</button>
+                </div>
+              </div>
+            `;
+          }
+
+          // 图片/视频区域保持当前状态（demo 预览），不替换
         }
       }
     }
