@@ -1,0 +1,20 @@
+const { chromium } = require('playwright');
+const fs = require('fs');
+const path = require('path');
+const tag = process.argv[2] || 'after';
+const outDir = 'E:\\Projects\\btool\\screenshots';
+if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+(async () => {
+  const browser = await chromium.launch({ headless:true, executablePath:'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' });
+  const page = await browser.newPage({ viewport:{ width:1280, height:900 } });
+  await page.goto('http://localhost:8770/index.html', { waitUntil:'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: path.join(outDir, `desktop-${tag}.png`), fullPage:false });
+  await page.screenshot({ path: path.join(outDir, `desktop-${tag}-full.png`), fullPage:true });
+  const m = await browser.newPage({ viewport:{ width:390, height:844 } });
+  await m.goto('http://localhost:8770/index.html', { waitUntil:'networkidle' });
+  await m.waitForTimeout(1500);
+  await m.screenshot({ path: path.join(outDir, `mobile-${tag}.png`), fullPage:false });
+  await browser.close();
+  console.log('done:', outDir, tag);
+})();

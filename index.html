@@ -11,20 +11,75 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" onerror="var s=document.createElement('script');s.src='https://unpkg.com/gsap@3.12.5/dist/gsap.min.js';s.onerror=function(){console.warn('[gsap] 加载失败，跳过产品叙事动画');};document.head.appendChild(s);"></script>
   <style>
     :root{
-      --paper:#f7f3e9;
-      --paper-dark:#efe8d8;
-      --paper-deep:#e8dfca;
-      --ink:#1a1410;
-      --ink-light:#5c4d3c;
-      --ink-muted:#8a7b6a;
-      --cinnabar:#a3321f;
-      --cinnabar-dark:#7a2416;
-      --cinnabar-light:rgba(163,50,31,.12);
+      /* 色阶 3 级（纸面层级） */
+      --surface-bg:#f0ead9;
+      --surface-desk:#f7f3e9;
+      --surface-paper:#fbf8f0;
+      --surface-float:#ffffff;
+
+      /* 墨色 3 级 */
+      --ink-1:#1a1410;
+      --ink-2:#5c4d3c;
+      --ink-3:#8a7b6a;
+
+      /* 功能色（克制使用） */
+      --accent:#a3321f;
+      --accent-dark:#7a2416;
+      --accent-light:rgba(163,50,31,.1);
       --gold:#b8941f;
       --green:#3a6b4a;
-      --green-light:rgba(58,107,74,.12);
+      --green-light:rgba(58,107,74,.1);
+
+      /* 字阶 4 级 */
+      --fs-title:22px;
+      --fs-heading:15px;
+      --fs-body:13px;
+      --fs-caption:11px;
+
+      /* 字距归正 */
+      --ls-title:2px;
+      --ls-heading:1px;
+      --ls-body:0;
+      --ls-caption:0.5px;
+
+      /* 间距 8px 基点 */
+      --sp-xs:4px;
+      --sp-sm:8px;
+      --sp-md:16px;
+      --sp-lg:24px;
+      --sp-xl:32px;
+
+      /* 阴影 3 级（纸面层次） */
+      --shadow-inset:inset 0 1px 0 rgba(255,255,255,.6);
+      --shadow-sm:0 1px 2px rgba(26,20,16,.06), 0 2px 6px rgba(26,20,16,.04);
+      --shadow-md:0 2px 6px rgba(26,20,16,.08), 0 6px 18px rgba(26,20,16,.06);
+      --shadow-lg:0 4px 12px rgba(26,20,16,.1), 0 12px 32px rgba(26,20,16,.08);
+
+      /* 分隔线（淡墨） */
+      --divider:linear-gradient(90deg, transparent, rgba(26,20,16,.1) 10%, rgba(26,20,16,.1) 90%, transparent);
+      --divider-v:linear-gradient(180deg, transparent, rgba(26,20,16,.08) 15%, rgba(26,20,16,.08) 85%, transparent);
+
+      /* 圆角 3 级（册页感，不圆） */
+      --r-sm:1px;
+      --r-md:2px;
+      --r-lg:3px;
+
+      /* 组件高度 3 级 */
+      --h-sm:28px;
+      --h-md:34px;
+      --h-lg:40px;
+
+      /* 兼容旧变量（逐步迁移） */
+      --paper:var(--surface-desk);
+      --paper-dark:#efe8d8;
+      --paper-deep:#e8dfca;
+      --ink:var(--ink-1);
+      --ink-light:var(--ink-2);
+      --ink-muted:var(--ink-3);
+      --cinnabar:var(--accent);
+      --cinnabar-dark:var(--accent-dark);
+      --cinnabar-light:var(--accent-light);
       --shadow:0 12px 40px rgba(26,20,16,.15);
-      --shadow-sm:0 4px 12px rgba(26,20,16,.1);
       --border:rgba(26,20,16,.12);
       --border-strong:rgba(26,20,16,.2);
     }
@@ -32,9 +87,12 @@
     html{scroll-behavior:smooth}
     body{
       font-family:"Noto Serif SC",serif;
-      background:var(--paper);
-      color:var(--ink);
-      line-height:1.8;
+      background:
+        radial-gradient(ellipse at 12% 18%, rgba(139,69,19,.06) 0%, transparent 55%),
+        radial-gradient(ellipse at 88% 82%, rgba(139,69,19,.05) 0%, transparent 50%),
+        var(--surface-bg);
+      color:var(--ink-1);
+      line-height:1.75;
       min-height:100vh;
       position:relative;
       overflow-x:hidden;
@@ -1349,46 +1407,52 @@
     .scenario-tabs{
       display:flex;
       gap:2px;
-      background:rgba(26,20,16,.03);
+      background:rgba(26,20,16,.04);
       border:none;
       border-radius:2px;
       padding:3px;
+      height:34px;
+      box-sizing:border-box;
     }
     .scenario-tab{
       background:transparent;
       border:none;
-      padding:7px 15px;
+      padding:0 14px;
+      height:28px;
       font-family:"ZCOOL XiaoWei",serif;
-      font-size:13px;
-      color:var(--ink-light);
+      font-size:12px;
+      color:var(--ink-2);
       cursor:pointer;
-      letter-spacing:3px;
-      border-radius:2px;
-      transition:color .2s, background .2s;
+      letter-spacing:2px;
+      border-radius:1px;
+      transition:all .2s;
       white-space:nowrap;
+      display:inline-flex;
+      align-items:center;
     }
-    .scenario-tab:hover{color:var(--ink);background:rgba(255,255,255,.3)}
+    .scenario-tab:hover{color:var(--ink-1);background:rgba(255,255,255,.4)}
     .scenario-tab.active{
       color:#fff;
-      background:var(--cinnabar);
-      box-shadow:inset 0 0 0 2px rgba(255,255,255,.15);
+      background:var(--ink-1);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);
     }
     .case-file-settings{
       display:flex;
       align-items:center;
       gap:5px;
-      background:rgba(255,255,255,.3);
+      background:rgba(255,255,255,.35);
       border:none;
-      padding:6px 12px;
+      height:34px;
+      padding:0 12px;
       font-family:"ZCOOL XiaoWei",serif;
       font-size:12px;
-      color:var(--ink-light);
+      color:var(--ink-2);
       cursor:pointer;
       border-radius:2px;
       letter-spacing:2px;
       transition:all .2s;
     }
-    .case-file-settings:hover{background:rgba(163,50,31,.06);color:var(--cinnabar)}
+    .case-file-settings:hover{background:rgba(26,20,16,.06);color:var(--ink-1)}
     .case-file-settings svg{width:14px;height:14px}
     .case-file-config{margin:0;position:relative}
     .case-file-config .api-config-panel{
@@ -1840,10 +1904,11 @@
     @keyframes loadingPulse{0%,100%{opacity:.4}50%{opacity:1}}
 
     .generate-btn{
-      padding:4px 12px;
+      height:28px;
+      padding:0 12px;
       border:none;
-      background:rgba(163,50,31,.08);
-      color:var(--cinnabar);
+      background:rgba(26,20,16,.06);
+      color:var(--ink-2);
       border-radius:1px;
       font-family:"ZCOOL XiaoWei",serif;
       font-size:11px;
@@ -1851,14 +1916,15 @@
       transition:all .2s;
       letter-spacing:2px;
       position:relative;
+      display:inline-flex;
+      align-items:center;
     }
     .generate-btn:hover{
-      background:var(--cinnabar);
+      background:var(--ink-1);
       color:#fff;
-      box-shadow:0 1px 4px rgba(163,50,31,.25);
     }
     .generate-btn:focus-visible{
-      outline:2px solid var(--cinnabar);
+      outline:2px solid var(--ink-1);
       outline-offset:2px;
     }
 
@@ -2036,20 +2102,23 @@
       margin-bottom:10px;
     }
     .theme-preset{
-      padding:5px 12px;
+      height:28px;
+      padding:0 12px;
       border:none;
       background:rgba(255,255,255,.35);
-      color:var(--ink-light);
-      border-radius:2px;
+      color:var(--ink-2);
+      border-radius:1px;
       font-family:"ZCOOL XiaoWei",serif;
       font-size:12px;
       cursor:pointer;
       transition:all .2s;
       letter-spacing:1px;
+      display:inline-flex;
+      align-items:center;
     }
     .theme-preset:hover{
-      color:var(--cinnabar);
-      background:rgba(163,50,31,.06);
+      color:var(--ink-1);
+      background:rgba(255,255,255,.55);
     }
     .api-status-indicator{
       font-size:11px;
@@ -2248,30 +2317,33 @@
     /* 1.7.0：原 hero-narrative / scenario-entry / metrics-strip 已收敛进 .case-file，样式见上 */
 
 
-    /* ============ 1.8.0 主案例预览卡 hero-case-card（案台文稿） ============ */
+    /* ============ 1.8.0 主案例预览卡 hero-case-card（浮起·成品感） ============ */
     .hero-case-card{
       display:grid;
       grid-template-columns:140px 1fr;
       gap:18px;
       padding:18px 20px;
       background:
-        linear-gradient(135deg, rgba(255,255,255,.6) 0%, rgba(247,243,233,.4) 100%),
-        radial-gradient(ellipse at 85% 15%, rgba(139,69,19,.04) 0%, transparent 40%);
+        linear-gradient(135deg, rgba(255,255,255,.95) 0%, rgba(251,248,240,.8) 100%),
+        radial-gradient(ellipse at 85% 12%, rgba(139,69,19,.05) 0%, transparent 40%);
+      background-color:var(--surface-float);
       border:none;
-      border-radius:2px;
-      margin-bottom:14px;
+      border-radius:3px;
+      margin-bottom:16px;
       position:relative;
       overflow:visible;
+      transform:translateY(-2px);
       box-shadow:
-        0 1px 3px rgba(26,20,16,.06),
-        0 3px 8px rgba(26,20,16,.04);
+        0 2px 6px rgba(26,20,16,.08),
+        0 8px 24px rgba(26,20,16,.1),
+        0 16px 48px rgba(26,20,16,.08);
     }
     .hero-case-card::before{
       content:"";
       position:absolute;
       top:0;left:0;
       width:4px;height:100%;
-      background:linear-gradient(180deg, var(--cinnabar) 0%, rgba(163,50,31,.4) 100%);
+      background:linear-gradient(180deg, var(--accent) 0%, rgba(163,50,31,.4) 100%);
       border-radius:2px 0 0 2px;
     }
     .hero-case-card::after{
@@ -2358,7 +2430,7 @@
       font-family:"ZCOOL XiaoWei",serif;
       font-size:20px;
       letter-spacing:2px;
-      color:var(--ink);
+      color:var(--ink-1);
       line-height:1.4;
       display:flex;
       align-items:center;
@@ -2372,12 +2444,13 @@
     }
     .hero-summary{
       font-size:13px;
-      line-height:1.8;
-      color:var(--ink-light);
+      line-height:1.75;
+      color:var(--ink-2);
       display:-webkit-box;
       -webkit-line-clamp:3;
       -webkit-box-orient:vertical;
       overflow:hidden;
+      letter-spacing:0;
     }
     .hero-storyboard-thumbs{
       display:flex;
@@ -2479,18 +2552,34 @@
       box-sizing:border-box;
       position:relative;
     }
+    .pack-collapsible-left{
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+      min-width:0;
+      flex:1;
+    }
+    .pack-collapsible-summary{
+      font-size:11px;
+      color:var(--ink-3);
+      letter-spacing:0.5px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      flex:1;
+    }
     .pack-collapsible-header::before{
       content:"";
       position:absolute;
       left:0;top:50%;
       transform:translateY(-50%);
       width:3px;height:16px;
-      background:var(--cinnabar);
+      background:var(--ink-2);
       border-radius:1px;
-      opacity:.5;
+      opacity:.4;
       transition:opacity .2s;
     }
-    .pack-collapsible:hover .pack-collapsible-header::before{opacity:1}
+    .pack-collapsible:hover .pack-collapsible-header::before{opacity:.8}
     .pack-collapsible-title{
       font-family:"ZCOOL XiaoWei",serif;
       font-size:13px;
@@ -2541,23 +2630,25 @@
       .hero-summary{font-size:12px;-webkit-line-clamp:3;}
       .hero-cta-btn{padding:8px 16px;font-size:12px;letter-spacing:1px;}
     }
-    /* 1.8.0 响应式：390px hero 卡片上下布局 */
+    /* 1.8.0 响应式：390px hero 卡片上下布局（空书封降权） */
     @media(max-width:390px){
-      .hero-case-card{grid-template-columns:1fr;gap:8px;padding:8px;margin-bottom:10px;}
-      .hero-cover{width:100%;height:80px;}
-      .hero-cover-title{writing-mode:horizontal-tb;text-orientation:mixed;right:auto;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18px;letter-spacing:3px;}
-      .hero-cover-dynasty{writing-mode:horizontal-tb;text-orientation:mixed;top:6px;left:8px;font-size:8px;}
-      .hero-cover-seal{bottom:6px;left:auto;right:8px;transform:rotate(6deg);width:24px;height:24px;font-size:10px;}
-      .hero-title{font-size:15px;letter-spacing:1px;line-height:1.3;}
+      .hero-case-card{grid-template-columns:1fr;gap:6px;padding:8px;margin-bottom:10px;}
+      .hero-cover{width:100%;height:56px;opacity:.7;filter:saturate(.8);}
+      .hero-cover-title{writing-mode:horizontal-tb;text-orientation:mixed;right:auto;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;letter-spacing:2px;}
+      .hero-cover-dynasty{writing-mode:horizontal-tb;text-orientation:mixed;top:5px;left:6px;font-size:7px;}
+      .hero-cover-seal{bottom:5px;left:auto;right:6px;transform:rotate(6deg);width:20px;height:20px;font-size:9px;}
+      .hero-title{font-size:14px;letter-spacing:1px;line-height:1.3;}
       .hero-summary{font-size:10px;-webkit-line-clamp:2;line-height:1.6;}
       .hero-storyboard-thumbs{gap:4px;margin-top:0;}
-      .hero-thumb{height:26px;}
-      .hero-thumb-time{font-size:7px;padding:0 2px;}
-      .hero-thumb-title{font-size:8px;top:2px;left:4px;right:4px;}
-      .hero-cta{padding-top:6px;gap:8px;}
-      .hero-cta-btn{padding:6px 12px;font-size:10px;letter-spacing:1px;}
+      .hero-thumb{height:22px;}
+      .hero-thumb-time{font-size:6px;padding:0 2px;}
+      .hero-thumb-title{font-size:7px;top:2px;left:4px;right:4px;}
+      .hero-cta{padding-top:4px;gap:6px;}
+      .hero-cta-btn{padding:5px 10px;font-size:10px;letter-spacing:1px;}
+      .hero-cta-hint{font-size:9px;}
       .pack-collapsible-header{padding:6px 8px;height:34px;}
-      .pack-collapsible-title{font-size:10px;letter-spacing:1px;}
+      .pack-collapsible-title{font-size:11px;letter-spacing:1px;}
+      .pack-collapsible-summary{display:none;}
       .pack-collapsible-inner{padding:0 8px 8px;}
     }
 
@@ -2821,7 +2912,10 @@
           <!-- 文字包 -->
           <div class="pack-collapsible" data-pack="text">
             <div class="pack-collapsible-header" onclick="togglePackSection('text')">
-              <span class="pack-collapsible-title" id="packCollapsibleTitleText">文字包</span>
+              <div class="pack-collapsible-left">
+                <span class="pack-collapsible-title" id="packCollapsibleTitleText">文字包</span>
+                <span class="pack-collapsible-summary" id="packSummaryText">口播稿 · 小红书文案 · 白话解读</span>
+              </div>
               <span class="pack-collapsible-arrow">▾</span>
             </div>
             <div class="pack-collapsible-body">
@@ -2836,7 +2930,10 @@
           <!-- 图片包 -->
           <div class="pack-collapsible" data-pack="image">
             <div class="pack-collapsible-header" onclick="togglePackSection('image')">
-              <span class="pack-collapsible-title" id="packCollapsibleTitleImage">图片包</span>
+              <div class="pack-collapsible-left">
+                <span class="pack-collapsible-title" id="packCollapsibleTitleImage">图片包</span>
+                <span class="pack-collapsible-summary" id="packSummaryImage">金句卡 · 海报 · 配图提示词</span>
+              </div>
               <span class="pack-collapsible-arrow">▾</span>
             </div>
             <div class="pack-collapsible-body">
@@ -2851,7 +2948,10 @@
           <!-- 视频包 -->
           <div class="pack-collapsible" data-pack="video">
             <div class="pack-collapsible-header" onclick="togglePackSection('video')">
-              <span class="pack-collapsible-title" id="packCollapsibleTitleVideo">视频包</span>
+              <div class="pack-collapsible-left">
+                <span class="pack-collapsible-title" id="packCollapsibleTitleVideo">视频包</span>
+                <span class="pack-collapsible-summary" id="packSummaryVideo">60秒分镜 · 口播逐字稿 · BGM建议</span>
+              </div>
               <span class="pack-collapsible-arrow">▾</span>
             </div>
             <div class="pack-collapsible-body">
@@ -2866,7 +2966,10 @@
           <!-- 发布包 -->
           <div class="pack-collapsible" data-pack="publish">
             <div class="pack-collapsible-header" onclick="togglePackSection('publish')">
-              <span class="pack-collapsible-title" id="packCollapsibleTitlePublish">发布包</span>
+              <div class="pack-collapsible-left">
+                <span class="pack-collapsible-title" id="packCollapsibleTitlePublish">发布包</span>
+                <span class="pack-collapsible-summary" id="packSummaryPublish">发布时间 · 话题标签 · 互动引导</span>
+              </div>
               <span class="pack-collapsible-arrow">▾</span>
             </div>
             <div class="pack-collapsible-body">
@@ -2881,7 +2984,10 @@
           <!-- 引用说明 -->
           <div class="pack-collapsible" data-pack="citation">
             <div class="pack-collapsible-header" onclick="togglePackSection('citation')">
-              <span class="pack-collapsible-title" id="packCollapsibleTitleCitation">引用说明</span>
+              <div class="pack-collapsible-left">
+                <span class="pack-collapsible-title" id="packCollapsibleTitleCitation">引用说明</span>
+                <span class="pack-collapsible-summary">原文出处 · 版本信息 · 引用规范</span>
+              </div>
               <span class="pack-collapsible-arrow">▾</span>
             </div>
             <div class="pack-collapsible-body">
